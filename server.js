@@ -10,5 +10,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Lance le serveur sur le port 3000
 app.listen(PORT, () => {
-  console.log(`Server is running : https://localhost:${PORT}`);
+  console.log(`Server is running : http://localhost:${PORT}`);
 });
