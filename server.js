@@ -1,8 +1,14 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const PORT = 3000;
+const bodyParser = require('body-parser');
+const path = require("path");
+
+// Middleware
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Lance le serveur sur le port 3000
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running : https://localhost:${PORT}`);
 });
