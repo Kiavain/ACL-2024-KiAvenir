@@ -2,8 +2,9 @@
   "name": "kiavenir",
   "version": "1.0.0",
   "description": "Prévoir l'avenir avec KiAvenir !",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "authors": [
@@ -14,5 +15,10 @@
     "KHOUALED Rayan",
     "WIECZOREK Thomas"
   ],
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.0",
+    "sequelize": "^6.37.3"
+  }
 }
