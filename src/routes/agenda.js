@@ -1,4 +1,4 @@
-import Routeur from "../structure/Routeur.js";
+import Routeur from "../structures/Routeur.js";
 
 /**
  * Les routes liées à la page de l'agenda
