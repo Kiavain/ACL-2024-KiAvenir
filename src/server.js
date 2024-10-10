@@ -9,10 +9,33 @@ import Database from "./components/Database.js";
  * Représente le serveur de l'application
  */
 class KiAvenir {
+  /**
+   * Construit le serveur de l'application
+   * @constructor
+   */
   constructor() {
+    /**
+     * L'application
+     * @type {import('express').Express}
+     */
     this.app = express();
+
+    /**
+     * Le port du serveur
+     * @type {number} Le port du serveur
+     */
     this.PORT = 3000;
+
+    /**
+     * Les routes de l'application
+     * @type {Array<Object>}
+     */
     this.routes = [];
+
+    /**
+     * La base de données de l'application
+     * @type {Database}
+     */
     this.database = new Database(this);
   }
 
@@ -30,7 +53,7 @@ class KiAvenir {
 
   /**
    * Construit les routes de l'application
-   * @returns {Promise<void>} - Une promesse
+   * @returns {Promise<void>} Une promesse
    */
   async buildRoutes() {
     await this.init();
@@ -44,7 +67,7 @@ class KiAvenir {
 
   /**
    * Initialise les routes de l'application
-   * @returns {Promise<void>} - Une promesse
+   * @returns {Promise<void>} Une promesse
    */
   async initRoutes() {
     await this.buildRoutes();
@@ -56,7 +79,7 @@ class KiAvenir {
 
   /**
    * Démarre le serveur
-   * @returns {Promise<void>} - Une promesse
+   * @returns {Promise<void>} Une promesse
    */
   async start() {
     await this.initRoutes();
