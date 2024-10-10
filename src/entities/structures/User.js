@@ -17,18 +17,19 @@ export default class User extends EntityStructures {
      * @type {String}
      */
     this.id = data.id;
+    this.username = data.username;
 
     /**
      * The language of the user
      * @type {String}
      */
-    this.lang = data.lang;
+    this.email = data.email;
 
     /**
      * The money of the user
      * @type {Number}
      */
-    this.money = data.money;
+    this.salt = data.salt;
 
     /**
      * The date when the user is created

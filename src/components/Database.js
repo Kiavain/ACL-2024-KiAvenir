@@ -1,8 +1,7 @@
 import { Sequelize } from "sequelize";
-import fs from "fs/promises";
+import { fileURLToPath } from "url";
 import path from "path";
-import { getDirname } from "../utils/index.js";
-
+import fs from "fs/promises";
 /**
  * Représente la base de données
  */
@@ -43,8 +42,12 @@ export default class Database {
       }
     });
 
+    // Convertir import.meta.url en chemin de fichier valide
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
     // Récupère les fichiers des entités
-    const modelsPath = path.join(getDirname(import.meta.url), "../entities");
+    const modelsPath = path.join(__dirname, "../entities");
     const modelsFiles = await fs.readdir(modelsPath);
 
     for (const file of modelsFiles) {

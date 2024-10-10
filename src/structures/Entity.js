@@ -4,6 +4,12 @@ import { Op } from "sequelize";
  * Représente une table de la base de données.
  */
 export default class Entity {
+  /**
+   * Constuire une nouvelle table
+   * @param server {KiAvenir} - Le serveur
+   * @param definition {Object} - La définition de la table
+   * @param options {Object} - Les options
+   */
   constructor(server, definition = {}, options = {}) {
     this.server = server;
     this.cache = new Map();
