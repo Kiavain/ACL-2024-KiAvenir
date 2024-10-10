@@ -1,25 +1,29 @@
 import { Router } from "express";
 import path from "path";
-import { fileURLToPath } from "url";
+import { getDirname } from "../utils/index.js";
 
 /**
  * Représente la structure d'un routeur.
  * Correspond à l'élément qui va gérer les routes.
  */
 class Routeur {
+  /**
+   * Construit le routeur
+   * @constructor
+   */
   constructor() {
     this.router = Router();
-    this.__dirname = path.dirname(fileURLToPath(import.meta.url));
     this.build();
   }
 
   /**
    * Récupère le chemin d'un fichier dans le dossier public
-   * @param file {string} - Le nom du fichier
-   * @returns {string} - Le chemin du fichier
+   * @param file {string} Le nom du fichier
+   * @returns {string} Le chemin du fichier
    */
   getPathInHTML(file) {
-    return path.join(this.__dirname, "../public/html/", file);
+    const __dirname = getDirname(import.meta.url);
+    return path.join(__dirname, "../public/html/", file);
   }
 
   /**
@@ -27,7 +31,7 @@ class Routeur {
    */
   build() {
     throw new Error(
-      "Oubli d'implémentation de la méthode 'main' dans une route !"
+      "Oubli d'implémentation de la méthode 'build' dans une route !"
     );
   }
 }
