@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+  <title>KiAvenir - Inscription</title>
+</head>
+<body>
+    <h1>KiAvenir</h1>
+
+    <form name="accountCreation" action="/account/new" method="POST">
+        <table>
+            <tbody>
+                <tr>
+                    <td><label for="username">Entrez le nom d'utilisateur</label></td>
+                    <td><input name="username" value="<%= locals.username ?? '' %>" /></td>
+                    <td><label><%= locals.message ?? '' %></label></td>
+                </tr>
+                <tr>
+                    <td><label for="password">Entrez le mot de passe</label></td>
+                    <td><input type="password" name="password" value="" /></td>
+                    <td><label id="passwordMessage"></label></td>
+                </tr>
+                <tr>
+                    <td><label for="passwordRepeated">Confirmez le mot de passe</label></td>
+                    <td><input type="password" id="passwordRepeated" value="" /></td>
+                    <td><label id="passwordRepeatedMessage"></label></td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <input type="submit" value="Créer un compte"/>
+        </div>
+    </form>
+
+
+    <script src="/js/hash.js"></script>
+    <script>
+        let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
+
+        const accountForm = document.forms.accountCreation;
+
+        accountForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            validateAccountCreation();
+        });
+
+        async function validateAccountCreation() {
+            // ...
+        }
+    </script>
+</body>
+
+</html>
