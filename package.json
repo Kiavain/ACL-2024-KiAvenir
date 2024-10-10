@@ -2,10 +2,10 @@
   "name": "kiavenir",
   "version": "0.0.1",
   "description": "Prévoir l'avenir avec KiAvenir !",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "run": "npm install && node server.js",
-    "start": "node server.js",
+    "run": "npm install && node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "authors": [
