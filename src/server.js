@@ -23,6 +23,8 @@ class KiAvenir {
     const dirname = getDirname(import.meta.url);
     this.app.use(bodyParser.json());
     this.app.use(express.static(path.join(dirname, "public")));
+    this.app.set("views", path.join(dirname, "public/views"));
+    this.app.set("view engine", "ejs");
 
     await this.database.load();
     console.log("Base de données chargée !");
