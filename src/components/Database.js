@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize";
-import { fileURLToPath } from "url";
-import path from "path";
 import fs from "fs/promises";
+import { getDirname } from "../utils/index.js";
+import { fileURLToPath, pathToFileURL } from "url";
+import path from "path";
+
 /**
  * Représente la base de données
  */
@@ -42,12 +44,8 @@ export default class Database {
       }
     });
 
-    // Convertir import.meta.url en chemin de fichier valide
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-
     // Récupère les fichiers des entités
-    const modelsPath = path.join(__dirname, "../entities");
+    const modelsPath = path.join(getDirname(import.meta.url), "../entities");
     const modelsFiles = await fs.readdir(modelsPath);
 
     for (const file of modelsFiles) {
@@ -56,12 +54,17 @@ export default class Database {
         continue;
       }
 
+      // Convertir import.meta.url en chemin de fichier valide
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+
       // Récupère la classe de l'entité
-      const modulePath = path.join(modelsPath, file);
-      const { default: Table } = await import(modulePath);
+      const modulePath = path.join(__dirname, "../entities", file);
+      const moduleURL = pathToFileURL(modulePath).href; // Convertir en URL
+      const { default: Table } = await import(moduleURL); // Utiliser l'URL pour l'import dynamique
       const table = new Table(this.server);
 
-      // Définit la table dans la base de données avec la structure du fichier JS
+      // Définit la table dans la base de données
       await this.connector?.define(
         table.tableName,
         table.definition,
