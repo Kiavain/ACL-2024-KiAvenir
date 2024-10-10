@@ -21,6 +21,10 @@ export default class UsersEntity extends Entity {
         type: DataTypes.TEXT,
         allowNull: false
       },
+      salt: {
+        type: DataTypes.STRING(4),
+        allowNull: false
+      },
       createdAt: {
         type: DataTypes.TIME,
         allowNull: false,
