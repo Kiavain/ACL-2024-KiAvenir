@@ -4,6 +4,7 @@ import path from "path";
 import { getDirname } from "./utils/index.js";
 import * as fs from "node:fs";
 import Database from "./components/Database.js";
+import { hashPassword } from './utils/hash.js';
 
 /**
  * Représente le serveur de l'application
@@ -68,6 +69,18 @@ class KiAvenir {
       );
     });
   }
+  
 }
+
+app.post('/signin', async (req, res) => {
+  const { username, password } = req.body;
+
+  const hashedPassword = await hashPassword(password);
+  
+  // Sauvegarder l'utilisateur avec le mot de passe hashé dans la base de données
+  // await User.create({ username, password: hashedPassword });
+
+  res.send('Compte créé avec succès !');
+});
 
 export default KiAvenir;

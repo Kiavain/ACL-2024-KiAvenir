@@ -46,8 +46,9 @@
     </form>
 
 
-    <script src="/js/hash.js"></script>
     <script>
+        // import { hashPassword, comparePassword } from '/js/hash.js';
+
         let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
 
         const accountForm = document.forms.accountCreation;
@@ -59,6 +60,30 @@
 
         async function validateAccountCreation() {
             // ...
+            let username = document.querySelector('[name="username"]').value;
+            let password = document.querySelector('[name="password"]').value;
+            let passwordRepeated = document.querySelector('[id="passwordRepeated"]').value;
+            
+            //todo: à supprimer
+            console.log("username: '" + username + "'");
+            console.log("password: '" + password + "'");
+            console.log("passwordRepeated: '" + passwordRepeated + "'");
+
+
+            if (password != passwordRepeated) {
+                //todo: afficher une vraie erreur
+                alert("Les mots de passe ne correspondent pas !");
+            }
+
+            // let hashedPassword = await hashPassword(password);
+            // console.log("hashedPassword: '" + hashedPassword + "'");
+
+            //todo: récupérer le sel ??
+            // let salt = "pas encore fait";
+
+            //todo: enregistrer le compte dans la base de données
+                // Vérifier si doublons ou autre ? 🤔
+
         }
     </script>
 </body>
