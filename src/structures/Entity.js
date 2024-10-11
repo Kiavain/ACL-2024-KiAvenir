@@ -6,14 +6,34 @@ import { Op } from "sequelize";
 export default class Entity {
   /**
    * Constuire une nouvelle table
-   * @param server {KiAvenir} - Le serveur
-   * @param definition {Object} - La définition de la table
-   * @param options {Object} - Les options
+   * @param server {KiAvenir} Le serveur
+   * @param definition {Object} La définition de la table
+   * @param options {Object} Les options
+   * @constructor
    */
   constructor(server, definition = {}, options = {}) {
-    this.server = server;
+    /**
+     * Le cache de la table
+     * @type {Map<String, EntityStructure>}
+     */
     this.cache = new Map();
+
+    /**
+     * Le serveur
+     * @type {KiAvenir}
+     */
+    this.server = server;
+
+    /**
+     * La définition de la table
+     * @type {Object}
+     */
     this.definition = definition;
+
+    /**
+     * Les options
+     * @type {{freezeTableName: boolean}}
+     */
     this.options = {
       freezeTableName: true,
       ...options
@@ -43,10 +63,10 @@ export default class Entity {
 
   /**
    * Récupère la table dans la base de données
-   * @return {*} La table
+   * @return {Object} La table
    */
   get table() {
-    return this.server.database.connector.models[this.tableName];
+    return this.server.database.models[this.tableName];
   }
 
   /**
@@ -71,25 +91,25 @@ export default class Entity {
 
   /**
    * Vérifie si l'entité a la clé primaire
-   * @param key {string} - La clé primaire
-   * @returns {boolean}  - Si l'entité a la clé primaire
+   * @param key {string} La clé primaire
+   * @returns {boolean} Si l'entité a la clé primaire
    */
   has(...key) {
     return this.cache.has(`${this.tableName}:${key.map((x) => x).join(":")}`);
   }
 
   /**
-   * Get all the rows
-   * @return {*} The rows
+   * Récupère toutes les lignes
+   * @return {EntityStructure[]} Les lignes
    */
   getAll() {
-    return this.cache.values();
+    return [...this.cache.values()];
   }
 
   /**
-   * Filter the rows
-   * @param {Function} fn The filter function
-   * @return {*} The filtered rows
+   * Filtre les lignes
+   * @param fn {Function} La fonction de filtre
+   * @returns {EntityStructure[]} Les lignes filtrées
    */
   filter(fn) {
     const data = this.getAll();
@@ -97,9 +117,9 @@ export default class Entity {
   }
 
   /**
-   * Check if every row respect the condition
-   * @param {Function} fn The filter function
-   * @return {Boolean} The result
+   * Vérifie si toutes les lignes respectent la condition
+   * @param fn {Function} La fonction de filtre
+   * @returns {boolean} Si toutes les lignes respectent la condition
    */
   every(fn) {
     const data = this.getAll();
@@ -107,9 +127,9 @@ export default class Entity {
   }
 
   /**
-   * Check if one of the rows respect the condition
-   * @param {Function} fn The filter function
-   * @return {Boolean} The result
+   * Vérifie si au moins une ligne respect la condition
+   * @param fn {Function} La fonction de filtre
+   * @returns {boolean} Si au moins une ligne respect
    */
   some(fn) {
     const data = this.getAll();
@@ -117,18 +137,18 @@ export default class Entity {
   }
 
   /**
-   * Get the row with key
-   * @param {String} key The key
-   * @return {*} The row
+   * Récupère une ligne
+   * @param key {string} La clé primaire
+   * @returns {EntityStructure} La ligne
    */
   get(...key) {
     return this.cache.get(`${this.tableName}:${key.map((x) => x).join(":")}`);
   }
 
   /**
-   * Map the rows
-   * @param {Function} [fn] The map function
-   * @return {*} The mapped rows
+   * Récupère une ligne
+   * @param fn {Function} La fonction de filtre
+   * @returns {unknown[]} Les lignes
    */
   map(fn) {
     const data = this.getAll();
@@ -136,17 +156,9 @@ export default class Entity {
   }
 
   /**
-   * Get the rows in array
-   * @return {*} The rows
-   */
-  array() {
-    return this.getAll();
-  }
-
-  /**
-   * Find rows with the condition
-   * @param {Function} [fn] The condition
-   * @return {*} The rows
+   * Trouve une ligne
+   * @param fn {Function} La fonction de filtre
+   * @return {EntityStructure} La ligne
    */
   find(fn) {
     const data = this.getAll();
@@ -154,10 +166,10 @@ export default class Entity {
   }
 
   /**
-   * Slice the rows
-   * @param {Number} [start] The start
-   * @param {Number} [end] The end
-   * @return {*} The sliced rows
+   * Récupère une ligne suivant les indices
+   * @param start {number} L'index de départ
+   * @param end {number} L'index de fin
+   * @returns {EntityStructure[]} Les lignes
    */
   slice(start, end) {
     const data = this.getAll();
@@ -165,9 +177,9 @@ export default class Entity {
   }
 
   /**
-   * Sort the rows
-   * @param {Function} [fn] The sort function
-   * @return {*} The sorted rows
+   * Trie les lignes
+   * @param fn {Function} La fonction de tri
+   * @returns {EntityStructure[]} Les lignes triées
    */
   sort(fn) {
     const data = this.getAll();
@@ -175,9 +187,9 @@ export default class Entity {
   }
 
   /**
-   * Create a row
-   * @param {Object} [data] The data
-   * @return {Promise<*>} The row
+   * Crée une ligne
+   * @param data {Object} Les données
+   * @returns {Promise<EntityStructure>} La ligne
    */
   async create(data) {
     const created = await this.table.create(data);
@@ -192,10 +204,10 @@ export default class Entity {
   }
 
   /**
-   * Update a row
-   * @param {Function} [fn] The condition
-   * @param {Object} [data] The data
-   * @return {Promise<*>} The row
+   * Met à jour une ligne
+   * @param fn {Function} La condition
+   * @param data {Object} Les données
+   * @returns {Promise<EntityStructure>} Les lignes
    */
   async update(fn, data) {
     const all = this.filter(fn);
@@ -232,9 +244,9 @@ export default class Entity {
   }
 
   /**
-   * Delete a row
-   * @param {Function} [fn] The condition
-   * @return {Promise<void>} The result
+   * Supprime une ligne
+   * @param fn {Function} La condition
+   * @returns {Promise<void>} La ligne
    */
   async delete(fn) {
     const all = this.filter(fn);

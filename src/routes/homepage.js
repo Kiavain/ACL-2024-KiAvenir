@@ -13,7 +13,7 @@ class HomepageRouteur extends Routeur {
    */
   build() {
     this.router.get("/", (req, res) => {
-      res.sendFile(this.getPathInHTML("homepage.html"));
+      res.render("homepage");
     });
   }
 }
