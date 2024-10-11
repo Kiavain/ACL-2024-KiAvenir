@@ -39,48 +39,36 @@
     </form>
 
 
+    <script src="/javascripts/hash.js"></script>
     <script>
-        // import { hashPassword, comparePassword } from '/js/hash.js';
-
         let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
 
         const accountForm = document.forms.accountCreation;
-
         accountForm.addEventListener("submit", (e) => {
             e.preventDefault();
             validateAccountCreation();
         });
-
+        
         async function validateAccountCreation() {
-            // ...
-            let username = document.querySelector('[name="username"]').value;
-            let password = document.querySelector('[name="password"]').value;
-            let passwordRepeated = document.querySelector('[id="passwordRepeated"]').value;
-
-            //todo: à supprimer
-            console.log("username: '" + username + "'");
-            console.log("password: '" + password + "'");
-            console.log("passwordRepeated: '" + passwordRepeated + "'");
-
-
-            if (password != passwordRepeated) {
-                //todo: afficher une vraie erreur
-                alert("Les mots de passe ne correspondent pas !");
+            const passwordMessage = document.getElementById("passwordMessage");
+            const passwordRepeated = document.getElementById("passwordRepeated");
+            const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
+            passwordMessage.textContent = "";
+            passwordRepeatedMessage.textContent = "";
+            if (accountForm.password.value.length < 8) {
+                passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+            } else if (accountForm.password.value != passwordRepeated.value) {
+                passwordRepeatedMessage.textContent = "Les mots de passe ne correspondent pas.";
+            } else {
+                const rawValue = accountForm.password.value;
+                accountForm.password.value = await hashSHA256(rawValue);
+                accountForm.submit();
+                accountForm.password.value = rawValue;
             }
-
-            // let hashedPassword = await hashPassword(password);
-            // console.log("hashedPassword: '" + hashedPassword + "'");
-
-            //todo: récupérer le sel ??
-            // let salt = "pas encore fait";
-
-            //todo: enregistrer le compte dans la base de données
-                // Vérifier si doublons ou autre ? 🤔
-
         }
     </script>
-
-
+    
     <%- include('partials/footer') %>
 </body>
+
 </html>
