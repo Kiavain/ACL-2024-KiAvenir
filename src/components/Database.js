@@ -8,15 +8,33 @@ import path from "path";
  * Représente la base de données
  */
 export default class Database {
+  /**
+   * Construit la base de données
+   * @param server {KiAvenir} Le serveur
+   */
   constructor(server) {
+    /**
+     * Le serveur
+     * @type {KiAvenir}
+     */
     this.server = server;
+
+    /**
+     * Le connecteur de la base de données
+     * @type {Sequelize|null}
+     */
     this.connector = null;
+
+    /**
+     * Les tables de la base de données
+     * @type {Map<String, Object>}
+     */
     this.tables = new Map();
   }
 
   /**
-   * Get the models
-   * @return The models
+   * Récupère les modèles de la base de données
+   * @return {{[key: string]: Object}} Les modèles
    */
   get models() {
     return this.connector.models;
