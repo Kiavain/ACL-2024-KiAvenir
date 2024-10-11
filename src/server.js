@@ -1,9 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-import path from "path";
-import { getDirname } from "./utils/index.js";
 import * as fs from "node:fs";
 import Database from "./components/Database.js";
+import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 /**
  * Représente le serveur de l'application
@@ -14,10 +14,6 @@ class KiAvenir {
    * @constructor
    */
   constructor() {
-    /**
-     * L'application
-     * @type {import('express').Express}
-     */
     this.app = express();
 
     /**
@@ -43,9 +39,9 @@ class KiAvenir {
    * Initialisation du serveur
    */
   async init() {
-    const dirname = getDirname(import.meta.url);
-    this.app.use(bodyParser.json());
-    this.app.use(express.static(path.join(dirname, "public")));
+    this.app
+      .use(bodyParser.json())
+      .use(express.static(new URL("./public", import.meta.url).pathname));
 
     await this.database.load();
     console.log("Base de données chargée !");
@@ -72,9 +68,24 @@ class KiAvenir {
   async initRoutes() {
     await this.buildRoutes();
 
+    // Dossier views avec view  engine EJS
+    this.app
+      .set("view engine", "ejs")
+      .set("views", new URL("./views", import.meta.url).pathname)
+      // Middleware pour logger les requêtes
+      .use(morgan("dev"))
+      // Middleware pour parser les cookies
+      .use(cookieParser());
+
+    // Utilisation des routes
     for (const route of this.routes) {
       this.app.use(route.default);
     }
+
+    // Middleware pour gérer les erreurs 404
+    this.app.use((req, res) => {
+      res.status(404).send("<h1>404 Not Found</h1>");
+    });
   }
 
   /**

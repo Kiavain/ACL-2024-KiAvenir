@@ -13,7 +13,7 @@ class AgendaRouteur extends Routeur {
    */
   build() {
     this.router.get("/agenda", (req, res) => {
-      res.sendFile(this.getPathInHTML("agenda.html"));
+      res.render("agenda");
     });
   }
 }
