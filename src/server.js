@@ -72,15 +72,4 @@ class KiAvenir {
   
 }
 
-app.post('/signin', async (req, res) => {
-  const { username, password } = req.body;
-
-  const hashedPassword = await hashPassword(password);
-  
-  // Sauvegarder l'utilisateur avec le mot de passe hashé dans la base de données
-  // await User.create({ username, password: hashedPassword });
-
-  res.send('Compte créé avec succès !');
-});
-
 export default KiAvenir;
