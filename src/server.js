@@ -4,7 +4,6 @@ import path from "path";
 import { getDirname } from "./utils/index.js";
 import * as fs from "node:fs";
 import Database from "./components/Database.js";
-import { hashPassword } from './utils/hash.js';
 
 /**
  * Représente le serveur de l'application
