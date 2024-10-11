@@ -4,8 +4,8 @@
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
-    "run": "npm install && node index.js",
-    "start": "node index.js",
+    "run": "npm install && nodemon index.js",
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "authors": [
@@ -19,6 +19,7 @@
   "type": "module",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "eslint": "^9.12.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
@@ -28,12 +29,13 @@
     "prettier": "^3.3.3"
   },
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
-    "kiavenir": "file:",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.7",
     "sequelize": "^6.37.3",
     "sqlite3": "^5.1.7"
   },
