@@ -4,9 +4,6 @@ import Routeur from "../structures/Routeur.js";
  * Les routes liées à la page de l'agenda
  */
 class AgendaRouteur extends Routeur {
-  /**
-   * Construit la route
-   */
   constructor() {
     super();
   }
@@ -16,7 +13,7 @@ class AgendaRouteur extends Routeur {
    */
   build() {
     this.router.get("/agenda", (req, res) => {
-      res.sendFile(this.getPathInHTML("agenda.html"));
+      res.render("agenda");
     });
   }
 }
