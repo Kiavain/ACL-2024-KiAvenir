@@ -7,7 +7,6 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import { devDatabase } from "../data/script.js";
-import dotenv from "dotenv";
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -36,14 +35,25 @@ class KiAvenir {
       .use(bodyParser.json())
       .use(express.static(path.join(__dirname, "public")));
 
-    await this.database.load();
-    console.log("Base de données chargée !");
-
-    // Peuple la base de données de développement
-    console.log("Environnement : ", process.env.NODE_ENV);
-    if (process.env.NODE_ENV === "development") {
-      await devDatabase(this);
+    try {
+      await this.database.load();
+      if (process.env.NODE_ENV === "development") {
+        await devDatabase(this);
+      }
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        const file = "data/db.sqlite";
+        if (fs.existsSync(file)) {
+          fs.unlinkSync(file);
+        }
+        await this.database.load();
+        await devDatabase(this);
+      } else {
+        console.error(err);
+        process.exit(1);
+      }
     }
+    console.log("Base de données chargée !");
   }
 
   /**
