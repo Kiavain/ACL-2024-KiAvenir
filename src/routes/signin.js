@@ -7,8 +7,8 @@ class SignInRouteur extends Routeur {
   /**
    * Construit la route
    */
-  constructor() {
-    super();
+  constructor(server) {
+    super(server);
   }
 
   /**
@@ -21,5 +21,4 @@ class SignInRouteur extends Routeur {
   }
 }
 
-const signInRouteur = new SignInRouteur();
-export default signInRouteur.router;
+export default SignInRouteur;
