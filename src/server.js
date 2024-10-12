@@ -6,6 +6,8 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { devDatabase } from "../data/script.js";
+import dotenv from "dotenv";
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -36,6 +38,12 @@ class KiAvenir {
 
     await this.database.load();
     console.log("Base de données chargée !");
+
+    // Peuple la base de données de développement
+    console.log("Environnement : ", process.env.NODE_ENV);
+    if (process.env.NODE_ENV === "development") {
+      await devDatabase(this);
+    }
   }
 
   /**
