@@ -44,7 +44,7 @@ class KiAvenir {
       if (process.env.NODE_ENV === "development") {
         const file = "data/db.sqlite";
         if (fs.existsSync(file)) {
-          fs.unlinkSync(file);
+          await fs.promises.unlink(file);
         }
         await this.database.load();
         await devDatabase(this);
