@@ -35,23 +35,9 @@ class KiAvenir {
       .use(bodyParser.json())
       .use(express.static(path.join(__dirname, "public")));
 
-    try {
-      await this.database.load();
-      if (process.env.NODE_ENV === "development") {
-        await devDatabase(this);
-      }
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        const file = "data/db.sqlite";
-        if (fs.existsSync(file)) {
-          await fs.promises.unlink(file);
-        }
-        await this.database.load();
-        await devDatabase(this);
-      } else {
-        console.error(err);
-        process.exit(1);
-      }
+    await this.database.load();
+    if (process.env.NODE_ENV === "development") {
+      await devDatabase(this);
     }
     console.log("Base de données chargée !");
   }
