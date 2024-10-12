@@ -4,44 +4,25 @@ import * as fs from "node:fs";
 import Database from "./components/Database.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import path from "path";
+import { fileURLToPath } from "url";
 
-/**
- * Représente le serveur de l'application
- */
+// Créez l'équivalent de __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 class KiAvenir {
-  /**
-   * Construit le serveur de l'application
-   * @constructor
-   */
   constructor() {
     this.app = express();
-
-    /**
-     * Le port du serveur
-     * @type {number} Le port du serveur
-     */
     this.PORT = 3000;
-
-    /**
-     * Les routes de l'application
-     * @type {Array<Object>}
-     */
     this.routes = [];
-
-    /**
-     * La base de données de l'application
-     * @type {Database}
-     */
     this.database = new Database(this);
   }
 
-  /**
-   * Initialisation du serveur
-   */
   async init() {
     this.app
       .use(bodyParser.json())
-      .use(express.static(new URL("./public", import.meta.url).pathname));
+      .use(express.static(path.join(__dirname, "public")));
 
     await this.database.load();
     console.log("Base de données chargée !");
@@ -68,10 +49,10 @@ class KiAvenir {
   async initRoutes() {
     await this.buildRoutes();
 
-    // Dossier views avec view  engine EJS
+    // Dossier views avec view engine EJS
     this.app
       .set("view engine", "ejs")
-      .set("views", new URL("./views", import.meta.url).pathname)
+      .set("views", path.join(__dirname, "views"))
       // Middleware pour logger les requêtes
       .use(morgan("dev"))
       // Middleware pour parser les cookies
@@ -88,10 +69,6 @@ class KiAvenir {
     });
   }
 
-  /**
-   * Démarre le serveur
-   * @returns {Promise<void>} Une promesse
-   */
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {
