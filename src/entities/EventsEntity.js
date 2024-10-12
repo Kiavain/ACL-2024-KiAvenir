@@ -27,9 +27,6 @@ export default class EventsEntity extends Entity {
       name: {
         type: DataTypes.STRING(32)
       },
-      color: {
-        type: DataTypes.STRING(7)
-      },
       startDate: {
         type: DataTypes.DATE
       },
