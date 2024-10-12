@@ -11,7 +11,13 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Classe principale de l'application
+ */
 class KiAvenir {
+  /**
+   * Crée une instance de l'application
+   */
   constructor() {
     this.app = express();
     this.PORT = 3000;
@@ -19,6 +25,10 @@ class KiAvenir {
     this.database = new Database(this);
   }
 
+  /**
+   * Initialise l'application
+   * @returns {Promise<void>} Une promesse
+   */
   async init() {
     this.app
       .use(bodyParser.json())
@@ -38,7 +48,9 @@ class KiAvenir {
     // Récupère les routes dans le dossier routes
     for (const file of fs.readdirSync("src/routes")) {
       const route = await import(`./routes/${file}`);
-      this.routes.push(route);
+      const routeInstance = new route.default(this);
+      console.log(`Route ${file} chargée !`);
+      this.routes.push(routeInstance.router);
     }
   }
 
@@ -60,7 +72,7 @@ class KiAvenir {
 
     // Utilisation des routes
     for (const route of this.routes) {
-      this.app.use(route.default);
+      this.app.use(route);
     }
 
     // Middleware pour gérer les erreurs 404
@@ -69,6 +81,10 @@ class KiAvenir {
     });
   }
 
+  /**
+   * Démarre le serveur
+   * @returns {Promise<void>} Une promesse
+   */
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {

@@ -4,8 +4,8 @@ import Routeur from "../structures/Routeur.js";
  * Les routes liées à la page d'accueil
  */
 class HomepageRouteur extends Routeur {
-  constructor() {
-    super();
+  constructor(server) {
+    super(server);
   }
 
   /**
@@ -18,5 +18,4 @@ class HomepageRouteur extends Routeur {
   }
 }
 
-const homepageRoute = new HomepageRouteur();
-export default homepageRoute.router;
+export default HomepageRouteur;
