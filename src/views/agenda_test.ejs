@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda</title>
+    <link rel="stylesheet" href="/css/calendar.css">
+</head>
+<body>
+<h1>KiAvenir</h1>
+
+<div class="navigation">
+    <div class="view-switch">
+        <a href="?view=day&date=<%= currentDate.format('YYYY-MM-DD') %>">Vue Journée</a>
+        <a href="?view=week&date=<%= currentDate.format('YYYY-MM-DD') %>">Vue Semaine</a>
+        <a href="?view=month&date=<%= currentDate.format('YYYY-MM-DD') %>">Vue Mois</a>
+    </div>
+    <div class="date-navigation">
+        <a href="?view=<%= view %>&date=<%= prevDate %>">Précédent</a>
+        <span><%= currentDate.format(view === 'month' ? 'MMMM YYYY' : 'DD MMMM YYYY') %></span>
+        <a href="?view=<%= view %>&date=<%= nextDate %>">Suivant</a>
+    </div>
+</div>
+
+<!-- Modale pour afficher les informations de l'événement -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="eventTitle"></h2>
+        <p id="eventDetails"></p>
+        <p id="eventTime"></p>
+    </div>
+</div>
+
+<% if (view === 'day') { %>
+    <h2>Événements pour le <%= currentDate.format('DD MMMM YYYY') %></h2>
+    <ul>
+        <% events.filter(event => moment.isMoment(event.start) && moment.isMoment(event.end) &&
+                (event.start.isSame(currentDate, 'day') || event.end.isSame(currentDate, 'day') ||
+                        (event.start.isBefore(currentDate) && event.end.isAfter(currentDate))))
+        .forEach(event => { %>
+            <li class="event-item"
+                data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format("HH:mm"), end: event.end.format("HH:mm") }) %>'>
+                <strong><%= event.title %></strong> -
+                <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : event.start.isSame(currentDate, 'day') ? `${event.start.format('HH:mm')} à 23:59` : event.end.isSame(currentDate, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+            </li>
+        <% }) %>
+    </ul>
+<% } else if (view === 'week') { %>
+    <h2>Semaine du <%= weekStart.format('DD MMMM YYYY') %> au <%= weekEnd.format('DD MMMM YYYY') %></h2>
+    <% for (let day = weekStart.clone(); day.isSameOrBefore(weekEnd, 'day'); day.add(1, 'days')) { %>
+        <div class="day">
+            <h3><%= day.format('dddd DD MMMM YYYY') %></h3>
+            <ul>
+                <% events.filter(event => moment.isMoment(event.start) && moment.isMoment(event.end) &&
+                        (event.start.isSame(day, 'day') || event.end.isSame(day, 'day') ||
+                                (event.start.isBefore(day) && event.end.isAfter(day))))
+                .forEach(event => { %>
+                    <li class="event-item"
+                        data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format("HH:mm"), end: event.end.format("HH:mm") }) %>'>
+                        <strong><%= event.title %></strong> -
+                        <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : event.start.isSame(day, 'day') ? `${event.start.format('HH:mm')} à 23:59` : event.end.isSame(day, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
+<% } else if (view === 'month') { %>
+    <table>
+        <tr>
+            <% for (let i = 0; i < 7; i++) { %>
+                <th><%= moment().day(i).format('dddd') %></th>
+            <% } %>
+        </tr>
+        <% let day = currentDate.clone().startOf('month').startOf('week'); %>
+        <% while (day.isBefore(currentDate.clone().endOf('month').endOf('week'))) { %>
+            <tr>
+                <% for (let i = 0; i < 7; i++) { %>
+                    <td>
+                        <% if (day.isBefore(currentDate.clone().startOf('month')) || day.isAfter(currentDate.clone().endOf('month'))) { %>
+                            &nbsp;
+                        <% } else { %>
+                            <%= day.format('D') %>
+                            <ul>
+                                <% events.forEach(event => { %>
+                                    <% if (moment.isMoment(event.start) && moment.isMoment(event.end) &&
+                                            (event.start.isBefore(day.endOf('day')) && event.end.isAfter(day.startOf('day')))) { %>
+                                        <li class="event-item"
+                                            data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format("HH:mm"), end: event.end.format("HH:mm") }) %>'>
+                                            <strong><%= event.title %></strong> -
+                                            <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : day.isSame(event.start, 'day') ? `${event.start.format('HH:mm')} à 23:59` : day.isSame(event.end, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+                                        </li>
+                                    <% } %>
+                                <% }) %>
+                            </ul>
+                        <% } %>
+                        <% day.add(1, 'days'); %>
+                    </td>
+                <% } %>
+            </tr>
+        <% } %>
+    </table>
+<% } %>
+
+<script src="/js/EventDetails.js"></script>
+</body>
+</html>
