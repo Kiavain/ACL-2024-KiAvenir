@@ -3,7 +3,7 @@ import Routeur from "../structures/Routeur.js";
 /**
  * Les routes liées à la page d'inscription
  */
-class SignInRouteur extends Routeur {
+class LogInRouteur extends Routeur {
   /**
    * Construit la route
    */
@@ -15,11 +15,11 @@ class SignInRouteur extends Routeur {
    * Construit la route
    */
   build() {
-    this.router.get("/signin", (req, res) => {
-      res.render("signin", { title: "Inscription" });
+    this.router.get("/login", (req, res) => {
+      res.render("login", { title: "Connexion" });
     });
   }
 }
 
-const signInRouteur = new SignInRouteur();
-export default signInRouteur.router;
+const logInRouteur = new LogInRouteur();
+export default logInRouteur.router;

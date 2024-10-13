@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <head>
-  <title>KiAvenir - Inscription</title>
+  <title>KiAvenir - Connexion</title>
 </head>
 
     <%- include('partials/header') %>
@@ -8,40 +8,30 @@
     <div class="container d-flex justify-content-center align-items-center h-75">
         <div class="card shadow-lg" style="width: 600px;">
             <div class="card-body">
-                <h2 class="text-center mb-4 fw-bold">Inscription</h2>
-                <form name="accountCreation" action="/account/new" method="POST">
+                <h2 class="text-center mb-4 fw-bold">Connexion</h2>
+                <form name="accountLogin" action="/account/login" method="POST">
                     <div class="row">
-                        <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Entrez votre adresse mail</label>
-                        <div class="col-md-7">
-                            <input type="text" class="form-control" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail">
-                            <label class="form-label text-danger"><%= locals.message ?? '' %></label>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Entrez un nom d'utilisateur</label>
+                        <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Nom d'utilisateur</label>
                         <div class="col-md-7">
                             <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur">
                             <label class="form-label text-danger"><%= locals.message ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
-                        <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Entrez un mot de passe</label>
+                        <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Mot de passe</label>
                         <div class="col-md-7">
                             <input type="password" class="form-control" name="password" placeholder="Mot de passe">
                             <label class="form-label text-danger" id="passwordMessage"></label>
                         </div>
                     </div>
-                    <div class="row">
-                        <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
-                        <div class="col-md-7">
-                            <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe">
-                            <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
-                        </div>
-                    </div>
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold">Créer un compte</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Se connecter</button>
                     </div>
                 </form>
+                <!-- Text with link below the form -->
+                <div class="mt-3 text-center">
+                    <p class="mb-0">Nouveau ? <a href="/signin">Créer un compte</a></p>
+                </div>
             </div>
         </div>
     </div>
@@ -56,26 +46,20 @@
     <script>
         let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
 
-        const accountForm = document.forms.accountCreation;
+        const accountForm = document.forms.accountLogin;
         accountForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            validateAccountCreation();
+            validateAccountLogin();
         });
         
-        async function validateAccountCreation() {
+        async function validateAccountLogin() {
             const passwordMessage = document.getElementById("passwordMessage");
-            const passwordRepeated = document.getElementById("passwordRepeated");
-            const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
             passwordMessage.textContent = "";
-            passwordRepeatedMessage.textContent = "";
 
             let password = accountForm.password.value;
-            let passwordConfirmation = passwordRepeated.value;
 
             if (password.length < 8) {
                 passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
-            } else if (password != passwordConfirmation) {
-                passwordRepeatedMessage.textContent = "Les mots de passe ne correspondent pas.";
             } else {
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
