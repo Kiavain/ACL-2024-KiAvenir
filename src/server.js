@@ -6,10 +6,10 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authenticate } from './controllers/authController.js';
+import { authenticate } from './controllers/accountController.js'; // Pour identifier l'utilisateur à chaque chargement de page
 
 import dotenv from 'dotenv';
-dotenv.config();  // On charge les variables d'environnement depuis le fichier .env
+dotenv.config();  // On charge les variables d'environnement depuis le fichier .env (sert notamment pour JWT_SECRET, pour créer des tokens avec une clé secrète)
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -29,13 +29,13 @@ class KiAvenir {
       .use(bodyParser.urlencoded({ extended: true })) // For form data (application/x-www-form-urlencoded)
       .use(express.static(path.join(__dirname, "public")))
       .use((req, res, next) => {
-        res.locals.currentPath = req.path; // Pour récupérer l'url local
+        res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar)
         next();
       })
-      .use(authenticate); // Pour récupérer le token s'il existe
+      .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
 
     await this.database.load();
-    this.app.locals.database = this.database; // Make the database available globally
+    this.app.locals.database = this.database; // Fait en sorte que la database soit accessible de manière globale (pour y accéder par exemple dans accountController.js)
     console.log("Base de données chargée !");
   }
 
@@ -76,7 +76,6 @@ class KiAvenir {
 
     // Middleware pour gérer les erreurs 404
     this.app.use((req, res) => {
-      // res.status(404).send("<h1>404 Not Found</h1>");
       res.status(404).render("errors/404.ejs");
     });
   }
