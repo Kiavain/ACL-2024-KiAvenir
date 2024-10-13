@@ -4,15 +4,43 @@
 </head>
     <%- include('partials/header') %>
 
-    <h1 class="text-center mb-4 fw-bold text-primary">Mes informations</h1>
-    <ul class="d-grid gap-2 d-md-block mx-auto">
-        <li>Adresse email: <%= locals.user.email ?? '' %></li>
-        <li>Nom d'utilisateur: <%= locals.user.username ?? '' %></li>
-    </ul>
+    <div class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
+        <h1 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h1>
+        <ul class="list-group d-grid gap-2 d-md-block mx-auto mb-1">
+            <li class="list-group-item">Adresse email: <%= locals.user.email ?? '' %></li>
+            <li class="list-group-item">Nom d'utilisateur: <%= locals.user.username ?? '' %></li>
+        </ul>
+    
+        <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
+    </div>
     
     <div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-        <a class="btn btn-outline-danger btn-sm" href="/account/delete">Supprimer mon compte</a>
+        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Supprimer mon compte
+        </button>
     </div>
+    
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-danger">
+                    Cette action est définitive !
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form action="/account/delete" method="post">
+                        <!-- <button type="button" class="btn btn-danger" onclick="window.location.href='/account/delete';">Supprimer</button> -->
+                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <%- include('partials/footer') %>
 </body>

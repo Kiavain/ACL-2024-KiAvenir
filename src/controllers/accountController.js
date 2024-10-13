@@ -105,7 +105,7 @@ export function login(req, res) {
         res.cookie("accessToken", token, { httpOnly: true });
         res.redirect("/");
     } else {
-        res.render("login", { message: "Nom d'utilisateur/mot de passe invalide." });
+        res.render("login", { message: "Nom d'utilisateur/mot de passe incorrect." });
     }
 }
 
@@ -117,8 +117,14 @@ export function logout(req, res) {
 
 
 export function deleteAccount(req, res) {
-    //todo
+    const localUser = res.locals.user;
+    const user = req.app.locals.database.tables.get("users").find((user) => user.username === localUser.username);
 
-    // On finira quoi qu'il arrive par ça (si le compte est bien supprimé)
-    logout(req, res);
+    try {
+        user.delete(); // Supprime l'utilisateur de la base de données
+        //todo: mettre à jour la base de données locale (on peut toujours se connecter à un compte supprimé jusqu'au redémarrage du serveur)
+        logout(req, res);
+    } catch {
+        res.render("account", { errorMessage: "Erreur: impossible de supprimer le compte." });
+    }
 }
