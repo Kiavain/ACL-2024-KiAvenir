@@ -40,24 +40,9 @@ class EventRouteur extends Routeur {
 
     // Route pour créer un événement
     this.router.put("/api/events/create", async (req, res) => {
-      const { name, date, description, lieu, agendaId } = req.body;
-      console.log(req.body);
-      // Vérification de la présence des champs nécessaires
-      if (!name || !date || !description || !lieu || !agendaId) {
-        return res.status(400).json({
-          success: false,
-          message: "Tous les champs sont obligatoires."
-        });
-      }
-      const newEvent = await this.server.database.tables.get("events").create({
-        name: name,
-        date: date,
-        description: description,
-        lieu: lieu,
-        agendaId: agendaId
-      });
+      const newEvent = await this.server.database.tables.get("events");
       if (newEvent) {
-        await newEvent.create();
+        await newEvent.create(req.body);
         res.json({ success: true });
       } else {
         res.json({ success: false });
