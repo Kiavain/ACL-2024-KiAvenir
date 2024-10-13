@@ -83,4 +83,19 @@ export default class Event extends EntityStructures {
   getAgenda() {
     return this.agendas.get(this.agendaId);
   }
+
+  /**
+   * Retourne les données de l'événement
+   * @returns {Object} Les données de l'événement
+   */
+  toJSON() {
+    return {
+      eventId: this.eventId,
+      agendaId: this.agendaId,
+      name: this.name,
+      description: this.description,
+      startDate: this.startDate,
+      endDate: this.endDate
+    };
+  }
 }

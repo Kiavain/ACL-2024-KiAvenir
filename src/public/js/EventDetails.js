@@ -6,12 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Fonction pour ouvrir la modale avec les détails de l'événement
   const openModal = (eventData) => {
-    document.getElementById("eventTitle").innerText = eventData.title;
+    console.log(eventData);
+    document.getElementById("eventTitle").innerText = eventData.name;
     document.getElementById("eventDetails").innerText =
-      eventData.details || "Pas de détails disponibles.";
+      eventData.description || "Pas de détails disponibles.";
     document.getElementById("eventTime").innerText = formatEventPeriod(
-      moment(eventData.start),
-      moment(eventData.end)
+      moment(eventData.startDate),
+      moment(eventData.endDate)
     );
     modal.style.display = "block";
   };
@@ -31,6 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
   // Écouteur d'événements pour chaque événement
   document.querySelectorAll(".event-item").forEach((item) => {
     item.addEventListener("click", () => {
+      let clickTimeout;
+
+      // Si un clic a déjà été détecté, on annule le timeout pour ne pas exécuter le simple clic
+      if (clickTimeout) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
+      } else {
+        // Si aucun double clic n'est détecté dans le délai, on exécute le simple clic
+        clickTimeout = setTimeout(() => {
+          clickTimeout = null;
+        }, 300); // Délai de 300ms pour attendre un éventuel double clic
+      }
+    });
+
+    item.addEventListener("dblclick", () => {
       openModal(JSON.parse(item.dataset.event));
     });
   });

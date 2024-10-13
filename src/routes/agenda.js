@@ -69,10 +69,9 @@ function getEventsForDate(server, currentDate) {
     .filter((event) => event.startDate.getMonth() === currentDate.month())
     .map((event) => {
       return {
-        title: event.name,
-        details: event.description,
-        start: moment(event.startDate),
-        end: moment(event.endDate),
+        ...event.toJSON(),
+        startDate: moment(event.startDate),
+        endDate: moment(event.endDate),
         color: event.getAgenda().color,
         rgba: hexToRgba(event.getAgenda().color, 0.1)
       };
