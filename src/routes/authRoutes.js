@@ -16,6 +16,10 @@ class AuthRouteur extends Routeur {
     this.router.post('/account/new', createAccount);
     this.router.post('/account/login', login);
     this.router.get('/account/logout', logout);
+
+    this.router.get("/account", (req, res) => {
+      res.render("account");
+    });
   }
 }
 
