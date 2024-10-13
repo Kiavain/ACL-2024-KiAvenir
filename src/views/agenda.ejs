@@ -49,21 +49,22 @@
                 <label for="event-name">Nom de l'événement:</label>
                 <input type="text" id="event-name" name="event-name" required>
 
-                <label for="event-date">Date:</label>
+                <label for="event-date">Date de début:</label>
                 <input type="datetime-local" id="event-date" name="event-date" required>
 
+                <label for="event-date-end">Date de fin:</label>
+                <input type="datetime-local" id="event-date-end" name="event-date" required>
+
                 <label for="event-agenda">Agenda:</label>
-                <select id="event-agenda" name="event-agenda" required>
+                <select id="event-agenda" name="event-agenda" >
                     <option value="" selected disabled>---Veuillez choisir un agenda---</option>
                 </select>
 
-                <label for="event-location">Lieu:</label>
-                <input type="text" id="event-location" name="event-location" required>
 
                 <label for="event-description">Description:</label>
                 <textarea  id="event-description" name="event-description" rows = "3"></textarea>
 
-                <button type="submit" class="submit-btn">Enregistrer</button>
+                <button id="saveEvent" class="submit-btn">Enregistrer</button>
             </form>
         </div>
     </div>

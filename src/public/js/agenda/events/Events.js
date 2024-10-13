@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const createEvent = document.getElementById("createEvent");
   const modal = document.getElementById("modal");
   const closeModalBtn = document.getElementById("close-btn");
+  const createButton = document.getElementById("saveEvent");
+
+  // Utilitaires pour sélectionner les éléments
+  const getElement = (id) => document.getElementById(id);
+  const setInputValue = (id, value) => (getElement(id).value = value);
+  const getInputValue = (id) => getElement(id).value;
 
   createAgendaOrEvent.onclick = () => {
     windowAgendaOrEvent.style.display = "block";
@@ -29,4 +35,38 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "none";
     }
   });
+
+  createButton.onclick = () => {
+    console.log("new Event");
+    const name = getInputValue("event-name");
+    const dateDebut = getInputValue("event-date");
+    const description = getInputValue("event-description");
+    const dateFin = getInputValue("event-date-end");
+    if (name && dateDebut && description && dateFin) {
+      console.log("good");
+
+      const data = {
+        name: name,
+        agendaId: "1",
+        description: description,
+        startDate: dateDebut,
+        endDate: dateFin
+      };
+      fetch("/api/events/create", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Événement CREER avec succès!");
+            window.location.reload();
+          } else {
+            alert("Échec de la CREATION de l'événement.");
+          }
+        })
+        .catch((error) => console.error("Erreur:", error));
+    }
+  };
 });
