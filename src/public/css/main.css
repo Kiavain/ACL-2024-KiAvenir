@@ -1,0 +1,10 @@
+html, body {
+    height: 100%;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+.content {
+    flex: 1; /* Takes up remaining space, pushing footer to bottom if necessary */
+}
