@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import { devDatabase } from "../data/script.js";
+import { createStream } from "rotating-file-stream";
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -65,12 +66,18 @@ class KiAvenir {
   async initRoutes() {
     await this.buildRoutes();
 
+    // Crée un stream pour les logs
+    const accessLogStream = createStream("access.log", {
+      interval: "1d",
+      path: path.join(__dirname, "logs")
+    });
+
     // Dossier views avec view engine EJS
     this.app
       .set("view engine", "ejs")
       .set("views", path.join(__dirname, "views"))
       // Middleware pour logger les requêtes
-      .use(morgan("dev"))
+      .use(morgan("dev", { stream: accessLogStream }))
       // Middleware pour parser les cookies
       .use(cookieParser());
 
