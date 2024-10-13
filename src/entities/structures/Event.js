@@ -52,6 +52,14 @@ export default class Event extends EntityStructures {
   }
 
   /**
+   * Récupère les agendas
+   * @returns {Object} Les agendas
+   */
+  get agendas() {
+    return this.entity.server.database.tables.get("agendas");
+  }
+
+  /**
    * Met à jour les données de l'événement
    * @param data {Object} Les données à mettre à jour
    * @returns {Promise<Event>} Une promesse de l'événement
@@ -66,5 +74,13 @@ export default class Event extends EntityStructures {
    */
   async delete() {
     return this.entity.delete((x) => x.id === this.id);
+  }
+
+  /**
+   * Retourne l'agenda de l'événement
+   * @returns {Agenda} L'agenda
+   */
+  getAgenda() {
+    return this.agendas.get(this.agendaId);
   }
 }

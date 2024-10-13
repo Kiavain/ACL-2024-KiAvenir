@@ -148,9 +148,6 @@ td:hover {
   border: 1px solid #ccc;
 }
 
-
-
-
 /* Styles de la modale */
 .modal {
   display: none; /* Cachée par défaut */
@@ -192,3 +189,4 @@ td:hover {
 h2 {
   margin: 0 0 10px; /* Marge pour le titre */
 }
+
