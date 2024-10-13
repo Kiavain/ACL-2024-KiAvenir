@@ -81,7 +81,8 @@ export function createAccount(req, res) {
         };
 
         // Ajoute l'utilisateur à la base
-        req.app.locals.database.tables.get("users").create(newUser)
+        req.app.locals.database.tables.get("users").create(newUser);
+        req.app.locals.database.load(); // Met à jour la base locale au cas où
 
         // Créer un token JWT
         const token = createJWT(newUser);
@@ -122,7 +123,7 @@ export function deleteAccount(req, res) {
 
     try {
         user.delete(); // Supprime l'utilisateur de la base de données
-        //todo: mettre à jour la base de données locale (on peut toujours se connecter à un compte supprimé jusqu'au redémarrage du serveur)
+        req.app.locals.database.load(); // Met à jour la base de données locale (sinon on pourrait toujours se connecter sur un compte supprimé jusqu'au redémarrage du serveur)
         logout(req, res);
     } catch {
         res.render("account", { errorMessage: "Erreur: impossible de supprimer le compte." });
