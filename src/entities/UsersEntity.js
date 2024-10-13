@@ -2,6 +2,8 @@ import Entity from "../structures/Entity.js";
 import User from "./structures/User.js";
 import { DataTypes } from "sequelize";
 import { encryptPassword } from "../utils/index.js";
+import crypto from 'crypto';
+
 
 /**
  * Représente l'entité des utilisateurs
@@ -42,7 +44,8 @@ export default class UsersEntity extends Entity {
             user.salt = crypto.randomBytes(2).toString("hex"); // 4 caractères hexadécimaux
 
             // Chiffrement du mot de passe avec le sel
-            user.password = encryptPassword(user.password, user.salt);
+            //todo: remettre (mais changer la vérification pour le login)
+            // user.password = encryptPassword(user.password, user.salt);
           }
         }
       }

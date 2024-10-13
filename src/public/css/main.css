@@ -8,3 +8,17 @@ body {
 .content {
     flex: 1; /* Takes up remaining space, pushing footer to bottom if necessary */
 }
+
+
+.nav-separator {
+    display: inline-block;
+    height: 24px;
+    width: 1px;
+    background-color: #ccc; /* Couleur du séparateur */
+    margin: 10px; /* Espace autour du séparateur */
+}
+@media (max-width: 991px) {
+        .nav-separator {
+        display: none;
+    }
+}
