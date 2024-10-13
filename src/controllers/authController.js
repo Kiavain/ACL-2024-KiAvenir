@@ -21,7 +21,7 @@ export function createAccount(req, res) {
 
     // Récupère les utilisateurs de la base de données
     const users = req.app.locals.database.tables.get("users").getAll();
-    console.log(users);
+    // console.log(users);
     const usernameAlreadyTaken = users.find(u => u.username === username)
     const emailAlreadyTaken = users.find(u => u.email === email)
 
@@ -51,7 +51,7 @@ export function createAccount(req, res) {
 
         // Défini le token dans le cookie et redirige
         res.cookie("accessToken", token, { httpOnly: true });
-        console.log("Les cookies créés: ", res.cookies);
+        // console.log("Les cookies créés: ", res.cookies);
         res.redirect("/");
     }
 }
@@ -89,10 +89,10 @@ export function authenticate(req, res, next) {
             return next();
         }
         const user = jwt.verify(token, process.env.JWT_SECRET);
-        console.log("On a authentifié l'utilisateur " + user.username);
+        // console.log("On a authentifié l'utilisateur " + user.username);
         res.locals.user = user;
     } catch (error) {
-        console.log("Aucun token d'accès trouvé dans le cookie:",error);
+        console.log("Aucun token d'accès trouvé dans le cookie:", error);
         
         // Compte de test pour tester l'affichage
         // res.locals.user = {
@@ -116,15 +116,12 @@ export function login(req, res) {
     if (user && user.password === password) {
         const token = createJWT(user);
         res.cookie("accessToken", token, { httpOnly: true });
-        console.log("Les cookies créés: ", res.cookies);
+        // console.log("Les cookies créés: ", res.cookies); // on ne peut pas y accéder avec res.cookies (voir fonction authenticate)
         res.redirect("/");
     } else {
         // console.log(user.password + "\n" + password);
         res.render("login", { message: "Nom d'utilisateur/mot de passe invalide." });
     }
-    // console.log(res);
-    
-    // console.log(user);
 }
 
 export function logout(req, res) {

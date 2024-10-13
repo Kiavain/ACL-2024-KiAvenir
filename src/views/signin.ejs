@@ -14,28 +14,28 @@
                         <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Entrez votre adresse mail</label>
                         <div class="col-md-7">
                             <input type="email" class="form-control" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail" required>
-                            <label class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
+                            <label class="form-label text-danger mt-2"><%= locals.emailTaken ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Entrez un nom d'utilisateur</label>
                         <div class="col-md-7">
                             <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
-                            <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
+                            <label class="form-label text-danger mt-2"><%= locals.usernameTaken ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Entrez un mot de passe</label>
                         <div class="col-md-7">
                             <input type="password" class="form-control" name="password" placeholder="Mot de passe" required>
-                            <label class="form-label text-danger" id="passwordMessage"></label>
+                            <label class="form-label text-danger mt-2" id="passwordMessage"></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
                         <div class="col-md-7">
                             <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe" required>
-                            <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
+                            <label class="form-label text-danger mt-2" id="passwordRepeatedMessage"></label>
                         </div>
                     </div>
                     <div class="d-grid">
@@ -45,11 +45,6 @@
             </div>
         </div>
     </div>
-
-    <!-- beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>beaucoup de contenu<br/>
-    encore du contenu<br/>encore du contenu<br/>encore du contenu<br/>encore du contenu<br/>encore du contenu<br/>encore du contenu<br/>
-    fin -->
-
 
 
     <script src="/js/hash.js"></script>
