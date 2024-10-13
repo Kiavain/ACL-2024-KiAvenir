@@ -13,28 +13,28 @@
                     <div class="row">
                         <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Entrez votre adresse mail</label>
                         <div class="col-md-7">
-                            <input type="text" class="form-control" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail">
+                            <input type="email" class="form-control" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail" required>
                             <label class="form-label text-danger"><%= locals.message ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Entrez un nom d'utilisateur</label>
                         <div class="col-md-7">
-                            <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur">
+                            <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
                             <label class="form-label text-danger"><%= locals.message ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Entrez un mot de passe</label>
                         <div class="col-md-7">
-                            <input type="password" class="form-control" name="password" placeholder="Mot de passe">
+                            <input type="password" class="form-control" name="password" placeholder="Mot de passe" required>
                             <label class="form-label text-danger" id="passwordMessage"></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
                         <div class="col-md-7">
-                            <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe">
+                            <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe" required>
                             <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
                         </div>
                     </div>
@@ -81,6 +81,12 @@
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
                 accountForm.password.value = rawValue;
+                console.log(rawValue);
+            }
+
+            // Prevent form submission if any field is invalid
+            if (!this.checkValidity()) {
+                event.preventDefault();
             }
         }
     </script>
