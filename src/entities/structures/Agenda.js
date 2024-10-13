@@ -45,7 +45,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
-    return this.entity.update((x) => x.id === this.id, data);
+    return this.entity.update((x) => x.agendaId === this.agendaId, data);
   }
 
   /**
@@ -53,6 +53,6 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<void>} Une promesse
    */
   async delete() {
-    return this.entity.delete((x) => x.id === this.id);
+    return this.entity.delete((x) => x.agendaId === this.agendaId);
   }
 }

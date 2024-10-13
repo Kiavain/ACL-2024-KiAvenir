@@ -261,9 +261,14 @@ export default class Entity {
         };
       }
 
+      // Suppression de la ligne dans le cache
+      const key = this.identifierColumns.map((c) => row.data[c]).join(":");
+      this.cache.delete(`${this.tableName}:${key}`);
+
       where.push(w);
     }
 
+    // Suppression de la ligne dans la base de données
     await this.table.destroy({ where: { [Op.or]: where } });
   }
 }
