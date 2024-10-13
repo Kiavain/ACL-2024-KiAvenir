@@ -1,0 +1,101 @@
+/* Style de la page principale */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f9f9f9;
+}
+
+.agenda {
+  padding: 20px;
+}
+
+/* Fenêtre modale (pop-up) */
+.modal {
+  display: none; /* Par défaut caché */
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Ombre semi-transparente */
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+/* Bouton fermer */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+/* Champs du formulaire */
+label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 10px;
+  display: block;
+}
+
+input[type="text"],
+textarea,
+input[type="datetime-local"],
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+button.submit-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button.submit-btn:hover {
+  background-color: #0059c1;
+}
+
+/* Bouton pour ouvrir le modal */
+.open-modal-btn {
+  padding: 10px 20px;
+  background-color: #1a73e8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin: 20px;
+  transition: background-color 0.3s ease;
+}
+
+.open-modal-btn:hover {
+  background-color: #0059c1;
+}
