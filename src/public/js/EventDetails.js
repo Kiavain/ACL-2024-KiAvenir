@@ -1,12 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("eventModal");
+  const contextMenu = document.getElementById("eventContextMenu");
   const closeButton = modal.querySelector(".close");
 
   moment.locale("fr");
 
   // Fonction pour ouvrir la modale avec les détails de l'événement
   const openModal = (eventData) => {
-    console.log(eventData);
     document.getElementById("eventTitle").innerText = eventData.name;
     document.getElementById("eventDetails").innerText =
       eventData.description || "Pas de détails disponibles.";
@@ -26,28 +26,61 @@ document.addEventListener("DOMContentLoaded", () => {
   window.onclick = (event) => {
     if (event.target === modal) {
       modal.style.display = "none";
+    } else if (event.target !== contextMenu) {
+      contextMenu.style.display = "none";
     }
   };
 
-  // Écouteur d'événements pour chaque événement
+  // Clic gauche sur un événement pour le sélectionner
   document.querySelectorAll(".event-item").forEach((item) => {
     item.addEventListener("click", () => {
       let clickTimeout;
 
-      // Si un clic a déjà été détecté, on annule le timeout pour ne pas exécuter le simple clic
+      // Si un second  clic a déjà été détecté, on annule le timeout
       if (clickTimeout) {
         clearTimeout(clickTimeout);
         clickTimeout = null;
       } else {
-        // Si aucun double clic n'est détecté dans le délai, on exécute le simple clic
         clickTimeout = setTimeout(() => {
+          // TODO: Sélectionner/Désélectionner l'événement
           clickTimeout = null;
         }, 300); // Délai de 300ms pour attendre un éventuel double clic
       }
     });
 
+    // Double clic sur un événement pour ouvrir les détails
     item.addEventListener("dblclick", () => {
       openModal(JSON.parse(item.dataset.event));
+    });
+
+    // Clic droit sur un événement pour ouvrir le menu contextuel
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const eventData = JSON.parse(item.dataset.event);
+      contextMenu.style.display = "block";
+      contextMenu.style.left = `${event.clientX}px`;
+      contextMenu.style.top = `${event.clientY}px`;
+
+      const detailsButton = document.getElementById("detailsEvent");
+      detailsButton.onclick = () => {
+        openModal(eventData);
+        contextMenu.style.display = "none";
+      };
+
+      const deleteButton = document.getElementById("deleteEvent");
+      deleteButton.onclick = () => {
+        fetch(`/api/events/delete/${eventData.eventId}`, {
+          method: "GET"
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.reload();
+              contextMenu.style.display = "none";
+            }
+          });
+      };
     });
   });
 });

@@ -32,6 +32,14 @@
     </div>
 </div>
 
+<!-- Menu contextuel d'un événement -->
+<div id="eventContextMenu" class="context-menu">
+    <ul>
+        <li id="detailsEvent">Plus d'info</li>
+        <li id="deleteEvent">Supprimer</li>
+    </ul>
+</div>
+
 <% if (view === 'day') { %>
     <h2>Événements pour le <%= currentDate.format('DD MMMM YYYY') %></h2>
     <ul>
