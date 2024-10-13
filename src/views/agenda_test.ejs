@@ -35,14 +35,14 @@
 <% if (view === 'day') { %>
     <h2>Événements pour le <%= currentDate.format('DD MMMM YYYY') %></h2>
     <ul>
-        <% events.filter(event => moment.isMoment(event.start) && moment.isMoment(event.end) &&
-                (event.start.isSame(currentDate, 'day') || event.end.isSame(currentDate, 'day') ||
-                        (event.start.isBefore(currentDate) && event.end.isAfter(currentDate))))
+        <% events.filter(event => moment.isMoment(event.startDate) && moment.isMoment(event.endDate) &&
+                (event.startDate.isSame(currentDate, 'day') || event.endDate.isSame(currentDate, 'day') ||
+                        (event.startDate.isBefore(currentDate) && event.endDate.isAfter(currentDate))))
         .forEach(event => { %>
             <li class="event-item"
-                data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format(), end: event.end.format()}) %>'>
-                <strong><%= event.title %></strong> -
-                <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : event.start.isSame(currentDate, 'day') ? `${event.start.format('HH:mm')} à 23:59` : event.end.isSame(currentDate, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+                data-event='<%= JSON.stringify({ ...event, startDate: event.startDate.format(), end: event.endDate.format() }) %>'>
+                <strong><%= event.name %></strong> -
+                <%= event.startDate.isSame(event.end, 'day') ? `${event.startDate.format('HH:mm')} à ${event.endDate.format('HH:mm')}` : event.startDate.isSame(currentDate, 'day') ? `${event.startDate.format('HH:mm')} à 23:59` : event.endDate.isSame(currentDate, 'day') ? `00:00 à ${event.endDate.format('HH:mm')}` : 'Toute la journée' %>
             </li>
         <% }) %>
     </ul>
@@ -52,14 +52,14 @@
         <div class="day">
             <h3><%= day.format('dddd DD MMMM YYYY') %></h3>
             <ul>
-                <% events.filter(event => moment.isMoment(event.start) && moment.isMoment(event.end) &&
-                        (event.start.isSame(day, 'day') || event.end.isSame(day, 'day') ||
-                                (event.start.isBefore(day) && event.end.isAfter(day))))
+                <% events.filter(event => moment.isMoment(event.startDate) && moment.isMoment(event.endDate) &&
+                        (event.startDate.isSame(day, 'day') || event.endDate.isSame(day, 'day') ||
+                                (event.startDate.isBefore(day) && event.endDate.isAfter(day))))
                 .forEach(event => { %>
                     <li class="event-item"
-                        data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format(), end: event.end.format() }) %>'>
-                        <strong><%= event.title %></strong> -
-                        <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : event.start.isSame(day, 'day') ? `${event.start.format('HH:mm')} à 23:59` : event.end.isSame(day, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+                        data-event='<%= JSON.stringify({ ...event, startDate: event.startDate.format(), end: event.endDate.format() }) %>'>
+                        <strong><%= event.name %></strong> -
+                        <%= event.startDate.isSame(event.end, 'day') ? `${event.startDate.format('HH:mm')} à ${event.endDate.format('HH:mm')}` : event.startDate.isSame(day, 'day') ? `${event.startDate.format('HH:mm')} à 23:59` : event.endDate.isSame(day, 'day') ? `00:00 à ${event.endDate.format('HH:mm')}` : 'Toute la journée' %>
                     </li>
                 <% }) %>
             </ul>
@@ -83,14 +83,14 @@
                             <%= day.format('D') %>
                             <ul>
                                 <% events.forEach(event => { %>
-                                    <% if (moment.isMoment(event.start) && moment.isMoment(event.end) &&
-                                            (event.start.isBefore(day.endOf('day')) && event.end.isAfter(day.startOf('day')))) { %>
+                                    <% if (moment.isMoment(event.startDate) && moment.isMoment(event.endDate) &&
+                                            (event.startDate.isBefore(day.endOf('day')) && event.endDate.isAfter(day.startOf('day')))) { %>
                                         <li class="event-item"
                                             style="border-left: 5px solid <%= event.color %>;
                                                     background-color: <%= event.rgba %>"
-                                            data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format(), end: event.end.format() }) %>'>
-                                            <strong><%= event.title %></strong> -
-                                            <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : day.isSame(event.start, 'day') ? `${event.start.format('HH:mm')} à 23:59` : day.isSame(event.end, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
+                                            data-event='<%= JSON.stringify({ ...event, startDate: event.startDate.format(), end: event.endDate.format() }) %>'>
+                                            <strong><%= event.name %></strong> -
+                                            <%= event.startDate.isSame(event.end, 'day') ? `${event.startDate.format('HH:mm')} à ${event.endDate.format('HH:mm')}` : day.isSame(event.startDate, 'day') ? `${event.startDate.format('HH:mm')} à 23:59` : day.isSame(event.end, 'day') ? `00:00 à ${event.endDate.format('HH:mm')}` : 'Toute la journée' %>
                                         </li>
                                     <% } %>
                                 <% }) %>
