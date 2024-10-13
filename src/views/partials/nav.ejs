@@ -6,7 +6,7 @@
             <img src="/img/favicon.ico" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
             <!-- Brand name -->
             <span class="ms-2">KiAvenir</span> <!-- Add some margin-left with 'ms-2' -->
-          </a>
+        </a>
 
         <!-- Toggle button for mobile view -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -30,7 +30,10 @@
                 <% if (locals.user) { %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <%= locals.user.username %>
+                            <!-- Logo on the left -->
+                            <img src="/img/account.jpg" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                            <!-- Brand name -->
+                            <span class="ms-2"><%= locals.user.username %></span> <!-- Add some margin-left with 'ms-2' -->
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item <%= currentPath === '/account' ? 'active' : '' %>" href="/account">Mon compte</a></li>

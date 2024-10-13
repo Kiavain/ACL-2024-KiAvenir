@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<head>
+  <title>KiAvenir - Mon compte</title>
+</head>
+    <%- include('partials/header') %>
+
+    <h1 class="text-center mb-4 fw-bold text-primary">Mes informations</h1>
+    <ul class="d-grid gap-2 d-md-block mx-auto">
+        <li>Adresse email: <%= locals.user.email ?? '' %></li>
+        <li>Nom d'utilisateur: <%= locals.user.username ?? '' %></li>
+    </ul>
+    
+    <div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
+        <a class="btn btn-outline-danger btn-sm" href="/account/delete">Supprimer mon compte</a>
+    </div>
+
+    <%- include('partials/footer') %>
+</body>
+
+</html>
