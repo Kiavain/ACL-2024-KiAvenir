@@ -80,8 +80,8 @@
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
-                console.log("raw password: " + rawValue);
-                console.log("hashed password: " + accountForm.password.value);
+                // console.log("raw password: " + rawValue);
+                // console.log("hashed password: " + accountForm.password.value);
                 accountForm.password.value = rawValue;
             }
 

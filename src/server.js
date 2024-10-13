@@ -6,6 +6,10 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { authenticate } from './controllers/authController.js';
+
+import dotenv from 'dotenv';
+dotenv.config();  // On charge les variables d'environnement depuis le fichier .env
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -22,9 +26,16 @@ class KiAvenir {
   async init() {
     this.app
       .use(bodyParser.json())
-      .use(express.static(path.join(__dirname, "public")));
+      .use(bodyParser.urlencoded({ extended: true })) // For form data (application/x-www-form-urlencoded)
+      .use(express.static(path.join(__dirname, "public")))
+      .use((req, res, next) => {
+        res.locals.currentPath = req.path; // Pour récupérer l'url local
+        next();
+      })
+      .use(authenticate); // Pour récupérer le token s'il existe
 
     await this.database.load();
+    this.app.locals.database = this.database; // Make the database available globally
     console.log("Base de données chargée !");
   }
 
@@ -65,7 +76,8 @@ class KiAvenir {
 
     // Middleware pour gérer les erreurs 404
     this.app.use((req, res) => {
-      res.status(404).send("<h1>404 Not Found</h1>");
+      // res.status(404).send("<h1>404 Not Found</h1>");
+      res.status(404).render("errors/404.ejs");
     });
   }
 

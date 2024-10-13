@@ -1,9 +1,5 @@
 import Routeur from "../structures/Routeur.js";
-import { createAccount, authenticate } from '../controllers/authController.js';
-import Database from '../components/Database.js'; // Assuming you are importing your database here
-
-// Use the database from your main application and pass it to the controller
-const database = new Database();
+import { createAccount, authenticate, login, logout } from '../controllers/authController.js';
 
 /**
  * Les routes liées à l'authentification
@@ -17,8 +13,9 @@ class AuthRouteur extends Routeur {
    * Implémentation de la construction des routes
    */
   build() {
-    this.router.post('/account/new', createAccount.bind(this.app));
-    this.router.post('/account/login', authenticate.bind(this.app));
+    this.router.post('/account/new', createAccount);
+    this.router.post('/account/login', login);
+    this.router.post('/account/logout', logout);
   }
 }
 
