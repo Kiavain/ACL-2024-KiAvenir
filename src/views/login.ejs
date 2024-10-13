@@ -13,14 +13,14 @@
                     <div class="row">
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Nom d'utilisateur</label>
                         <div class="col-md-7">
-                            <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur">
+                            <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
                             <label class="form-label text-danger"><%= locals.message ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Mot de passe</label>
                         <div class="col-md-7">
-                            <input type="password" class="form-control" name="password" placeholder="Mot de passe">
+                            <input type="password" class="form-control" name="password" placeholder="Mot de passe" required>
                             <label class="form-label text-danger" id="passwordMessage"></label>
                         </div>
                     </div>
@@ -56,15 +56,19 @@
             const passwordMessage = document.getElementById("passwordMessage");
             passwordMessage.textContent = "";
 
-            let password = accountForm.password.value;
-
-            if (password.length < 8) {
+            if (accountForm.password.value.length < 8) {
                 passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
             } else {
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
                 accountForm.password.value = rawValue;
+                console.log(rawValue);
+            }
+
+            // Prevent form submission if any field is invalid
+            if (!this.checkValidity()) {
+                event.preventDefault();
             }
         }
     </script>
