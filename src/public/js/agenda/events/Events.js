@@ -37,14 +37,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   createButton.onclick = () => {
-    console.log("new Event");
     const name = getInputValue("event-name");
     const dateDebut = getInputValue("event-date");
     const description = getInputValue("event-description");
     const dateFin = getInputValue("event-date-end");
     if (name && dateDebut && description && dateFin) {
-      console.log("good");
-
       const data = {
         name: name,
         agendaId: "1",
