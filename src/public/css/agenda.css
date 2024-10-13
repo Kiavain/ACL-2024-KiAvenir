@@ -1,0 +1,155 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #d0d7df;
+    border-bottom: 1px solid #bbb;
+}
+
+.header-left, .header-middle, .header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-title {
+    font-size: 18px;
+    text-align: center;
+    padding-right: 4em;
+}
+
+.header-right {
+    gap: 10px;
+}
+
+.footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: #85a3ae; 
+    font-size: 16px;
+    font-weight: bold;
+    color: #000000;
+    border-top: 1px solid #ccc;
+}
+
+
+.date-range, .view-toggle {
+    font-size: 14px;
+    margin-right: 15px;
+}
+
+.planning-grid {
+    display: flex;
+}
+
+/* Colonne des heures*/
+
+.time-column {
+    width: 60px;
+    background-color: #f9f9f9;
+    border-right: 1px solid #ccc;
+}
+
+.time-slot {
+    padding-bottom: 25px;
+    padding-top: 25px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    color: #666;
+}
+.menu-slot {
+    border-bottom: 1px solid #ccc; 
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+/* Barre de navigation */
+
+.navigation-column {
+    background-color: #f6f9fa;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    justify-content: space-between;
+    border-bottom: 1px solid #bbb;
+}
+
+.nav-buttons {
+    display: flex;
+    align-items: center;
+    padding-left: 5%;
+}
+.nav-labels {
+    display: flex;
+    align-items: center;
+    padding-right: 5%;
+}
+
+/* Jours */
+
+.days-row {
+    display: flex;
+    flex-grow: 1;
+}
+
+.day-column {
+    flex: 1;
+    border-left: 1px solid #ccc;
+    border-right: 1px dashed #ccc;
+    background-color: #fff;
+}
+
+.day-label {
+    text-align: center;
+    padding: 19.7px;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #bbb;
+}
+
+.day-column .time-slot {
+    border-bottom: 1px dashed #ccc;
+    height: 60px;
+}
+
+/* Icones et boutons */
+.material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
+}
+.icon-button {
+    background-color: transparent; 
+    border: none; 
+    cursor: pointer; 
+    padding: 10px; 
+    transition: background-color 0.3s ease, transform 0.3s ease; 
+}
+
+.icon-button:hover {
+    background-color: rgba(0, 0, 0, 0.1); 
+    transform: scale(1.1); 
+}
+
+.icon-button .material-symbols-outlined {
+    font-size: 24px; 
+    color: #333; 
+    transition: color 0.3s ease; 
+}
+
+.icon-button:hover .material-symbols-outlined {
+    color: #007BFF;
+}
