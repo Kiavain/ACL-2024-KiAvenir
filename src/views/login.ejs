@@ -62,12 +62,13 @@
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
+                console.log("raw password: " + rawValue);
+                console.log("hashed password: " + accountForm.password.value);
                 accountForm.password.value = rawValue;
-                console.log(rawValue);
             }
 
             // Prevent form submission if any field is invalid
-            if (!this.checkValidity()) {
+            if (!accountForm.checkValidity()) {
                 event.preventDefault();
             }
         }

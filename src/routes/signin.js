@@ -1,7 +1,7 @@
 import Routeur from "../structures/Routeur.js";
 
 /**
- * Les routes liées à la page d'inscription
+ * Les routes liées à la page de connexion
  */
 class SignInRouteur extends Routeur {
   /**
