@@ -66,16 +66,36 @@ class AgendaRouteur extends Routeur {
 function getEventsForDate(server, currentDate) {
   return server.database.tables
     .get("events")
-    .getAll()
     .filter((event) => event.startDate.getMonth() === currentDate.month())
     .map((event) => {
       return {
         title: event.name,
         details: event.description,
         start: moment(event.startDate),
-        end: moment(event.endDate)
+        end: moment(event.endDate),
+        color: event.getAgenda().color,
+        rgba: hexToRgba(event.getAgenda().color, 0.1)
       };
     });
+}
+
+/**
+ * Convertit une couleur hexadécimale en RGBA
+ * @param hex La couleur hexadécimale
+ * @param alpha L'opacité
+ * @returns {string} La couleur au format RGBA
+ */
+function hexToRgba(hex, alpha) {
+  // Retirer le # si présent
+  hex = hex.replace(/^#/, "");
+
+  // Décomposer la couleur hexadécimale en RGB
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+
+  // Retourner la couleur au format RGBA avec l'opacité (alpha)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export default AgendaRouteur;

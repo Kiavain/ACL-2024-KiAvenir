@@ -86,6 +86,8 @@
                                     <% if (moment.isMoment(event.start) && moment.isMoment(event.end) &&
                                             (event.start.isBefore(day.endOf('day')) && event.end.isAfter(day.startOf('day')))) { %>
                                         <li class="event-item"
+                                            style="border-left: 5px solid <%= event.color %>;
+                                                    background-color: <%= event.rgba %>"
                                             data-event='<%= JSON.stringify({ title: event.title, details: event.details || "Pas de détails disponibles.", start: event.start.format(), end: event.end.format() }) %>'>
                                             <strong><%= event.title %></strong> -
                                             <%= event.start.isSame(event.end, 'day') ? `${event.start.format('HH:mm')} à ${event.end.format('HH:mm')}` : day.isSame(event.start, 'day') ? `${event.start.format('HH:mm')} à 23:59` : day.isSame(event.end, 'day') ? `00:00 à ${event.end.format('HH:mm')}` : 'Toute la journée' %>
