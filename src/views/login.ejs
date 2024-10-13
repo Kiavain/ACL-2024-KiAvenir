@@ -28,7 +28,6 @@
                         <button type="submit" class="btn btn-primary fw-bold">Se connecter</button>
                     </div>
                 </form>
-                <!-- Text with link below the form -->
                 <div class="mt-3 text-center">
                     <p class="mb-0">Nouveau ? <a href="/signin">Créer un compte</a></p>
                 </div>
@@ -57,6 +56,8 @@
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
+                // console.log("raw password: " + rawValue);
+                // console.log("hashed password: " + accountForm.password.value);
                 accountForm.password.value = rawValue;
             }
 
