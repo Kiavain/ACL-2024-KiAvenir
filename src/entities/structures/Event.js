@@ -85,6 +85,14 @@ export default class Event extends EntityStructures {
   }
 
   /**
+   * Retourne le propriétaire de l'agenda
+   * @returns {User} L'utilisateur
+   */
+  getOwner() {
+    return this.getAgenda().getOwner();
+  }
+
+  /**
    * Retourne les données de l'événement
    * @returns {Object} Les données de l'événement
    */
