@@ -14,14 +14,14 @@
                         <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Entrez votre adresse mail</label>
                         <div class="col-md-7">
                             <input type="email" class="form-control" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail" required>
-                            <label class="form-label text-danger"><%= locals.message ?? '' %></label>
+                            <label class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Entrez un nom d'utilisateur</label>
                         <div class="col-md-7">
                             <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
-                            <label class="form-label text-danger"><%= locals.message ?? '' %></label>
+                            <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">

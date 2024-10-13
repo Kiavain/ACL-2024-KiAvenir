@@ -26,9 +26,11 @@ export function createAccount(req, res) {
     const emailAlreadyTaken = users.find(u => u.email === email)
 
     if (usernameAlreadyTaken) {
-        return res.status(400).send("Ce nom d'utilisateur est déjà pris.");
+        // return res.status(400).send("Ce nom d'utilisateur est déjà pris.");
+        return res.render("signin", { usernameTaken: "Ce nom d'utilisateur est déjà pris.", email: email, username: username });
     } else if (emailAlreadyTaken) {
-        return res.status(400).send("Un compte existe déjà pour cette adresse mail.");
+        // return res.status(400).send("Un compte existe déjà pour cette adresse mail.");
+        return res.render("signin", { emailTaken: "Un compte existe déjà pour cette adresse mail.", email: email, username: username });
     } else {
         const createdAt = Date.now();
         const updatedAt = createdAt;
@@ -49,30 +51,55 @@ export function createAccount(req, res) {
 
         // Défini le token dans le cookie et redirige
         res.cookie("accessToken", token, { httpOnly: true });
+        console.log("Les cookies créés: ", res.cookies);
         res.redirect("/");
     }
 }
 
+
+// Fonction pour lire les cookies
+function parseCookies (request) {
+    const list = {};
+    const cookieHeader = request.headers?.cookie;
+    if (!cookieHeader) return list;
+
+    cookieHeader.split(`;`).forEach(function(cookie) {
+        let [ name, ...rest] = cookie.split(`=`);
+        name = name?.trim();
+        if (!name) return;
+        const value = rest.join(`=`).trim();
+        if (!value) return;
+        list[name] = decodeURIComponent(value);
+    });
+
+    return list;
+}
+
 export function authenticate(req, res, next) {
-    console.log("Cookies:", req.cookies);  // Debug log to check if cookies are populated
+    // Lecture des cookies
+    const cookies = parseCookies(req);
+    // console.log("On a trouvé les cookies: ", cookies);
+    // console.log("cookies.accessToken: ", cookies.accessToken, !cookies.accessToken);
+
     try {
-        const token = req.cookies.accessToken;
+        const token = cookies.accessToken;
         if (!token) {
             console.log("PAS DE TOKEN TROUVÉ");
             res.locals.user = null;
             return next();
         }
-        const user = jwt.verify(token, process.env.SECRET);
-        console.log("ON ESSAIE D'AUTHENTIFIER L'UTILISATEUR " + user.email);
+        const user = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("On a authentifié l'utilisateur " + user.username);
         res.locals.user = user;
     } catch (error) {
-        console.log("Aucun token d'accès trouvé dans le cookie pour authentifier le client");
+        console.log("Aucun token d'accès trouvé dans le cookie:",error);
         
         // Compte de test pour tester l'affichage
-        res.locals.user = {
-            email: "jb@kiavenir.fr",
-            username: "Jean-Baptiste"
-        }
+        // res.locals.user = {
+        //     email: "jb@kiavenir.fr",
+        //     username: "Jean-Baptiste"
+        // }
+
         // console.error("Authentication failed:", error);
         // res.status(401).send("Unauthorized");
     }
@@ -84,10 +111,12 @@ export function login(req, res) {
     const { username, password } = req.body;
     const user = req.app.locals.database.tables.get("users").find((user) => user.username === username);
 
+    // désactiver pour l'instant, parce que la on hashait 2 fois le mot de passe, donc à voir si on passe le mot de passe pas hashé avec la page de connexion
     // if (user && user.password === createHash("sha256").update(password).digest("hex")) { 
     if (user && user.password === password) {
         const token = createJWT(user);
         res.cookie("accessToken", token, { httpOnly: true });
+        console.log("Les cookies créés: ", res.cookies);
         res.redirect("/");
     } else {
         // console.log(user.password + "\n" + password);
@@ -100,5 +129,6 @@ export function login(req, res) {
 
 export function logout(req, res) {
     res.cookie("accessToken", null);
+    res.clearCookie('accessToken');
     res.redirect("/");
 }
