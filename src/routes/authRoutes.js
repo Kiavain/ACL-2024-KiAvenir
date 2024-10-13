@@ -1,5 +1,5 @@
 import Routeur from "../structures/Routeur.js";
-import { createAccount, authenticate, login, logout } from '../controllers/authController.js';
+import { createAccount, login, logout } from '../controllers/authController.js';
 
 /**
  * Les routes liées à l'authentification
@@ -15,7 +15,7 @@ class AuthRouteur extends Routeur {
   build() {
     this.router.post('/account/new', createAccount);
     this.router.post('/account/login', login);
-    this.router.post('/account/logout', logout);
+    this.router.get('/account/logout', logout);
   }
 }
 

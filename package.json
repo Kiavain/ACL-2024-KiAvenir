@@ -36,6 +36,7 @@
     "express": "^4.21.0",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
+    "kiavenir": "file:",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.7",
     "sequelize": "^6.37.3",
