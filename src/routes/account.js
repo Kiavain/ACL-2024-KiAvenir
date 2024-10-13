@@ -27,7 +27,7 @@ class AccountRouteur extends Routeur {
     this.router.post('/account/new', createAccount);
     this.router.post('/account/login', login);
     this.router.get('/account/logout', logout);
-    this.router.get('/account/delete', deleteAccount);
+    this.router.post('/account/delete', deleteAccount);
 
     // Page "Mon compte"
     this.router.get("/account", (req, res) => {
