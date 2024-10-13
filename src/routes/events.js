@@ -12,13 +12,26 @@ class EventRouteur extends Routeur {
    * Construit la route
    */
   build() {
-    this.router.get("/api/events/delete/:eventId", async (req, res) => {
+    this.router.delete("/api/events/delete/:eventId", async (req, res) => {
       const event = this.server.database.tables
         .get("events")
         .get(req.params.eventId);
 
       if (event) {
         await event.delete();
+        res.json({ success: true });
+      } else {
+        res.json({ success: false });
+      }
+    });
+
+    this.router.put("/api/events/update/:eventId", async (req, res) => {
+      const event = this.server.database.tables
+        .get("events")
+        .get(req.params.eventId);
+
+      if (event) {
+        await event.update(req.body);
         res.json({ success: true });
       } else {
         res.json({ success: false });
