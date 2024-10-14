@@ -217,6 +217,14 @@ export async function editAccount(req, res) {
   const users = req.app.locals.database.tables.get("users").getAll();
   const user = users.find((user) => user.email === localUser.email);
 
+  if (!user) {
+    return res.render("account", {
+        errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
+        email: email,
+        username: username
+    });
+  }
+
   // Vérifie si le nouveau pseudo est déjà existant
   const usernameAlreadyTaken = users.find(
     (u) => u.username === username && u.username !== localUser.username
@@ -261,7 +269,11 @@ export async function editAccount(req, res) {
       try {
         await user.update(newUser);
       } catch {
-        res.redirect("/");
+        return res.render("account", {
+            errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
+            email: email,
+            username: username
+        });
       }
     }
 
