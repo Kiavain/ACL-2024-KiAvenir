@@ -11,8 +11,8 @@ import {
  * Les routes liées à l'authentification
  */
 class AccountRouteur extends Routeur {
-  constructor() {
-    super();
+  constructor(server) {
+    super(server);
   }
 
   /**
@@ -20,21 +20,30 @@ class AccountRouteur extends Routeur {
    */
   build() {
     // Page d'inscription
-    this.router.get("/signin", (req, res) => {
-      res.render("signin", { title: "Inscription" });
-    });
+    this.router
+      .get("/signin", (req, res) => {
+        res.render("signin", { title: "Inscription" });
+      })
 
-    // Page de connexion
-    this.router.get("/login", (req, res) => {
-      res.render("login", { title: "Connexion" });
-    });
+      // Page de connexion
+      .get("/login", (req, res) => {
+        res.render("login", { title: "Connexion" });
+      })
 
-    // Actions réalisées sur un compte (création, connexion, déconnexion et suppression)
-    this.router.post("/account/new", createAccount);
-    this.router.post("/account/login", login);
-    this.router.get("/account/logout", logout); // cette route pourrait être mis en post, mais d'un point de vue sécurité c'est pareil donc pas important
-    this.router.post("/account/edit", editAccount);
-    this.router.post("/account/delete", deleteAccount);
+      // Actions réalisées sur un compte (création, connexion, déconnexion et suppression)
+      .post("/account/new", (req, res) => {
+        createAccount(req, res, this.server.database);
+      })
+      .post("/account/login", (req, res) => {
+        login(req, res, this.server.database);
+      })
+      .get("/account/logout", logout) // cette route pourrait être mis en post, mais d'un point de vue sécurité c'est pareil donc pas important
+      .post("/account/edit", (req, res) => {
+        editAccount(req, res, this.server.database);
+      })
+      .post("/account/delete", (req, res) => {
+        deleteAccount(req, res, this.server.database);
+      });
 
     // Page "Mon compte"
     this.router.get("/account", (req, res) => {
@@ -43,5 +52,4 @@ class AccountRouteur extends Routeur {
   }
 }
 
-const accountRoute = new AccountRouteur();
-export default accountRoute.router;
+export default AccountRouteur;
