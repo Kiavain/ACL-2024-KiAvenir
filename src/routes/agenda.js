@@ -4,8 +4,8 @@ import Routeur from "../structures/Routeur.js";
  * Les routes liées à la page de l'agenda
  */
 class AgendaRouteur extends Routeur {
-  constructor() {
-    super();
+  constructor(server) {
+    super(server);
   }
 
   /**
@@ -18,5 +18,4 @@ class AgendaRouteur extends Routeur {
   }
 }
 
-const agendaRouteur = new AgendaRouteur();
-export default agendaRouteur.router;
+export default AgendaRouteur;

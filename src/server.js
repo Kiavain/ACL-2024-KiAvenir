@@ -35,7 +35,6 @@ class KiAvenir {
       .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
 
     await this.database.load();
-    this.app.locals.database = this.database; // Fait en sorte que la database soit accessible de manière globale (pour y accéder par exemple dans accountController.js)
     console.log("Base de données chargée !");
   }
 
@@ -49,7 +48,9 @@ class KiAvenir {
     // Récupère les routes dans le dossier routes
     for (const file of fs.readdirSync("src/routes")) {
       const route = await import(`./routes/${file}`);
-      this.routes.push(route);
+      const routeInstance = new route.default(this);
+      console.log(`Route ${file} chargée !`);
+      this.routes.push(routeInstance.router);
     }
   }
 
@@ -71,7 +72,7 @@ class KiAvenir {
 
     // Utilisation des routes
     for (const route of this.routes) {
-      this.app.use(route.default);
+      this.app.use(route);
     }
 
     // Middleware pour gérer les erreurs 404

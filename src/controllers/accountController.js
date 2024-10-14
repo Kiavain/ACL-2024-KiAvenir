@@ -125,13 +125,14 @@ export function authenticate(req, res, next) {
  * Crée un compte utilisateur avec les informations du formulaire
  * @param req {Request} La requête
  * @param res {Response} La réponse
+ * @param database {Database} La base de données
  * @returns {void}
  */
-export async function createAccount(req, res) {
+export async function createAccount(req, res, database) {
   const { email, username, password } = req.body;
 
   // Récupère les utilisateurs de la base de données
-  const users = req.app.locals.database.tables.get("users").getAll();
+  const users = database.tables.get("users").getAll();
 
   const usernameAlreadyTaken = users.find((u) => u.username === username);
   const emailAlreadyTaken = users.find((u) => u.email === email);
@@ -161,8 +162,7 @@ export async function createAccount(req, res) {
     };
 
     // Ajoute l'utilisateur à la base
-    req.app.locals.database.tables.get("users").create(newUser);
-    req.app.locals.database.load(); // Met à jour la base locale au cas où
+    await database.tables.get("users").create(newUser);
 
     // Créer un token JWT
     const token = await createJWT(newUser);
@@ -173,10 +173,16 @@ export async function createAccount(req, res) {
   }
 }
 
-// Appeler après validation du formulaire de connexion
-export async function login(req, res) {
+/**
+ * Connecte un utilisateur avec les informations du formulaire
+ * @param req {Request} La requête
+ * @param res {Response} La réponse
+ * @param database {Database} La base de données
+ * @returns {Promise<void>}
+ */
+export async function login(req, res, database) {
   const { username, password } = req.body;
-  const user = req.app.locals.database.tables
+  const user = database.tables
     .get("users")
     .find((user) => user.username === username);
 
@@ -204,9 +210,10 @@ export function logout(req, res) {
  * Modifie les informations du compte de l'utilisateur connecté
  * @param req {Request} La requête
  * @param res {Response} La réponse
+ * @param database {Database} La base de données
  * @returns {*} La réponse
  */
-export async function editAccount(req, res) {
+export async function editAccount(req, res, database) {
   // On récupère les nouvelles informations envoyées par l'utilisateur
   const { email, username, password } = req.body;
 
@@ -214,14 +221,15 @@ export async function editAccount(req, res) {
   const localUser = res.locals.user;
 
   // On cherche cet utilisateur dans la base de données
-  const users = req.app.locals.database.tables.get("users").getAll();
+  const users = database.tables.get("users").getAll();
   const user = users.find((user) => user.email === localUser.email);
 
   if (!user) {
     return res.render("account", {
-        errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
-        email: email,
-        username: username
+      errorMessage:
+        "Il y a eu un problème dans l'enregistrement de vos modifications.",
+      email: email,
+      username: username
     });
   }
 
@@ -270,9 +278,10 @@ export async function editAccount(req, res) {
         await user.update(newUser);
       } catch {
         return res.render("account", {
-            errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
-            email: email,
-            username: username
+          errorMessage:
+            "Il y a eu un problème dans l'enregistrement de vos modifications.",
+          email: email,
+          username: username
         });
       }
     }
@@ -280,9 +289,15 @@ export async function editAccount(req, res) {
     // Créer un token JWT
     const token = await createJWT(user);
 
+    // Modifie le local user
+    res.locals.user = {
+      email: email,
+      username: username
+    };
+
     // Défini le token dans le cookie et redirige
     res.cookie("accessToken", token, { httpOnly: true });
-    res.redirect("/");
+    res.render("homepage");
   }
 }
 
@@ -290,11 +305,12 @@ export async function editAccount(req, res) {
  * Supprime le compte de l'utilisateur connecté
  * @param req {Request} La requête
  * @param res {Response} La réponse
+ * @param database {Database} La base de données
  * @returns {Promise<void>}
  */
-export async function deleteAccount(req, res) {
+export async function deleteAccount(req, res, database) {
   const localUser = res.locals.user;
-  const user = req.app.locals.database.tables
+  const user = database.tables
     .get("users")
     .find((user) => user.username === localUser.username);
 
