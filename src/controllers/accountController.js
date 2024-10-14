@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { encryptPassword } from "../utils/index.js";
 
 // Fonction pour créer un token
 function createJWT(user) {
@@ -54,12 +55,11 @@ export function authenticate(req, res, next) {
 
 // Crée un compte utilisateur avec les informations du formulaire
 export function createAccount(req, res) {
-    // Pour la suite, on part du principe que password est déjà hash !
-
     const { email, username, password } = req.body;
 
     // Récupère les utilisateurs de la base de données
     const users = req.app.locals.database.tables.get("users").getAll();
+
     const usernameAlreadyTaken = users.find(u => u.username === username)
     const emailAlreadyTaken = users.find(u => u.email === email)
 
@@ -95,7 +95,6 @@ export function createAccount(req, res) {
 
 // Appeler après validation du formulaire de connexion
 export function login(req, res) {
-    // Pour la suite, on part du principe que password est déjà hash !
     const { username, password } = req.body;
     const user = req.app.locals.database.tables.get("users").find((user) => user.username === username);
 
@@ -105,7 +104,7 @@ export function login(req, res) {
         res.cookie("accessToken", token, { httpOnly: true });
         res.redirect("/");
     } else {
-        res.render("login", { errorMessage: "Nom d'utilisateur/mot de passe incorrect." });
+        res.render("login", { username: username, errorMessage: "Nom d'utilisateur/mot de passe incorrect." });
     }
 }
 
@@ -115,6 +114,89 @@ export function logout(req, res) {
     res.cookie("accessToken", null);
     res.clearCookie('accessToken');
     res.redirect("/");
+}
+
+
+// Modifie un compte utilisateur avec les informations du formulaire
+export function editAccount(req, res) {
+    // On récupère les nouvelles informations envoyées par l'utilisateur
+    const { email, username, password } = req.body;
+
+    // On récupère l'utilisateur connecté
+    const localUser = res.locals.user;
+    // On cherche cet utilisateur dans la base de données
+    const users = req.app.locals.database.tables.get("users").getAll();
+    const user = req.app.locals.database.tables.get("users").find((user) => user.email === localUser.email);
+    // console.log("LocalUser? ", !!localUser);
+    // console.log("User? ", !!user);
+    
+    // Vérifie si le nouveau pseudo est déjà existant
+    const usernameAlreadyTaken = users.find(u => u.username === username && u.username !== localUser.username);
+    const emailAlreadyTaken = users.find(u => u.email === email && u.email !== localUser.email)
+
+    // On empêche bien sûr de changer de pseudo ou de mail pour un déjà existant
+    if (usernameAlreadyTaken) {
+        return res.render("account", { usernameTaken: "Ce nom d'utilisateur est déjà pris.", email: email, username: username });
+    } else if (emailAlreadyTaken) {
+        return res.render("account", { emailTaken: "Un compte existe déjà pour cette adresse mail.", email: email, username: username });
+    } else {
+        // J'ai bien vu la fonction user.update(data), mais je pense pas pouvoir l'utiliser ici
+        var userIsUpdated = false;
+
+        var newUser = {
+            email: user.email,
+            username: user.username,
+            password: user.password,
+            updatedAt: Date.now()
+        };
+
+        // const newUser = user;
+        if (email !== user.email) {
+            newUser.email = email;
+            userIsUpdated = true;
+        }
+        if (username !== user.username) {
+            newUser.username = username;
+            userIsUpdated = true;
+        }
+        if (password !== "" && !user.checkPassword(password)) {
+            newUser.password = encryptPassword(password, user.salt);
+            userIsUpdated = true;
+        }
+
+        // console.log("Update ? ", userIsUpdated);
+
+        // Effectue les modifications de l'utilisateur dans la base
+        if (userIsUpdated) {
+            // user.update(newUser);
+            console.log(user);
+
+            try {
+                user.update(newUser); // Ça fonctionne au niveau bdd, mais ça renvoie une erreur serveur et donc au client aussi
+                
+                //Toujours la même erreur:
+                /*
+                    file:///C:/Users/nicol/OneDrive/Documents/Semestre%207/ACL/Projet/ACL-2024-KiAvenir/src/structures/Entity.js:233
+                        for (const row of updated[1]) {
+                                                ^
+                    TypeError: updated[1] is not iterable
+                        at UsersEntity.update (file:///C:/Users/nicol/OneDrive/Documents/Semestre%207/ACL/Projet/ACL-2024-KiAvenir/src/structures/Entity.js:233:30)
+                */
+
+                req.app.locals.database.load(); // Met à jour la base locale au cas où
+            } catch {
+                res.redirect("/");
+            }
+            // req.
+        }
+
+        // Créer un token JWT
+        const token = createJWT(user);
+
+        // Défini le token dans le cookie et redirige
+        res.cookie("accessToken", token, { httpOnly: true });
+        res.redirect("/");
+    }
 }
 
 
