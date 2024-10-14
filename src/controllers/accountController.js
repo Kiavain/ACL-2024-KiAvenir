@@ -276,6 +276,7 @@ export async function editAccount(req, res, database) {
     if (userIsUpdated) {
       try {
         await user.update(newUser);
+        return logout(req, res);
       } catch {
         return res.render("account", {
           errorMessage:
@@ -288,12 +289,6 @@ export async function editAccount(req, res, database) {
 
     // Créer un token JWT
     const token = await createJWT(user);
-
-    // Modifie le local user
-    res.locals.user = {
-      email: email,
-      username: username
-    };
 
     // Défini le token dans le cookie et redirige
     res.cookie("accessToken", token, { httpOnly: true });
@@ -317,7 +312,8 @@ export async function deleteAccount(req, res, database) {
   try {
     await user.delete(); // Supprime l'utilisateur de la base de données
     logout(req, res);
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.render("account", {
       errorMessage: "Erreur: impossible de supprimer le compte."
     });
