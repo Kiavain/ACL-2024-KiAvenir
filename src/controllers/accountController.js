@@ -126,7 +126,7 @@ export function authenticate(req, res, next) {
  * @param req {Request} La requête
  * @param res {Response} La réponse
  * @param database {Database} La base de données
- * @returns {void}
+ * @returns {Promise<void>}
  */
 export async function createAccount(req, res, database) {
   const { email, username, password } = req.body;
@@ -211,7 +211,7 @@ export function logout(req, res) {
  * @param req {Request} La requête
  * @param res {Response} La réponse
  * @param database {Database} La base de données
- * @returns {*} La réponse
+ * @returns {Promise<void>}
  */
 export async function editAccount(req, res, database) {
   // On récupère les nouvelles informations envoyées par l'utilisateur
