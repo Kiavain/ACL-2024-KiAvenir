@@ -44,8 +44,7 @@ export default class UsersEntity extends Entity {
             user.salt = crypto.randomBytes(2).toString("hex"); // 4 caractères hexadécimaux
 
             // Chiffrement du mot de passe avec le sel
-            //todo: remettre (mais changer la vérification pour le login)
-            // user.password = encryptPassword(user.password, user.salt);
+            user.password = encryptPassword(user.password, user.salt);
           }
         }
       }
