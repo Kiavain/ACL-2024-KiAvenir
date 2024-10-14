@@ -38,23 +38,22 @@
                                 </div>
                             </div>
                             <div class="d-grid">
-                                <!-- todo: enlever le disabled quand j'aurais fix l'erreur -->
-                                <button type="submit" class="btn btn-primary fw-bold" disabled>Enregistrer les modifications</button>
+                                <button type="submit" class="btn btn-primary fw-bold">Enregistrer les modifications</button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-        
+
             <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
         </div>
-        
+
         <div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 Supprimer mon compte
             </button>
         </div>
-        
+
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -88,7 +87,7 @@
                 e.preventDefault();
                 validateAccountCreation();
             });
-            
+
             async function validateAccountCreation() {
                 const passwordMessage = document.getElementById("passwordMessage");
                 passwordMessage.textContent = "";
@@ -106,7 +105,7 @@
                 } else {
                     accountForm.submit();
                 }
-                
+
 
                 // Empêche la soumission du formulaire si un champ est incorrect
                 if (!accountForm.checkValidity()) {
