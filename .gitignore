@@ -1,6 +1,9 @@
 # IDEA
 .idea
 
+# VSCode
+.vscode
+
 # Database
 *.sqlite
 
