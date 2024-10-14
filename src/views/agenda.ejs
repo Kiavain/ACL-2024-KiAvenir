@@ -58,6 +58,10 @@
                 <label for="event-agenda">Agenda:</label>
                 <select id="event-agenda" name="event-agenda" >
                     <option value="" selected disabled>---Veuillez choisir un agenda---</option>
+                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
+                    .forEach(agenda => { %>
+                        <option value="<%= agenda.id %>"><%= agenda.name %></option>
+                    <% }) %>
                 </select>
 
 
@@ -161,6 +165,7 @@
             </div>
         </div>
     </div>
+
     <script src="/js/agenda/events/Events.js"></script>
 
 </body>
