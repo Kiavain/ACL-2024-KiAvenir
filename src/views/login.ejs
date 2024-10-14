@@ -14,7 +14,7 @@
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Nom d'utilisateur</label>
                         <div class="col-md-7">
                             <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
-                            <label class="form-label text-danger"><%= locals.message ?? '' %></label>
+                            <label class="form-label text-danger"><%= locals.errorMessage ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
@@ -52,16 +52,13 @@
             if (accountForm.password.value.length < 8) {
                 passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
             } else {
-                //todo: ne pas hashé le mot de passe ici, pour pouvoir le hasher côté serveur ?? (pour ajouter le sel) 
                 const rawValue = accountForm.password.value;
                 accountForm.password.value = await hashSHA256(rawValue);
                 accountForm.submit();
-                // console.log("raw password: " + rawValue);
-                // console.log("hashed password: " + accountForm.password.value);
                 accountForm.password.value = rawValue;
             }
 
-            // Prevent form submission if any field is invalid
+            // Empêche la soumission du formulaire si un champ est incorrect
             if (!accountForm.checkValidity()) {
                 event.preventDefault();
             }
