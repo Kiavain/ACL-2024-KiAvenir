@@ -114,6 +114,7 @@ export function authenticate(req, res, next) {
       return next();
     }
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
+    console.log("Utilisateur authentifié :", res.locals.user);
   } catch (error) {
     console.log("Erreur: aucun token d'accès trouvé dans le cookie\n", error);
     // res.status(401).send("Unauthorized");
@@ -222,7 +223,7 @@ export async function editAccount(req, res, database) {
 
   // On cherche cet utilisateur dans la base de données
   const users = database.tables.get("users").getAll();
-  const user = users.find((user) => user.email === localUser.email);
+  let user = users.find((user) => user.email === localUser.email);
 
   if (!user) {
     return res.render("account", {
@@ -257,7 +258,11 @@ export async function editAccount(req, res, database) {
   } else {
     let userIsUpdated = false;
 
-    const newUser = {};
+    const newUser = {
+      email: user.email,
+      username: user.username,
+      password: user.password
+    };
 
     if (email !== user.email) {
       newUser.email = email;
@@ -272,11 +277,21 @@ export async function editAccount(req, res, database) {
       userIsUpdated = true;
     }
 
-    // Effectue les modifications de l'utilisateur dans la base
     if (userIsUpdated) {
       try {
         await user.update(newUser);
-        return logout(req, res);
+        const u = database.tables
+          .get("users")
+          .find((u) => u.email === newUser.email);
+
+        // Générer un nouveau token JWT avec les informations mises à jour
+        const newToken = await createJWT(u);
+        res.cookie("accessToken", newToken, { httpOnly: true });
+
+        // Mettre à jour res.locals.user avec les informations actualisées
+        res.locals.user = newToken;
+
+        res.redirect("/");
       } catch {
         return res.render("account", {
           errorMessage:
@@ -286,13 +301,6 @@ export async function editAccount(req, res, database) {
         });
       }
     }
-
-    // Créer un token JWT
-    const token = await createJWT(user);
-
-    // Défini le token dans le cookie et redirige
-    res.cookie("accessToken", token, { httpOnly: true });
-    res.render("homepage");
   }
 }
 
