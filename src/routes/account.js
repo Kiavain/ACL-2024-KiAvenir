@@ -1,5 +1,11 @@
 import Routeur from "../structures/Routeur.js";
-import { createAccount, login, logout, editAccount, deleteAccount } from '../controllers/accountController.js';
+import {
+  createAccount,
+  login,
+  logout,
+  editAccount,
+  deleteAccount
+} from "../controllers/accountController.js";
 
 /**
  * Les routes liées à l'authentification
@@ -24,11 +30,11 @@ class AccountRouteur extends Routeur {
     });
 
     // Actions réalisées sur un compte (création, connexion, déconnexion et suppression)
-    this.router.post('/account/new', createAccount);
-    this.router.post('/account/login', login);
-    this.router.get('/account/logout', logout); // cette route pourrait être mis en post, mais d'un point de vue sécurité c'est pareil donc pas important
-    this.router.post('/account/edit', editAccount);
-    this.router.post('/account/delete', deleteAccount);
+    this.router.post("/account/new", createAccount);
+    this.router.post("/account/login", login);
+    this.router.get("/account/logout", logout); // cette route pourrait être mis en post, mais d'un point de vue sécurité c'est pareil donc pas important
+    this.router.post("/account/edit", editAccount);
+    this.router.post("/account/delete", deleteAccount);
 
     // Page "Mon compte"
     this.router.get("/account", (req, res) => {
