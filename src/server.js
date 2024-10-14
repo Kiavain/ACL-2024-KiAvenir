@@ -6,10 +6,10 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authenticate } from './controllers/accountController.js'; // Pour identifier l'utilisateur à chaque chargement de page
+import { authenticate } from "./controllers/accountController.js"; // Pour identifier l'utilisateur à chaque chargement de page
 
-import dotenv from 'dotenv';
-dotenv.config();  // On charge les variables d'environnement depuis le fichier .env (sert notamment pour JWT_SECRET, pour créer des tokens avec une clé secrète)
+import dotenv from "dotenv";
+dotenv.config(); // On charge les variables d'environnement depuis le fichier .env (sert notamment pour JWT_SECRET, pour créer des tokens avec une clé secrète)
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
