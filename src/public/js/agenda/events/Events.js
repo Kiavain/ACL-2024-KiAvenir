@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   createButton.onclick = () => {
     const name = getInputValue("event-name");
     const dateDebut = getInputValue("event-date");
-    const description = getInputValue("event-description");
+    const description = getInputValue("event-description") ? null : " ";
     const dateFin = getInputValue("event-date-end");
     if (name && dateDebut && description && dateFin) {
       const data = {
