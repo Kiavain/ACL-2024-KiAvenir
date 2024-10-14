@@ -37,6 +37,13 @@
                                     <label class="form-label text-danger" id="passwordMessage"></label>
                                 </div>
                             </div>
+                            <div class="row">
+                                <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
+                                <div class="col-md-7">
+                                    <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe">
+                                    <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
+                                </div>
+                            </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary fw-bold">Enregistrer les modifications</button>
                             </div>
@@ -89,13 +96,20 @@
             });
 
             async function validateAccountCreation() {
-                const passwordMessage = document.getElementById("passwordMessage");
-                passwordMessage.textContent = "";
+            const passwordMessage = document.getElementById("passwordMessage");
+            const passwordRepeated = document.getElementById("passwordRepeated");
+            const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
+            passwordMessage.textContent = "";
+            passwordRepeatedMessage.textContent = "";
 
                 let password = accountForm.password.value;
+                let passwordConfirmation = passwordRepeated.value;
+
                 if (password !== "") {
                     if (password.length < 8) {
-                    passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+                        passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+                    } else if (password != passwordConfirmation) {
+                        passwordRepeatedMessage.textContent = "Les mots de passe ne correspondent pas.";
                     } else {
                         const rawValue = accountForm.password.value;
                         accountForm.password.value = await hashSHA256(rawValue);
