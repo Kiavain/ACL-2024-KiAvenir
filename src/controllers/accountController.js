@@ -101,7 +101,7 @@ export function login(req, res) {
 
     // Désactivé pour l'instant, parce que là on hashait 2 fois le mot de passe, donc à voir si on passerait plutôt le mot de passe pas hashé avec la page de connexion
     // if (user && user.password === createHash("sha256").update(password).digest("hex")) { 
-    if (user && user.password === password) {
+    if (user && user.checkPassword(password)) {
         const token = createJWT(user);
         res.cookie("accessToken", token, { httpOnly: true });
         res.redirect("/");
