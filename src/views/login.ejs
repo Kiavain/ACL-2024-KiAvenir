@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<html lang="fr">
 <head>
   <title>KiAvenir - Connexion</title>
 </head>
-
+<body>
+    <% /* global locals */ %>
     <%- include('partials/header') %>
 
     <div class="container d-flex justify-content-center align-items-center h-75">
@@ -13,14 +15,14 @@
                     <div class="row">
                         <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Nom d'utilisateur</label>
                         <div class="col-md-7">
-                            <input type="text" class="form-control" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
+                            <input type="text" class="form-control" name="username" id="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
                             <label class="form-label text-danger"><%= locals.errorMessage ?? '' %></label>
                         </div>
                     </div>
                     <div class="row">
                         <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Mot de passe</label>
                         <div class="col-md-7">
-                            <input type="password" class="form-control" name="password" placeholder="Mot de passe" required>
+                            <input type="password" class="form-control" name="password" id="password" placeholder="Mot de passe" required>
                             <label class="form-label text-danger" id="passwordMessage"></label>
                         </div>
                     </div>
@@ -35,36 +37,9 @@
         </div>
     </div>
 
-    <script src="/js/hash.js"></script>
-    <script>
-        let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
+    <script src="/js/utils.js"></script>
+    <script src="/js/login.js"></script>
 
-        const accountForm = document.forms.accountLogin;
-        accountForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            validateAccountLogin();
-        });
-        
-        async function validateAccountLogin() {
-            const passwordMessage = document.getElementById("passwordMessage");
-            passwordMessage.textContent = "";
-
-            if (accountForm.password.value.length < 8) {
-                passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
-            } else {
-                const rawValue = accountForm.password.value;
-                accountForm.password.value = await hashSHA256(rawValue);
-                accountForm.submit();
-                accountForm.password.value = rawValue;
-            }
-
-            // Empêche la soumission du formulaire si un champ est incorrect
-            if (!accountForm.checkValidity()) {
-                event.preventDefault();
-            }
-        }
-    </script>
-    
     <%- include('partials/footer') %>
 </body>
 
