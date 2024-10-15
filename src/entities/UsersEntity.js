@@ -26,7 +26,8 @@ export default class UsersEntity extends Entity {
           type: DataTypes.STRING(32)
         },
         email: {
-          type: DataTypes.STRING(2)
+          type: DataTypes.STRING(32),
+          unique: true
         },
         password: {
           type: DataTypes.TEXT
