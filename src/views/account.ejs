@@ -22,27 +22,21 @@
                             <div class="row">
                                 <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Votre adresse mail</label>
                                 <div class="col-md-7">
-                                    <label>
-                                        <input type="email" class="form-control" name="email" value="<%= locals.user.email ?? '' %>" placeholder="Adresse mail">
-                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" value="<%= locals.user.email ?? '' %>" placeholder="Adresse mail">
                                     <label class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Votre nom d'utilisateur</label>
                                 <div class="col-md-7">
-                                    <label>
-                                        <input type="text" class="form-control" name="username" value="<%= locals.user.username ?? '' %>" placeholder="Nom d'utilisateur">
-                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username" value="<%= locals.user.username ?? '' %>" placeholder="Nom d'utilisateur">
                                     <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
                                 </div>
                             </div>
                             <div class="row">
                                 <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Nouveau mot de passe</label>
                                 <div class="col-md-7">
-                                    <label>
-                                        <input type="password" class="form-control" name="password" placeholder="Mot de passe">
-                                    </label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe">
                                     <label class="form-label text-danger" id="passwordMessage"></label>
                                 </div>
                             </div>
@@ -94,8 +88,8 @@
 
 
     <% if (locals.user) { %>
-        <script src="/js/hash.js"></script>
-        <script src="/js/account.js"></script>
+        <script src="/js/utils.js"></script>
+        <script src="/js/accountEdition.js"></script>
     <% } %>
 
     <%- include('partials/footer') %>

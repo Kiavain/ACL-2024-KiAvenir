@@ -1,3 +1,4 @@
+import { checkPassword } from "./utils.js";
 const accountForm = document.forms["accountEdition"];
 accountForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -22,18 +23,13 @@ async function validateAccountCreation(e) {
   let passwordConfirmation = passwordRepeated["value"];
 
   if (password !== "") {
-    if (password.length < 8) {
-      passwordMessage.textContent =
-        "Le mot de passe doit contenir au moins 8 caractères.";
-    } else if (password !== passwordConfirmation) {
-      passwordRepeatedMessage.textContent =
-        "Les mots de passe ne correspondent pas.";
-    } else {
-      const rawValue = accountForm.password.value;
-      accountForm.password.value = await hashSHA256(rawValue);
-      accountForm.submit();
-      accountForm.password.value = rawValue;
-    }
+    await checkPassword(
+      password,
+      passwordMessage,
+      passwordConfirmation,
+      passwordRepeatedMessage,
+      accountForm
+    );
   } else {
     accountForm.submit();
   }

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+<html lang="fr">
 <head>
   <title>KiAvenir - Accueil</title>
 </head>
-
+<body>
+    <% /* global locals */ %>
     <%- include('partials/header') %>
 
     <div class="container" style="display: flex; justify-content: center; align-items: center; height: 25%; flex-direction: column;">
@@ -20,12 +22,12 @@
               Bienvenue sur notre site de gestion d'agendas.
             </div>
             <div class="mb-2 fs-6">
-              Vous pouvez dès à présent <a href="/signin" class="link-underline link-underline-opacity-0"">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0"">vous connecter</a> pour accéder à toutes les fonctionnalités.
+              Vous pouvez dès à présent <a href="/signin" class="link-underline link-underline-opacity-0">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0">vous connecter</a> pour accéder à toutes les fonctionnalités.
             </div>
         <% } %>
       </h3>
     </div>
-    
+
     <%- include('partials/footer') %>
 </body>
 </html>
