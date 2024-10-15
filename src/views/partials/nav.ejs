@@ -32,7 +32,14 @@
                             <li><a class="dropdown-item <%= currentPath === '/account' ? 'active' : '' %>" href="/account">Mon compte</a></li>
                             <li><a class="dropdown-item <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Mes agendas</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/account/logout">Déconnexion</a></li>
+                            <li>
+                                <script src="/js/logout.js"></script>
+                                <a class="dropdown-item"  href="#" onclick="sendLogout()">Déconnexion</a>
+                                <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
+                                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                </form>
+                            </li>
+
                         </ul>
                     </li>
                 <% } else { %>
