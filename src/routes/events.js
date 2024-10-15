@@ -3,9 +3,9 @@ import Routeur from "../structures/Routeur.js";
 /**
  * Les routes liées à la page des événements
  */
-class EventRouteur extends Routeur {
+export default class EventRouteur extends Routeur {
   constructor(server) {
-    super(server);
+    super(server, null);
   }
 
   /**
@@ -39,5 +39,3 @@ class EventRouteur extends Routeur {
     });
   }
 }
-
-export default EventRouteur;
