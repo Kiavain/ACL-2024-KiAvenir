@@ -14,32 +14,6 @@
     <%- include('partials/header') %>
 
 
-<header class="header">
-    <div class="header-left">
-        Icone du site ici
-    </div>
-    <div class="header-middle">
-        <span class="header-title">Header trop cool</span>
-    </div>
-    <div class="header-right">
-        <!-- Rajouter un onClick sur le + (créer agenda/event) -->
-        <button class="icon-button" id="createAgendaOrEvent" >
-            <span class="material-symbols-outlined">
-                add
-            </span>
-        </button>
-        <div id="agendaEventWindow" style="display: none">
-            <button id="createAgenda">new Agenda</button>
-            <button id="createEvent">new Event</button>
-        </div>
-        <!-- Rajouter un onClick sur le logOut -->
-        <button class="icon-button">
-            <span class="material-symbols-outlined">
-                logout
-            </span>
-        </button>
-    </div>
-</header>
 
     <%- include('partials/notifs') %>
     <!-- Fenêtre modale -->
@@ -93,6 +67,15 @@
             </button>
         </div>
         <div class="nav-labels">
+            <button class="icon-button" id="createAgendaOrEvent" >
+            <span class="material-symbols-outlined">
+                add
+            </span>
+            </button>
+            <div id="agendaEventWindow">
+                <button id="createAgenda">new Agenda</button>
+                <button id="createEvent">new Event</button>
+            </div>
             <button class="icon-button">
                 <span class="material-symbols-outlined">looks_one</span>
             </button>

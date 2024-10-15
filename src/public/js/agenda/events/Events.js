@@ -1,20 +1,19 @@
-console.log("Events.js chargé");
-
 document.addEventListener("DOMContentLoaded", () => {
-  const createAgendaOrEvent = document.getElementById("createAgendaOrEvent");
-  const windowAgendaOrEvent = document.getElementById("agendaEventWindow");
+  // Utilitaires pour sélectionner les éléments
+  const getElement = (id) => document.getElementById(id);
+  const getInputValue = (id) => getElement(id).value;
+
+  const popup = document.getElementById("agendaEventWindow");
+  const createAgendaOrEvent = getElement("createAgendaOrEvent");
+  createAgendaOrEvent.addEventListener("click", function () {
+    popup.classList.toggle("show");
+  });
+
   const createEvent = document.getElementById("createEvent");
   const modal = document.getElementById("modal");
   const closeModalBtn = document.getElementById("close-btn");
   const createButton = document.getElementById("saveEvent");
 
-  // Utilitaires pour sélectionner les éléments
-  const getElement = (id) => document.getElementById(id);
-  const getInputValue = (id) => getElement(id).value;
-
-  createAgendaOrEvent.onclick = () => {
-    windowAgendaOrEvent.style.display = "block";
-  };
   createEvent.onclick = () => {
     modal.style.display = "block";
   };
