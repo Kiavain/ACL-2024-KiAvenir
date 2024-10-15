@@ -3,9 +3,10 @@ import Routeur from "../structures/Routeur.js";
 /**
  * Les routes liées à la page de l'agenda
  */
-class AgendaRouteur extends Routeur {
-  constructor() {
-    super();
+// noinspection JSUnusedGlobalSymbols // Utilisé par le serveur
+export default class AgendaRouteur extends Routeur {
+  constructor(server) {
+    super(server, null);
   }
 
   /**
@@ -17,6 +18,3 @@ class AgendaRouteur extends Routeur {
     });
   }
 }
-
-const agendaRouteur = new AgendaRouteur();
-export default agendaRouteur.router;
