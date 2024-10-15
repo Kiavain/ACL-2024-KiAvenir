@@ -1,86 +1,57 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
-  <link rel="stylesheet" href="/css/signin.css">
-
   <title>KiAvenir - Inscription</title>
 </head>
 <body>
+    <% /* global locals */ %>
     <%- include('partials/header') %>
 
-    <h1>Création de compte</h1>
-
-    <form name="accountCreation" action="/account/new" method="POST">
-        <table>
-            <tbody>
-                <tr>
-                    <td><label for="username">Entrez le nom d'utilisateur</label></td>
-                    <td><input name="username" value="<%= locals.username ?? '' %>" /></td>
-                    <td><label><%= locals.message ?? '' %></label></td>
-                </tr>
-                <tr>
-                    <td><label for="password">Entrez le mot de passe</label></td>
-                    <td><input type="password" name="password" value="" /></td>
-                    <td><label id="passwordMessage"></label></td>
-                </tr>
-                <tr>
-                    <td><label for="passwordRepeated">Confirmez le mot de passe</label></td>
-                    <td><input type="password" id="passwordRepeated" value="" /></td>
-                    <td><label id="passwordRepeatedMessage"></label></td>
-                </tr>
-            </tbody>
-        </table>
-        <div>
-            <input type="submit" value="Créer un compte"/>
+    <div class="container d-flex justify-content-center align-items-center h-75">
+        <div class="card shadow-lg" style="width: 600px;">
+            <div class="card-body">
+                <h2 class="text-center mb-4 fw-bold">Inscription</h2>
+                <form name="accountCreation" action="/account/new" method="POST">
+                    <div class="row">
+                        <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Entrez votre adresse mail</label>
+                        <div class="col-md-7">
+                            <input type="email" class="form-control" id="email" name="email" value="<%= locals.email ?? '' %>" placeholder="Adresse mail" required>
+                            <label for="email" class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Entrez un nom d'utilisateur</label>
+                        <div class="col-md-7">
+                                <input type="text" class="form-control" id="username" name="username" value="<%= locals.username ?? '' %>" placeholder="Nom d'utilisateur" required>
+                            <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Entrez un mot de passe</label>
+                        <div class="col-md-7">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe" required>
+                            <label class="form-label text-danger" id="passwordMessage"></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
+                        <div class="col-md-7">
+                            <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe" required>
+                            <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary fw-bold">Créer un compte</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 
 
-    <script>
-        // import { hashPassword, comparePassword } from '/js/hash.js';
-
-        let FF_FOUC_FIX; /* pour empêcher un warning de chargement dans Firefox (FOUC) */
-
-        const accountForm = document.forms.accountCreation;
-
-        accountForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            validateAccountCreation();
-        });
-
-        async function validateAccountCreation() {
-            // ...
-            let username = document.querySelector('[name="username"]').value;
-            let password = document.querySelector('[name="password"]').value;
-            let passwordRepeated = document.querySelector('[id="passwordRepeated"]').value;
-
-            //todo: à supprimer
-            console.log("username: '" + username + "'");
-            console.log("password: '" + password + "'");
-            console.log("passwordRepeated: '" + passwordRepeated + "'");
-
-
-            if (password != passwordRepeated) {
-                //todo: afficher une vraie erreur
-                alert("Les mots de passe ne correspondent pas !");
-            }
-
-            // let hashedPassword = await hashPassword(password);
-            // console.log("hashedPassword: '" + hashedPassword + "'");
-
-            //todo: récupérer le sel ??
-            // let salt = "pas encore fait";
-
-            //todo: enregistrer le compte dans la base de données
-                // Vérifier si doublons ou autre ? 🤔
-
-        }
-    </script>
-
+    <script src="/js/register.js"></script>
 
     <%- include('partials/footer') %>
 </body>
+
 </html>

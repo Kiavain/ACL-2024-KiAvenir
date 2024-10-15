@@ -4,9 +4,10 @@ import moment from "moment";
 /**
  * Les routes liées à la page de l'agenda
  */
-class AgendaRouteur extends Routeur {
+// noinspection JSUnusedGlobalSymbols // Utilisé par le serveur
+export default class AgendaRouteur extends Routeur {
   constructor(server) {
-    super(server);
+    super(server, null);
   }
 
   /**
@@ -60,7 +61,7 @@ class AgendaRouteur extends Routeur {
 /**
  * Retourne les événements
  * @param server {KiAvenir}
- * @param currentDate {moment}
+ * @param currentDate {moment.Moment}
  * @returns {Object[]}
  */
 function getEventsForDate(server, currentDate) {
@@ -96,5 +97,3 @@ function hexToRgba(hex, alpha) {
   // Retourner la couleur au format RGBA avec l'opacité (alpha)
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
-
-export default AgendaRouteur;
