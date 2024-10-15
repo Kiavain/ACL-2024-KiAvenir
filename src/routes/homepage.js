@@ -5,7 +5,7 @@ import Routeur from "../structures/Routeur.js";
  */
 class HomepageRouteur extends Routeur {
   constructor(server) {
-    super(server);
+    super(server, null);
   }
 
   /**

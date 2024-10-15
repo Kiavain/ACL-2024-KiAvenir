@@ -4,7 +4,224 @@ import { randomBytes } from "crypto";
 import dotenv from "dotenv";
 import { promises as fs } from "fs";
 import { join } from "path";
+import Controller from "./controller.js";
 
+export class AccountController extends Controller {
+  /**
+   * Crée un contrôleur pour les comptes utilisateurs
+   * @param server {KiAvenir} Le serveur
+   */
+  constructor(server) {
+    super(server);
+    this.createAccount = this.createAccount.bind(this);
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
+    this.editAccount = this.editAccount.bind(this);
+    this.deleteAccount = this.deleteAccount.bind(this);
+  }
+
+  /**
+   * Crée un compte utilisateur avec les informations du formulaire
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<void>}
+   */
+  async createAccount(req, res) {
+    const { email, username, password } = req.body;
+
+    // Récupère les utilisateurs de la base de données
+    const users = this.database.get("users").getAll();
+
+    const usernameAlreadyTaken = users.find((u) => u.username === username);
+    const emailAlreadyTaken = users.find((u) => u.email === email);
+
+    if (usernameAlreadyTaken) {
+      return res.render("signin", {
+        usernameTaken: "Ce nom d'utilisateur est déjà pris.",
+        email: email,
+        username: username
+      });
+    } else if (emailAlreadyTaken) {
+      return res.render("signin", {
+        emailTaken: "Un compte existe déjà pour cette adresse mail.",
+        email: email,
+        username: username
+      });
+    } else {
+      const createdAt = Date.now();
+      const updatedAt = createdAt;
+
+      const newUser = {
+        email,
+        username,
+        password,
+        createdAt,
+        updatedAt
+      };
+
+      // Ajoute l'utilisateur à la base
+      await this.database.get("users").create(newUser);
+
+      // Créer un token JWT
+      const token = await createJWT(newUser);
+
+      // Défini le token dans le cookie et redirige
+      res.cookie("accessToken", token, { httpOnly: true });
+      res.redirect("/");
+    }
+  }
+
+  /**
+   * Connecte un utilisateur avec les informations du formulaire
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<void>}
+   */
+  async login(req, res) {
+    const { username, password } = req.body;
+    const user = this.database.tables
+      .get("users")
+      .find((user) => user.username === username);
+
+    // On re-hash le mot de passe (avec sel cette fois) via l'entité user (comme à la création de compte)
+    if (user && user.checkPassword(password)) {
+      const token = await createJWT(user);
+      res.cookie("accessToken", token, { httpOnly: true });
+      res.redirect("/");
+    } else {
+      res.render("login", {
+        username: username,
+        errorMessage: "Nom d'utilisateur/mot de passe incorrect."
+      });
+    }
+  }
+
+  // Appeler lorsque l'on clique sur "se déconnecter"
+  logout(req, res) {
+    res.cookie("accessToken", null);
+    res.clearCookie("accessToken");
+    res.redirect("/");
+  }
+
+  /**
+   * Modifie les informations du compte de l'utilisateur connecté
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<void>}
+   */
+  async editAccount(req, res) {
+    // On récupère les nouvelles informations envoyées par l'utilisateur
+    const { email, username, password } = req.body;
+
+    // On récupère l'utilisateur connecté
+    const localUser = res.locals.user;
+
+    // On cherche cet utilisateur dans la base de données
+    const users = this.database.tables.get("users").getAll();
+    let user = users.find((user) => user.email === localUser.email);
+
+    if (!user) {
+      return res.render("account", {
+        errorMessage:
+          "Il y a eu un problème dans l'enregistrement de vos modifications.",
+        email: email,
+        username: username
+      });
+    }
+
+    // Vérifie si le nouveau pseudo est déjà existant
+    const usernameAlreadyTaken = users.find(
+      (u) => u.username === username && u.username !== localUser.username
+    );
+    const emailAlreadyTaken = users.find(
+      (u) => u.email === email && u.email !== localUser.email
+    );
+
+    // On empêche bien sûr de changer de pseudo ou de mail pour un déjà existant
+    if (usernameAlreadyTaken) {
+      return res.render("account", {
+        usernameTaken: "Ce nom d'utilisateur est déjà pris.",
+        email: email,
+        username: username
+      });
+    } else if (emailAlreadyTaken) {
+      return res.render("account", {
+        emailTaken: "Un compte existe déjà pour cette adresse mail.",
+        email: email,
+        username: username
+      });
+    } else {
+      let userIsUpdated = false;
+
+      const newUser = {
+        email: user.email,
+        username: user.username,
+        password: user.password
+      };
+
+      if (email !== user.email) {
+        newUser.email = email;
+        userIsUpdated = true;
+      }
+      if (username !== user.username) {
+        newUser.username = username;
+        userIsUpdated = true;
+      }
+      if (password !== "" && !user.checkPassword(password)) {
+        newUser.password = encryptPassword(password, user.salt);
+        userIsUpdated = true;
+      }
+
+      if (userIsUpdated) {
+        try {
+          await user.update(newUser);
+          const u = this.database.tables
+            .get("users")
+            .find((u) => u.email === newUser.email);
+
+          // Générer un nouveau token JWT avec les informations mises à jour
+          const newToken = await createJWT(u);
+          res.cookie("accessToken", newToken, { httpOnly: true });
+
+          // Mettre à jour res.locals.user avec les informations actualisées
+          res.locals.user = newToken;
+
+          res.redirect("/");
+        } catch {
+          return res.render("account", {
+            errorMessage:
+              "Il y a eu un problème dans l'enregistrement de vos modifications.",
+            email: email,
+            username: username
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Supprime le compte de l'utilisateur connecté
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<void>}
+   */
+  async deleteAccount(req, res) {
+    const localUser = res.locals.user;
+    const user = this.database.tables
+      .get("users")
+      .find((user) => user.username === localUser.username);
+
+    try {
+      await user.delete(); // Supprime l'utilisateur de la base de données
+      this.logout(req, res);
+    } catch (err) {
+      console.error(err);
+      res.render("account", {
+        errorMessage: "Erreur: impossible de supprimer le compte."
+      });
+    }
+  }
+}
 const envFilePath = join(process.cwd(), ".env");
 dotenv.config();
 
@@ -43,7 +260,7 @@ async function appendEnvVariable(key, value) {
  * Récupère la clé secrète pour les JWT, en la générant si nécessaire
  * @returns {Promise<String>} Le secret JWT
  */
-export async function getSecret() {
+async function getSecret() {
   if (!process.env.JWT_SECRET) {
     const newSecret = randomBytes(64).toString("hex");
     await appendEnvVariable("JWT_SECRET", newSecret);
@@ -76,7 +293,7 @@ async function createJWT(user) {
  */
 function parseCookies(request) {
   const list = {};
-  const cookieHeader = request.headers?.cookie;
+  const cookieHeader = request.headers["cookie"];
   if (!cookieHeader) {
     return list;
   }
@@ -108,222 +325,15 @@ export function authenticate(req, res, next) {
   const cookies = parseCookies(req);
 
   try {
-    const token = cookies.accessToken;
+    const token = cookies["accessToken"];
     if (!token) {
       res.locals.user = null;
       return next();
     }
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
-    console.log("Utilisateur authentifié :", res.locals.user);
   } catch (error) {
     console.log("Erreur: aucun token d'accès trouvé dans le cookie\n", error);
     // res.status(401).send("Unauthorized");
   }
   next();
-}
-
-/**
- * Crée un compte utilisateur avec les informations du formulaire
- * @param req {Request} La requête
- * @param res {Response} La réponse
- * @param database {Database} La base de données
- * @returns {Promise<void>}
- */
-export async function createAccount(req, res, database) {
-  const { email, username, password } = req.body;
-
-  // Récupère les utilisateurs de la base de données
-  const users = database.tables.get("users").getAll();
-
-  const usernameAlreadyTaken = users.find((u) => u.username === username);
-  const emailAlreadyTaken = users.find((u) => u.email === email);
-
-  if (usernameAlreadyTaken) {
-    return res.render("signin", {
-      usernameTaken: "Ce nom d'utilisateur est déjà pris.",
-      email: email,
-      username: username
-    });
-  } else if (emailAlreadyTaken) {
-    return res.render("signin", {
-      emailTaken: "Un compte existe déjà pour cette adresse mail.",
-      email: email,
-      username: username
-    });
-  } else {
-    const createdAt = Date.now();
-    const updatedAt = createdAt;
-
-    const newUser = {
-      email,
-      username,
-      password,
-      createdAt,
-      updatedAt
-    };
-
-    // Ajoute l'utilisateur à la base
-    await database.tables.get("users").create(newUser);
-
-    // Créer un token JWT
-    const token = await createJWT(newUser);
-
-    // Défini le token dans le cookie et redirige
-    res.cookie("accessToken", token, { httpOnly: true });
-    res.redirect("/");
-  }
-}
-
-/**
- * Connecte un utilisateur avec les informations du formulaire
- * @param req {Request} La requête
- * @param res {Response} La réponse
- * @param database {Database} La base de données
- * @returns {Promise<void>}
- */
-export async function login(req, res, database) {
-  const { username, password } = req.body;
-  const user = database.tables
-    .get("users")
-    .find((user) => user.username === username);
-
-  // On re-hash le mot de passe (avec sel cette fois) via l'entité user (comme à la création de compte)
-  if (user && user.checkPassword(password)) {
-    const token = await createJWT(user);
-    res.cookie("accessToken", token, { httpOnly: true });
-    res.redirect("/");
-  } else {
-    res.render("login", {
-      username: username,
-      errorMessage: "Nom d'utilisateur/mot de passe incorrect."
-    });
-  }
-}
-
-// Appeler lorsque l'on clique sur "se déconnecter"
-export function logout(req, res) {
-  res.cookie("accessToken", null);
-  res.clearCookie("accessToken");
-  res.redirect("/");
-}
-
-/**
- * Modifie les informations du compte de l'utilisateur connecté
- * @param req {Request} La requête
- * @param res {Response} La réponse
- * @param database {Database} La base de données
- * @returns {Promise<void>}
- */
-export async function editAccount(req, res, database) {
-  // On récupère les nouvelles informations envoyées par l'utilisateur
-  const { email, username, password } = req.body;
-
-  // On récupère l'utilisateur connecté
-  const localUser = res.locals.user;
-
-  // On cherche cet utilisateur dans la base de données
-  const users = database.tables.get("users").getAll();
-  let user = users.find((user) => user.email === localUser.email);
-
-  if (!user) {
-    return res.render("account", {
-      errorMessage:
-        "Il y a eu un problème dans l'enregistrement de vos modifications.",
-      email: email,
-      username: username
-    });
-  }
-
-  // Vérifie si le nouveau pseudo est déjà existant
-  const usernameAlreadyTaken = users.find(
-    (u) => u.username === username && u.username !== localUser.username
-  );
-  const emailAlreadyTaken = users.find(
-    (u) => u.email === email && u.email !== localUser.email
-  );
-
-  // On empêche bien sûr de changer de pseudo ou de mail pour un déjà existant
-  if (usernameAlreadyTaken) {
-    return res.render("account", {
-      usernameTaken: "Ce nom d'utilisateur est déjà pris.",
-      email: email,
-      username: username
-    });
-  } else if (emailAlreadyTaken) {
-    return res.render("account", {
-      emailTaken: "Un compte existe déjà pour cette adresse mail.",
-      email: email,
-      username: username
-    });
-  } else {
-    let userIsUpdated = false;
-
-    const newUser = {
-      email: user.email,
-      username: user.username,
-      password: user.password
-    };
-
-    if (email !== user.email) {
-      newUser.email = email;
-      userIsUpdated = true;
-    }
-    if (username !== user.username) {
-      newUser.username = username;
-      userIsUpdated = true;
-    }
-    if (password !== "" && !user.checkPassword(password)) {
-      newUser.password = encryptPassword(password, user.salt);
-      userIsUpdated = true;
-    }
-
-    if (userIsUpdated) {
-      try {
-        await user.update(newUser);
-        const u = database.tables
-          .get("users")
-          .find((u) => u.email === newUser.email);
-
-        // Générer un nouveau token JWT avec les informations mises à jour
-        const newToken = await createJWT(u);
-        res.cookie("accessToken", newToken, { httpOnly: true });
-
-        // Mettre à jour res.locals.user avec les informations actualisées
-        res.locals.user = newToken;
-
-        res.redirect("/");
-      } catch {
-        return res.render("account", {
-          errorMessage:
-            "Il y a eu un problème dans l'enregistrement de vos modifications.",
-          email: email,
-          username: username
-        });
-      }
-    }
-  }
-}
-
-/**
- * Supprime le compte de l'utilisateur connecté
- * @param req {Request} La requête
- * @param res {Response} La réponse
- * @param database {Database} La base de données
- * @returns {Promise<void>}
- */
-export async function deleteAccount(req, res, database) {
-  const localUser = res.locals.user;
-  const user = database.tables
-    .get("users")
-    .find((user) => user.username === localUser.username);
-
-  try {
-    await user.delete(); // Supprime l'utilisateur de la base de données
-    logout(req, res);
-  } catch (err) {
-    console.error(err);
-    res.render("account", {
-      errorMessage: "Erreur: impossible de supprimer le compte."
-    });
-  }
 }
