@@ -9,10 +9,14 @@ import { getDirname } from "../utils/index.js";
 class Routeur {
   /**
    * Construit le routeur
+   * @param server {KiAvenir} L'instance du serveur
+   * @param controller {Controller | AccountController} Le contrôleur associé
    * @constructor
    */
-  constructor() {
+  constructor(server, controller) {
     this.router = Router();
+    this.server = server;
+    this.controller = controller;
     this.build();
   }
 

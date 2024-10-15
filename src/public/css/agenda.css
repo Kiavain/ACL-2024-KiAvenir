@@ -36,7 +36,7 @@ body {
     width: 100%;
     text-align: center;
     padding: 10px;
-    background-color: #85a3ae; 
+    background-color: #85a3ae;
     font-size: 16px;
     font-weight: bold;
     color: #000000;
@@ -69,7 +69,7 @@ body {
     color: #666;
 }
 .menu-slot {
-    border-bottom: 1px solid #ccc; 
+    border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
     padding-top: 10px;
 }
@@ -112,7 +112,7 @@ body {
 
 .day-label {
     text-align: center;
-    padding: 19.7px;
+    padding: 20px;
     font-size: 12px;
     font-weight: bold;
     border-bottom: 1px solid #bbb;
@@ -132,22 +132,22 @@ body {
     'opsz' 24
 }
 .icon-button {
-    background-color: transparent; 
-    border: none; 
-    cursor: pointer; 
-    padding: 10px; 
-    transition: background-color 0.3s ease, transform 0.3s ease; 
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .icon-button:hover {
-    background-color: rgba(0, 0, 0, 0.1); 
-    transform: scale(1.1); 
+    background-color: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
 }
 
 .icon-button .material-symbols-outlined {
-    font-size: 24px; 
-    color: #333; 
-    transition: color 0.3s ease; 
+    font-size: 24px;
+    color: #333;
+    transition: color 0.3s ease;
 }
 
 .icon-button:hover .material-symbols-outlined {

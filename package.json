@@ -1,6 +1,6 @@
 {
   "name": "kiavenir",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
@@ -31,9 +31,12 @@
   "dependencies": {
     "body-parser": "^1.20.3",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
     "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "kiavenir": "file:",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.7",
     "sequelize": "^6.37.3",

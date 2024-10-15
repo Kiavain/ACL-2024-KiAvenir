@@ -1,8 +1,11 @@
 # IDEA
 .idea
 
+# VSCode
+.vscode
+
 # Database
-*.sqlite
+data/*.sqlite
 
 # Logs
 logs

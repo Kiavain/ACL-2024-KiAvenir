@@ -6,6 +6,11 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { authenticate } from "./controllers/accountController.js";
+
+// Permet de charger les variables d'environnement
+import dotenv from "dotenv";
+dotenv.config();
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +27,14 @@ class KiAvenir {
   async init() {
     this.app
       .use(bodyParser.json())
-      .use(express.static(path.join(__dirname, "public")));
+      .use(bodyParser.urlencoded({ extended: true })) // For form data (application/x-www-form-urlencoded)
+      .use(express.static(path.join(__dirname, "public")))
+      .use((req, res, next) => {
+        res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar).
+        next();
+      })
+      .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
+
 
     await this.database.load();
     console.log("Base de données chargée !");
@@ -38,7 +50,9 @@ class KiAvenir {
     // Récupère les routes dans le dossier routes
     for (const file of fs.readdirSync("src/routes")) {
       const route = await import(`./routes/${file}`);
-      this.routes.push(route);
+      const routeInstance = new route.default(this);
+      console.log(`Route ${file} chargée !`);
+      this.routes.push(routeInstance.router);
     }
   }
 
@@ -60,12 +74,12 @@ class KiAvenir {
 
     // Utilisation des routes
     for (const route of this.routes) {
-      this.app.use(route.default);
+      this.app.use(route);
     }
 
     // Middleware pour gérer les erreurs 404
     this.app.use((req, res) => {
-      res.status(404).send("<h1>404 Not Found</h1>");
+      res.status(404).render("errors/404.ejs");
     });
   }
 
