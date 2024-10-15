@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   const createAgendaOrEvent = document.getElementById("createAgendaOrEvent");
   const windowAgendaOrEvent = document.getElementById("agendaEventWindow");
@@ -8,19 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Utilitaires pour sélectionner les éléments
   const getElement = (id) => document.getElementById(id);
-  const setInputValue = (id, value) => (getElement(id).value = value);
   const getInputValue = (id) => getElement(id).value;
 
   createAgendaOrEvent.onclick = () => {
     windowAgendaOrEvent.style.display = "block";
   };
   createEvent.onclick = () => {
-    if (this.user !== null) {
-      console.log("connecté");
-    } else {
-      console.log("pas connecté");
-    }
-    console.log("createEvent");
     modal.style.display = "block";
   };
 
@@ -35,16 +29,32 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "none";
     }
   });
-
   createButton.onclick = () => {
     const name = getInputValue("event-name");
     const dateDebut = getInputValue("event-date");
     const description = getInputValue("event-description") ? null : " ";
     const dateFin = getInputValue("event-date-end");
-    if (name && dateDebut && description && dateFin) {
+    const agendaValue = getInputValue("event-agenda");
+    const errorElement = getElement("date-error");
+    let verifs = false;
+    if (dateFin < dateDebut) {
+      errorElement.style.display = "block";
+      event.preventDefault();
+    } else {
+      errorElement.style.display = "none";
+      verifs = true;
+    }
+    if (
+      verifs === true &&
+      name &&
+      dateDebut &&
+      description &&
+      dateFin &&
+      agendaValue
+    ) {
       const data = {
         name: name,
-        agendaId: "1",
+        agendaId: agendaValue,
         description: description,
         startDate: dateDebut,
         endDate: dateFin
@@ -57,10 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.success) {
-            alert("Événement CREER avec succès!");
             window.location.reload();
-          } else {
-            alert("Échec de la CREATION de l'événement.");
+            //Mettre un pop-up de succès
           }
         })
         .catch((error) => console.error("Erreur:", error));

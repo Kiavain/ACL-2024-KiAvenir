@@ -24,7 +24,7 @@ body {
 
 .modal-content {
   background-color: #fff;
-  margin: 10% auto;
+  margin: 4% auto;
   padding: 20px;
   border-radius: 8px;
   width: 400px;
@@ -66,6 +66,7 @@ select {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 14px;
+  resize: none;
 }
 
 button.submit-btn {

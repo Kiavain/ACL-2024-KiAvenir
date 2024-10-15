@@ -1,0 +1,21 @@
+<head>
+    <link rel="stylesheet" href="css/notifs.css">
+</head>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var notification = document.querySelector('.alert-notif');
+    if (notification) {
+      setTimeout(function() {
+        //notification.remove();
+      }, 30000); // .3 secondes
+    }
+  });
+</script>
+
+<% if (notifications) { %>
+    <div class="alert-notif">
+        <%= notifications %>
+    </div>
+<% } %>
+
+
