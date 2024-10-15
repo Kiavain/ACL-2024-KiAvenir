@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 import { devDatabase } from "../data/script.js";
 import { createStream } from "rotating-file-stream";
 import session from "express-session";
+import flash from "connect-flash";
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -49,21 +50,15 @@ class KiAvenir {
       session({
         secret: "secret-key", // Utilise une clé secrète pour signer la session
         resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false } // Mettre à true en production si HTTPS
+        saveUninitialized: true
       })
     );
-
-    // Middleware pour gérer les notifications
+    // Configurer connect-flash
+    this.app.use(flash());
+    // Middleware pour rendre les flash messages accessibles dans les vues
     this.app.use((req, res, next) => {
-      // Si une notification existe dans la session, la passer dans les variables locales
-      if (req.session.notifications) {
-        res.locals.notifications = req.session.notifications; // Stocke la notification
-        delete req.session.notifications; // Supprime la notification après l'affichage
-      } else {
-        res.locals.notifications = null; // Aucun message
-      }
-      next(); // Passe au middleware suivant
+      res.locals.notifications = req.flash("notifications");
+      next();
     });
   }
 
