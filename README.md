@@ -4,13 +4,15 @@ Prévoir l'avenir avec KiAvenir !
 ## Description
 KiAvenir est une application web qui permet de gérer un agenda et de prévoir des événements futurs.
 
-## Installation (non disponible)
+## Installation
 ```bash
 npm install && npm start 
 ```
 
 ## Fonctionnalités
-- Aucune fonctionnalité n'est disponible pour le moment.
+- Créer un compte
+- Se connecter / Se déconnecter
+- Modifier son profil
 
 ## Auteurs
 - ARIA Aéna
