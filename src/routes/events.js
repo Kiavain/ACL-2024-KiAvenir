@@ -37,5 +37,17 @@ export default class EventRouteur extends Routeur {
         res.json({ success: false });
       }
     });
+
+    // Route pour créer un événement
+    this.router.put("/api/events/create", async (req, res) => {
+      const newEvent = await this.server.database.tables.get("events");
+      if (newEvent) {
+        await newEvent.create(req.body);
+        req.flash("notifications", "Événement créé avec succès");
+        res.redirect("/agenda");
+      } else {
+        res.json({ success: false });
+      }
+    });
   }
 }

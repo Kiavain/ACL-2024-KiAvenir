@@ -1,6 +1,5 @@
 import Routeur from "../structures/Routeur.js";
 import moment from "moment";
-import server from "../server.js";
 
 /**
  * Les routes liées à la page de l'agenda
@@ -16,8 +15,7 @@ export default class AgendaRouteur extends Routeur {
    */
   build() {
     this.router.get("/agenda", (req, res) => {
-      const agendas = this.server.database.tables
-        .get("agendas");
+      const agendas = this.server.database.tables.get("agendas");
       res.render("agenda", {
         agendas
       });
