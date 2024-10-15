@@ -12,7 +12,7 @@ export async function devDatabase(server) {
   }
   const lowan = await users.create({
     username: "test",
-    password: "test",
+    password: "123456789",
     email: "test@test.com"
   });
 
