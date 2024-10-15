@@ -79,7 +79,7 @@ export class AccountController extends Controller {
    */
   async login(req, res) {
     const { username, password } = req.body;
-    const user = this.database.tables
+    const user = this.database
       .get("users")
       .find((user) => user.username === username);
 
@@ -117,7 +117,7 @@ export class AccountController extends Controller {
     const localUser = res.locals.user;
 
     // On cherche cet utilisateur dans la base de données
-    const users = this.database.tables.get("users").getAll();
+    const users = this.database.get("users").getAll();
     let user = users.find((user) => user.email === localUser.email);
 
     if (!user) {
@@ -175,7 +175,7 @@ export class AccountController extends Controller {
       if (userIsUpdated) {
         try {
           await user.update(newUser);
-          const u = this.database.tables
+          const u = this.database
             .get("users")
             .find((u) => u.email === newUser.email);
 
@@ -207,7 +207,7 @@ export class AccountController extends Controller {
    */
   async deleteAccount(req, res) {
     const localUser = res.locals.user;
-    const user = this.database.tables
+    const user = this.database
       .get("users")
       .find((user) => user.username === localUser.username);
 
