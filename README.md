@@ -14,6 +14,10 @@ npm install && npm start
 - Se connecter / Se déconnecter
 - Modifier son profil
 
+## Projets et backlog associé
+- [Fonctionnalités](https://github.com/orgs/Kiavain/projects/2/views/1?filterQuery=fonc)
+- [Global](https://github.com/orgs/Kiavain/projects/2/)
+
 ## Auteurs
 - ARIA Aéna
 - ATTATFA Sarah

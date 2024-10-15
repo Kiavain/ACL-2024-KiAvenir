@@ -35,6 +35,7 @@ class KiAvenir {
       })
       .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
 
+
     await this.database.load();
     console.log("Base de données chargée !");
   }
