@@ -7,6 +7,8 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import { authenticate } from "./controllers/accountController.js";
+import { devDatabase } from "../data/script.js";
+import { createStream } from "rotating-file-stream";
 
 // Permet de charger les variables d'environnement
 import dotenv from "dotenv";
@@ -16,7 +18,13 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Classe principale de l'application
+ */
 class KiAvenir {
+  /**
+   * Crée une instance de l'application
+   */
   constructor() {
     this.app = express();
     this.PORT = 3000;
@@ -24,6 +32,10 @@ class KiAvenir {
     this.database = new Database(this);
   }
 
+  /**
+   * Initialise l'application
+   * @returns {Promise<void>} Une promesse
+   */
   async init() {
     this.app
       .use(bodyParser.json())
@@ -35,8 +47,10 @@ class KiAvenir {
       })
       .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
 
-
     await this.database.load();
+    if (process.env.NODE_ENV === "development") {
+      await devDatabase(this);
+    }
     console.log("Base de données chargée !");
   }
 
@@ -63,12 +77,18 @@ class KiAvenir {
   async initRoutes() {
     await this.buildRoutes();
 
+    // Crée un stream pour les logs
+    const accessLogStream = createStream("access.log", {
+      interval: "1d",
+      path: path.join(__dirname, "logs")
+    });
+
     // Dossier views avec view engine EJS
     this.app
       .set("view engine", "ejs")
       .set("views", path.join(__dirname, "views"))
       // Middleware pour logger les requêtes
-      .use(morgan("dev"))
+      .use(morgan("dev", { stream: accessLogStream }))
       // Middleware pour parser les cookies
       .use(cookieParser());
 
@@ -83,6 +103,10 @@ class KiAvenir {
     });
   }
 
+  /**
+   * Démarre le serveur
+   * @returns {Promise<void>} Une promesse
+   */
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {

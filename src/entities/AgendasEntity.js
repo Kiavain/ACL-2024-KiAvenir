@@ -16,17 +16,18 @@ export default class UsersEntity extends Entity {
     super(server, {
       agendaId: {
         type: DataTypes.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       ownerId: {
-        type: DataTypes.INTEGER,
-        primaryKey: true
+        type: DataTypes.INTEGER
       },
       name: {
         type: DataTypes.STRING(32)
       },
       color: {
-        type: DataTypes.STRING(7)
+        type: DataTypes.STRING(7),
+        defaultValue: "#2196f3"
       }
     });
   }
@@ -52,6 +53,6 @@ export default class UsersEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["agendaId", "ownerId"];
+    return ["agendaId"];
   }
 }
