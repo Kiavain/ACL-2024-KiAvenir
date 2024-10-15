@@ -347,9 +347,8 @@ export function authenticate(req, res, next) {
       return next();
     }
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
-  } catch (error) {
-    console.log("Erreur: aucun token d'accès trouvé dans le cookie\n", error);
-    // res.status(401).send("Unauthorized");
+  } catch {
+    res.redirect("/logout");
   }
   next();
 }
