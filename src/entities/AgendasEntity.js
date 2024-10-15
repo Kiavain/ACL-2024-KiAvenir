@@ -5,6 +5,7 @@ import { DataTypes } from "sequelize";
 /**
  * Représente l'entité des sagenda
  */
+// noinspection JSUnusedGlobalSymbols // Utilisé par la base de données
 export default class UsersEntity extends Entity {
   /**
    * Construit l'entité des agendas
