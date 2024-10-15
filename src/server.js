@@ -6,10 +6,11 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authenticate } from "./controllers/accountController.js"; // Pour identifier l'utilisateur à chaque chargement de page
+import { authenticate } from "./controllers/accountController.js";
 
+// Permet de charger les variables d'environnement
 import dotenv from "dotenv";
-dotenv.config(); // On charge les variables d'environnement depuis le fichier .env (sert notamment pour JWT_SECRET, pour créer des tokens avec une clé secrète)
+dotenv.config();
 
 // Créez l'équivalent de __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +30,7 @@ class KiAvenir {
       .use(bodyParser.urlencoded({ extended: true })) // For form data (application/x-www-form-urlencoded)
       .use(express.static(path.join(__dirname, "public")))
       .use((req, res, next) => {
-        res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar)
+        res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar).
         next();
       })
       .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)

@@ -15,7 +15,6 @@ export class AccountController extends Controller {
     super(server);
     this.createAccount = this.createAccount.bind(this);
     this.login = this.login.bind(this);
-    this.logout = this.logout.bind(this);
     this.editAccount = this.editAccount.bind(this);
     this.deleteAccount = this.deleteAccount.bind(this);
   }
@@ -83,7 +82,7 @@ export class AccountController extends Controller {
       .get("users")
       .find((user) => user.username === username);
 
-    // On re-hash le mot de passe (avec sel cette fois) via l'entité user (comme à la création de compte)
+    // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
       const token = await createJWT(user);
       res.cookie("accessToken", token, { httpOnly: true });
@@ -96,9 +95,13 @@ export class AccountController extends Controller {
     }
   }
 
-  // Appeler lorsque l'on clique sur "se déconnecter"
+  /**
+   * Déconnecte l'utilisateur
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   */
   logout(req, res) {
-    res.cookie("accessToken", null);
+    res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
     res.redirect("/");
   }
@@ -221,7 +224,20 @@ export class AccountController extends Controller {
       });
     }
   }
+
+  renderSignin(req, res) {
+    res.render("signin", { title: "Inscription" });
+  }
+
+  renderLogin(req, res) {
+    res.render("login", { title: "Connexion" });
+  }
+
+  renderAccount(req, res) {
+    res.render("account");
+  }
 }
+
 const envFilePath = join(process.cwd(), ".env");
 dotenv.config();
 
