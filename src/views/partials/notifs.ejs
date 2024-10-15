@@ -6,16 +6,24 @@
     var notification = document.querySelector('.alert-notif');
     if (notification) {
       setTimeout(function() {
-        //notification.remove();
-      }, 30000); // .3 secondes
+        notification.remove();
+      }, 3000); // .3 secondes
     }
   });
 </script>
 
+a
 <% if (notifications) { %>
-    <div class="alert-notif">
-        <%= notifications %>
-    </div>
+    nb : <% notifications.length %>
+<% } %>
+
+<% if (notifications && notifications.length > 0) { %>
+    <% notifications.forEach(function(message) { %>
+        <div class="alert-notif">
+            aze
+            <%= message %>
+        </div>
+    <% }) %>
 <% } %>
 
 
