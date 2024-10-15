@@ -1,3 +1,4 @@
+console.log("Events.js chargé");
 
 document.addEventListener("DOMContentLoaded", () => {
   const createAgendaOrEvent = document.getElementById("createAgendaOrEvent");
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "none";
     }
   });
-  createButton.onclick = () => {
+  createButton.onclick = (e) => {
     const name = getInputValue("event-name");
     const dateDebut = getInputValue("event-date");
     const description = getInputValue("event-description") ? null : " ";
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let verifs = false;
     if (dateFin < dateDebut) {
       errorElement.style.display = "block";
-      event.preventDefault();
+      e.preventDefault();
     } else {
       errorElement.style.display = "none";
       verifs = true;
@@ -59,18 +60,13 @@ document.addEventListener("DOMContentLoaded", () => {
         startDate: dateDebut,
         endDate: dateFin
       };
+
       fetch("/api/events/create", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
         .then((response) => response.json())
-        .then((data) => {
-          if (data.success) {
-            window.location.reload();
-            //Mettre un pop-up de succès
-          }
-        })
         .catch((error) => console.error("Erreur:", error));
     }
   };

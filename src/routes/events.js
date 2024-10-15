@@ -3,9 +3,9 @@ import Routeur from "../structures/Routeur.js";
 /**
  * Les routes liées à la page des événements
  */
-class EventRouteur extends Routeur {
+export default class EventRouteur extends Routeur {
   constructor(server) {
-    super(server);
+    super(server, null);
   }
 
   /**
@@ -43,13 +43,11 @@ class EventRouteur extends Routeur {
       const newEvent = await this.server.database.tables.get("events");
       if (newEvent) {
         await newEvent.create(req.body);
-        req.flash("notifications", "Nouveau event ajouté");
-        res.json({ success: true });
+        req.flash("notifications", "Événement créé avec succès");
+        res.redirect("/agenda");
       } else {
         res.json({ success: false });
       }
     });
   }
 }
-
-export default EventRouteur;

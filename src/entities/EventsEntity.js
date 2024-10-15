@@ -57,6 +57,6 @@ export default class EventsEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["eventId", "agendaId"];
+    return ["eventId"];
   }
 }

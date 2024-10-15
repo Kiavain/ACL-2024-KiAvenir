@@ -26,10 +26,30 @@
 <div id="eventModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2 id="eventTitle"></h2>
-        <p id="eventDetails"></p>
-        <p id="eventTime"></p>
+        <h2>Modifier l'événement</h2>
+        <label for="eventTitle">Titre :</label>
+        <input type="text" id="eventTitle" class="input-field" />
+
+        <label for="eventDetails">Détails :</label>
+        <textarea id="eventDetails" class="input-field"></textarea>
+
+        <label for="startEventTime">Date de début :</label>
+        <input type="datetime-local" id="startEventTime" class="input-field" />
+
+        <label for="endEventTime">Date de fin :</label>
+        <input type="datetime-local" id="endEventTime" class="input-field" />
+
+        <!-- Boutons pour enregistrer ou annuler -->
+        <button id="saveEvent">Enregistrer les modifications</button>
     </div>
+</div>
+
+<!-- Menu contextuel d'un événement -->
+<div id="eventContextMenu" class="context-menu">
+    <ul>
+        <li id="detailsEvent">Plus d'info</li>
+        <li id="deleteEvent">Supprimer</li>
+    </ul>
 </div>
 
 <% if (view === 'day') { %>
