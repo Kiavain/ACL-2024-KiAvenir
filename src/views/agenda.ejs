@@ -8,6 +8,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="css/agenda.css">
     <link rel="stylesheet" href="css/newEvent.css">
+
 </head>
 
 
@@ -40,6 +41,7 @@
 
 
 <body>
+    <%- include('partials/notifs') %>
     <!-- Fenêtre modale -->
     <div id="modal" class="modal">
         <div class="modal-content">
@@ -55,12 +57,14 @@
                 <label for="event-date-end">Date de fin:</label>
                 <input type="datetime-local" id="event-date-end" name="event-date" required>
 
+                <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
+
                 <label for="event-agenda">Agenda:</label>
-                <select id="event-agenda" name="event-agenda" >
+                <select id="event-agenda" name="event-agenda" required>
                     <option value="" selected disabled>---Veuillez choisir un agenda---</option>
-                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
+                    <% agendas.filter(agenda => agenda.ownerId === 1)
                     .forEach(agenda => { %>
-                        <option value="<%= agenda.id %>"><%= agenda.name %></option>
+                        <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
                     <% }) %>
                 </select>
 

@@ -43,6 +43,7 @@ class EventRouteur extends Routeur {
       const newEvent = await this.server.database.tables.get("events");
       if (newEvent) {
         await newEvent.create(req.body);
+        req.session.notifications = "Votre évenement a été créer avec succès !";
         res.json({ success: true });
       } else {
         res.json({ success: false });
