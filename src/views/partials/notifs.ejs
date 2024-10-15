@@ -3,7 +3,7 @@
 </head>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    var notification = document.querySelector('.alert-notif');
+    const notification = document.querySelector('.alert-notif');
     if (notification) {
       setTimeout(function() {
         notification.remove();
@@ -12,15 +12,9 @@
   });
 </script>
 
-a
-<% if (notifications) { %>
-    nb : <% notifications.length %>
-<% } %>
-
 <% if (notifications && notifications.length > 0) { %>
     <% notifications.forEach(function(message) { %>
         <div class="alert-notif">
-            aze
             <%= message %>
         </div>
     <% }) %>

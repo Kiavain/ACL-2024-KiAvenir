@@ -65,7 +65,7 @@ export default class Event extends EntityStructures {
    * @returns {Promise<Event>} Une promesse de l'événement
    */
   async update(data) {
-    return this.entity.update((x) => x.id === this.id, data);
+    return this.entity.update((x) => x.eventId === this.eventId, data);
   }
 
   /**
@@ -73,7 +73,7 @@ export default class Event extends EntityStructures {
    * @returns {Promise<void>}
    */
   async delete() {
-    return this.entity.delete((x) => x.id === this.id);
+    return this.entity.delete((x) => x.eventId === this.eventId);
   }
 
   /**
@@ -82,6 +82,14 @@ export default class Event extends EntityStructures {
    */
   getAgenda() {
     return this.agendas.get(this.agendaId);
+  }
+
+  /**
+   * Retourne le propriétaire de l'agenda
+   * @returns {User} L'utilisateur
+   */
+  getOwner() {
+    return this.getAgenda().getOwner();
   }
 
   /**

@@ -3,12 +3,12 @@ import Routeur from "../structures/Routeur.js";
 /**
  * Les routes liées à la page d'inscription
  */
-class SignInRouteur extends Routeur {
+export default class SignInRouteur extends Routeur {
   /**
    * Construit la route
    */
   constructor(server) {
-    super(server);
+    super(server, null);
   }
 
   /**
@@ -20,5 +20,3 @@ class SignInRouteur extends Routeur {
     });
   }
 }
-
-export default SignInRouteur;
