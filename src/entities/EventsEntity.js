@@ -15,17 +15,23 @@ export default class EventsEntity extends Entity {
     super(server, {
       eventId: {
         type: DataTypes.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
       agendaId: {
-        type: DataTypes.INTEGER,
-        primaryKey: true
+        type: DataTypes.INTEGER
+      },
+      description: {
+        type: DataTypes.TEXT
       },
       name: {
         type: DataTypes.STRING(32)
       },
-      color: {
-        type: DataTypes.STRING(7)
+      startDate: {
+        type: DataTypes.DATE
+      },
+      endDate: {
+        type: DataTypes.DATE
       }
     });
   }
@@ -51,6 +57,6 @@ export default class EventsEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["eventId", "agendaId"];
+    return ["eventId"];
   }
 }
