@@ -14,12 +14,11 @@ export default class AgendaRouteur extends Routeur {
    */
   build() {
     this.router.get("/agenda", (req, res) => {
-      // Vérifie si l'utilisateur est connecté
-      if (!req.cookies["accessToken"]) {
-        return res.redirect("/login");
-      }
-
-      res.render("agenda");
+      const agendas = this.server.database.tables.get("agendas");
+      res.render("agenda", {
+        agendas,
+        notifications: req.flash("notifications")
+      });
     });
   }
 }

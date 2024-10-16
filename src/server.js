@@ -9,6 +9,8 @@ import { fileURLToPath } from "url";
 import { authenticate } from "./controllers/accountController.js";
 import { devDatabase } from "../data/script.js";
 import { createStream } from "rotating-file-stream";
+import session from "express-session";
+import flash from "connect-flash";
 
 // Permet de charger les variables d'environnement
 import dotenv from "dotenv";
@@ -51,7 +53,25 @@ class KiAvenir {
     if (process.env.NODE_ENV === "development") {
       await devDatabase(this);
     }
+    await this.initNotifs();
     console.log("Base de données chargée !");
+  }
+  async initNotifs() {
+    // Configurer la session
+    this.app.use(
+      session({
+        secret: "secret-key", // Utilise une clé secrète pour signer la session
+        resave: false,
+        saveUninitialized: true
+      })
+    );
+    // Configurer connect-flash
+    this.app.use(flash());
+    // Middleware pour rendre les flash messages accessibles dans les vues
+    this.app.use((req, res, next) => {
+      res.locals.notifications = req.flash("notifications");
+      next();
+    });
   }
 
   /**
