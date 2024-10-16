@@ -83,11 +83,7 @@ export default class Database {
       const table = new Table(this.server);
 
       // Définit la table dans la base de données
-      await this.connector?.define(
-        table.tableName,
-        table.definition,
-        table.options
-      );
+      await this.connector?.define(table.tableName, table.definition, table.options);
 
       await table.load();
 

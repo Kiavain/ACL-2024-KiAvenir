@@ -14,22 +14,16 @@ accountForm.addEventListener("submit", async (e) => {
 async function validateAccountCreation(e) {
   const passwordMessage = document.getElementById("passwordMessage");
   const passwordRepeated = document.getElementById("passwordRepeated");
-  const passwordRepeatedMessage = document.getElementById(
-    "passwordRepeatedMessage"
-  );
+  const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
   passwordMessage.textContent = "";
   passwordRepeatedMessage.textContent = "";
 
   let password = accountForm.password.value;
   let passwordConfirmation = passwordRepeated.value;
 
-  await checkPassword(
-    password,
-    passwordMessage,
-    passwordConfirmation,
-    passwordRepeatedMessage,
-    accountForm
-  );
+  console.log("Vérification du mot de passe :", password, passwordConfirmation);
+  await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
+  console.log("Vérifié !");
 
   // Empêche la soumission du formulaire si un champ est incorrect
   if (!accountForm.checkValidity()) {

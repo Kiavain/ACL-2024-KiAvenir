@@ -27,11 +27,9 @@ export async function checkPassword(
   accountForm
 ) {
   if (password.length < 8) {
-    passwordMessage.textContent =
-      "Le mot de passe doit contenir au moins 8 caractères.";
+    passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
   } else if (password !== passwordConfirmation) {
-    passwordRepeatedMessage.textContent =
-      "Les mots de passe ne correspondent pas.";
+    passwordRepeatedMessage.textContent = "Les mots de passe ne correspondent pas.";
   } else {
     const rawValue = accountForm.password.value;
     accountForm.password.value = await hashSHA256(rawValue);
