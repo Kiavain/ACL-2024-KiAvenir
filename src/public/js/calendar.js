@@ -94,7 +94,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Récupère les événements depuis l'API pour les afficher dans le calendrier
-  const agendaId = calendarEl.dataset["agendaid"];
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
@@ -110,8 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
       day: "Jour",
       list: "Liste"
     },
+    eventColor: agenda.color,
     // Demande les événements à l'API avec un agendaId facultatif
-    events: `/api/events/${agendaId}`,
+    events: `/api/events/${agenda.agendaId}`,
     eventClick: (info) => {
       openModal(info.event); // Double clic pour ouvrir la modale
     }

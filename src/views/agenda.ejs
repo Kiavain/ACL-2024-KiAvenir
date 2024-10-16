@@ -13,68 +13,29 @@
 <% /* global locals,agenda,agendas */ %>
 <%- include('partials/header') %>
 
+<div class="header-middle">
+    <span class="header-title"><%= agenda.name %></span>
+    <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+</div>
 
-<header class="header">
-    <div class="header-left">
-        Icone du site ici
-    </div>
-    <div class="header-middle">
-        <span class="header-title"><%= agenda.name %></span>
-        <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
-    </div>
-    <div class="header-right">
-        <!-- Rajouter un onClick sur le + (créer agenda/event) -->
-        <button class="icon-button" id="createAgendaOrEvent" >
-            <span class="material-symbols-outlined">
-                add
-            </span>
-        </button>
-        <div id="agendaEventWindow" style="display: none">
-            <button id="createAgenda">new Agenda</button>
-            <button id="createEvent">new Event</button>
-        </div>
-        <!-- Rajouter un onClick sur le logOut -->
-        <button class="icon-button">
-            <span class="material-symbols-outlined">
-                logout
-            </span>
-        </button>
-    </div>
-</header>
-
-<%- include('partials/notifs') %>
-<!-- Pop Up - Création d'un évènement -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" id="close-btn">&times;</span>
-        <h2>Ajouter un événement</h2>
-        <form>
-            <label for="event-name">Nom de l'événement:</label>
-            <input type="text" id="event-name" name="event-name" required>
-
-            <label for="event-date">Date de début:</label>
-            <input type="datetime-local" id="event-date" name="event-date" required>
-
-            <label for="event-date-end">Date de fin:</label>
-            <input type="datetime-local" id="event-date-end" name="event-date" required>
-
-            <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
-
-            <label for="event-agenda">Agenda:</label>
-            <select id="event-agenda" name="event-agenda" required>
-                <option value="" selected disabled>---Veuillez choisir un agenda---</option>
-                <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
-                .forEach(agenda => { %>
-                    <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
-                <% }) %>
-            </select>
-
-
-            <label for="event-description">Description:</label>
-            <textarea  id="event-description" name="event-description" rows = "3"></textarea>
-
-            <button id="saveEvent" class="submit-btn">Enregistrer</button>
-        </form>
+<div id="menuAgendas" class="buttons-nav">
+    <button class="icon-button" id="menu-button" onclick="toggleMenu()">
+        <span class="material-symbols-outlined">menu</span>
+    </button>
+    <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
+    <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
+        <h3 class="agenda-title">Agendas</h3>
+        <ul class="agenda-list">
+            <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.agendaId !== locals.agenda.agendaId).
+            forEach(agenda => { %>
+                <li class="agenda-item">
+                    <a href="/agenda/<%= agenda.agendaId %>">
+                        <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
+                        <%= agenda.name %>
+                    </a>
+                </li>
+            <% }) %>
+        </ul>
     </div>
 </div>
 
@@ -113,127 +74,20 @@
     </div>
 </div>
 
-<!-- Barre de navigation, back-end à ajouter -->
-<div class="navigation-column">
-    <div class="nav-buttons">
-        <button class="icon-button">
-            <span class="material-symbols-outlined">chevron_left</span>
-        </button>
-        <button class="icon-button">
-            <span class="material-symbols-outlined">refresh</span>
-        </button>
-        <button class="icon-button">
-            <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-    </div>
-    <div class="nav-labels">
-        <button class="icon-button">
-            <span class="material-symbols-outlined">looks_one</span>
-        </button>
-        <button class="icon-button">
-            <span class="material-symbols-outlined">counter_7</span>
-        </button>
-        <button class="icon-button">
-            <span class="material-symbols-outlined">M</span>
-        </button>
-    </div>
-</div>
 
-<!-- Agenda -->
-<div class="planning-grid">
-    <div class="time-column">
-        <div id="menuAgendas" class="buttons-nav">
-            <button class="icon-button" id="menu-button" onclick="toggleMenu()">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-            <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
-            <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
-                <h3 class="agenda-title">Agendas</h3>
-                <ul class="agenda-list">
-                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.agendaId !== locals.agenda.agendaId).
-                    forEach(agenda => { %>
-                        <li class="agenda-item">
-                            <a href="/agenda/<%= agenda.agendaId %>">
-                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
-                                <%= agenda.name %>
-                            </a>
-                        </li>
-                    <% }) %>
-                </ul>
-            </div>
-        </div>
-        <!-- Le faire avec js pour éviter ce code dégueu ? -->
-        <div class="time-slot">00h00</div>
-        <div class="time-slot">01h00</div>
-        <div class="time-slot">02h00</div>
-        <div class="time-slot">03h00</div>
-        <div class="time-slot">04h00</div>
-        <div class="time-slot">05h00</div>
-        <div class="time-slot">06h00</div>
-        <div class="time-slot">07h00</div>
-        <div class="time-slot">08h00</div>
-        <div class="time-slot">09h00</div>
-        <div class="time-slot">10h00</div>
-        <div class="time-slot">11h00</div>
-        <div class="time-slot">12h00</div>
-        <div class="time-slot">13h00</div>
-        <div class="time-slot">14h00</div>
-        <div class="time-slot">15h00</div>
-        <div class="time-slot">16h00</div>
-        <div class="time-slot">17h00</div>
-        <div class="time-slot">18h00</div>
-        <div class="time-slot">19h00</div>
-        <div class="time-slot">20h00</div>
-        <div class="time-slot">21h00</div>
-        <div class="time-slot">22h00</div>
-        <div class="time-slot">23h00</div>
-
-    </div>
-
-    <!-- Le faire avec js pour avoir les bonnes dates -->
-    <div class="days-row">
-        <div class="day-column">
-            <div class="day-label">LUN.<br>03</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">MAR.<br>04</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">MER.<br>05</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">JEU.<br>06</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">VEN.<br>07</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">SAM.<br>08</div>
-        </div>
-        <div class="day-column">
-            <div class="day-label">DIM.<br>09</div>
-        </div>
-    </div>
-</div>
-
-<%- include('partials/footer') %>
-<script src="/js/agenda/events/Events.js"></script>
 <script src="/js/agenda/agendaCreation.js"></script>
 <script src="/js/agenda/agendaMenu.js"></script>
 <script>
   const agenda = {
     agendaId: "<%= agenda.agendaId %>",
+    color: "<%= agenda.color %>",
     name: "<%= agenda.name %>"
   };
 </script>
 <script src="/js/agenda/agendaEdition.js"></script>
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="css/agenda.css">
-</head>
-<body>
-    <% /* global locals,agendas */ %>
-    <%- include('partials/header') %>
-    <%- include('calendar') %>
-    <%- include('partials/footer') %>
+<link rel="stylesheet" href="css/agenda.css">
+
+<%- include('calendar') %>
+<%- include('partials/footer') %>
 </body>
 </html>

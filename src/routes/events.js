@@ -89,7 +89,7 @@ export default class EventRouteur extends Routeur {
       const start = req.query.start;
       const end = req.query.end;
 
-      const agendaId = req.params.agendaId;
+      const agendaId = parseInt(req.params.agendaId);
       const agenda = await this.server.database.tables
         .get("agendas")
         .get(agendaId);
@@ -98,29 +98,30 @@ export default class EventRouteur extends Routeur {
       }
 
       // Vérifie si le start et le end sont définis
-      if (start && end) {
-        // Récupère les événements entre le start et le end
-        const events = await agenda
-          .getEvents()
-          .filter((e) => {
-            return (
-              moment(e.startDate).isBetween(start, end) ||
-              moment(e.endDate).isBetween(start, end)
-            );
-          })
-          .map((e) => {
-            return {
-              eventId: e.eventId,
-              description: e.description,
-              title: e.name,
-              start: moment(e.startDate).format(),
-              end: moment(e.endDate).format()
-            };
-          });
-        res.json(events);
-      } else {
-        // Récupère tous les événements
-        const events = await agenda.getEvents().map((e) => {
+      if (!start || !end) {
+        return res.json([]);
+      }
+
+      await this.server.database.load();
+
+      console.log(agendaId);
+      console.log(
+        this.server.database.tables
+          .get("events")
+          .filter((e) => e.agendaId === agendaId).length
+      );
+
+      // Récupère les événements entre le start et le end
+      const events = agenda
+        .getEvents()
+        .filter((e) => {
+          return (
+            agendaId === e.agendaId &&
+            (moment(e.startDate).isBetween(start, end) ||
+              moment(e.endDate).isBetween(start, end))
+          );
+        })
+        .map((e) => {
           return {
             eventId: e.eventId,
             description: e.description,
@@ -129,8 +130,9 @@ export default class EventRouteur extends Routeur {
             end: moment(e.endDate).format()
           };
         });
-        res.json(events);
-      }
+
+      console.log(events);
+      res.json(events);
     });
   }
 }
