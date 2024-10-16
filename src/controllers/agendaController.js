@@ -16,7 +16,6 @@ export class AgendaController extends Controller {
   createAgenda(req, res) {
     const userId = res.locals.user.id;
     const { name, description, color } = req.body;
-    console.log("createAgenda userId:", userId);
 
     if (!name) {
       return res.render("agenda", {
@@ -74,8 +73,6 @@ export class AgendaController extends Controller {
     const agendaId = req.params.agendaId;
     const { name } = req.body;
     const agenda = await this.database.get("agendas").get(agendaId);
-    console.log("updateAgenda agenda owner:" + agenda.ownerId);
-    console.log("updateAgenda user:" + userId);
 
     if (!agenda) {
       return res.status(404).json({
