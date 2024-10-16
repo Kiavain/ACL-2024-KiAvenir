@@ -96,7 +96,7 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
-      await this.server.database.load();
+      await this.server.database.sync();
 
       // Récupère les événements entre le start et le end
       const events = agenda

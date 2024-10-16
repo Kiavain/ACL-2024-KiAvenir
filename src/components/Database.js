@@ -46,7 +46,6 @@ export default class Database {
    */
   async load() {
     // Connecte la base de données
-    this.tables.clear();
     this.connector = new Sequelize({
       dialect: "sqlite",
       storage: "data/db.sqlite",
@@ -93,5 +92,17 @@ export default class Database {
     }
 
     await this.connector?.authenticate();
+  }
+
+  /**
+   * Synchronise la base de données
+   * @return {Promise<void>} La promesse
+   */
+  async sync() {
+    await this.connector?.sync();
+
+    for (const table of this.tables.values()) {
+      await table.load();
+    }
   }
 }
