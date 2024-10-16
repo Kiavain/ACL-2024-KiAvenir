@@ -1,131 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-  <title>KiAvenir - Agenda</title>
-  <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <link rel="stylesheet" href="css/agenda.css">
+    <meta charset="UTF-8">
+    <title>Agenda</title>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/css/agenda.css">
+    <link rel="stylesheet" href="/css/newEvent.css">
 </head>
 <body>
-    <%- include('partials/header') %>
+<% /* global locals,agenda,agendas */ %>
+<%- include('partials/header') %>
 
+<!-- Pop Up - Création de l'agenda -->
+<div id="newAgenda" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeViewAgendaCreation">&times;</span>
+        <h2>Créer un Agenda</h2>
+        <form>
+            <label for="agenda-name">Nom:</label>
+            <input type="text" id="agenda-name" name="agenda-name" required>
 
-    <header class="header">
-        <div class="header-left">
-            Icone du site ici
-        </div>
-        <div class="header-middle">
-            <span class="header-title">Header trop cool</span>
-        </div>
-        <div class="header-right">
-            <!-- Rajouter un onClick sur le + (créer agenda/event) -->
-            <button class="icon-button">
-                <span class="material-symbols-outlined">
-                    add
-                </span>
-            </button>
-            <!-- Rajouter un onClick sur le logOut -->
-            <button class="icon-button">
-                <span class="material-symbols-outlined">
-                    logout
-                </span>
-            </button>
-        </div>
-    </header>
+            <label for="agenda-description">Description:</label>
+            <textarea  id="agenda-description" name="agenda-description" rows="3"></textarea>
 
+            <label for="agenda-color">Couleur:</label>
+            <input type="color" id="agenda-color" value="#2196f3"/>
 
-    <!-- Barre de navigation, back-end à ajouter -->
-    <div class="navigation-column">
-        <div class="nav-buttons">
-            <button class="icon-button">
-                <span class="material-symbols-outlined">chevron_left</span>
-            </button>
-            <button class="icon-button">
-                <span class="material-symbols-outlined">refresh</span>
-            </button>
-            <button class="icon-button">
-                <span class="material-symbols-outlined">chevron_right</span>
-            </button>
-        </div>
-        <div class="nav-labels">
-            <button class="icon-button">
-                <span class="material-symbols-outlined">looks_one</span>
-            </button>
-            <button class="icon-button">
-                <span class="material-symbols-outlined">counter_7</span>
-            </button>
-            <button class="icon-button">
-                <span class="material-symbols-outlined">M</span>
-            </button>
-        </div>
+            <p id="agenda-creation-error" style="color: red; display: none;">Le nom est requis.</p>
+
+            <button id="saveAgenda" class="submit-btn">Créer l'agenda</button>
+        </form>
     </div>
+</div>
 
-    <!-- Agenda -->
-    <div class="planning-grid">
-        <div class="time-column">
-            <div class="time-slot menu-slot">
-                <!-- Rajouter un onClick sur le menu -->
-                <button class="icon-button">
-                    <span class="material-symbols-outlined">
-                        menu
-                    </span>
-                </button>
-            </div>
-            <!-- Le faire avec js pour éviter ce code dégueu ? -->
-            <div class="time-slot">00h00</div>
-            <div class="time-slot">01h00</div>
-            <div class="time-slot">02h00</div>
-            <div class="time-slot">03h00</div>
-            <div class="time-slot">04h00</div>
-            <div class="time-slot">05h00</div>
-            <div class="time-slot">06h00</div>
-            <div class="time-slot">07h00</div>
-            <div class="time-slot">08h00</div>
-            <div class="time-slot">09h00</div>
-            <div class="time-slot">10h00</div>
-            <div class="time-slot">11h00</div>
-            <div class="time-slot">12h00</div>
-            <div class="time-slot">13h00</div>
-            <div class="time-slot">14h00</div>
-            <div class="time-slot">15h00</div>
-            <div class="time-slot">16h00</div>
-            <div class="time-slot">17h00</div>
-            <div class="time-slot">18h00</div>
-            <div class="time-slot">19h00</div>
-            <div class="time-slot">20h00</div>
-            <div class="time-slot">21h00</div>
-            <div class="time-slot">22h00</div>
-            <div class="time-slot">23h00</div>
-
-        </div>
-
-        <!-- Le faire avec js pour avoir les bonnes dates -->
-        <div class="days-row">
-            <div class="day-column">
-                <div class="day-label">LUN.<br>03</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">MAR.<br>04</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">MER.<br>05</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">JEU.<br>06</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">VEN.<br>07</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">SAM.<br>08</div>
-            </div>
-            <div class="day-column">
-                <div class="day-label">DIM.<br>09</div>
-            </div>
-        </div>
+<!-- Pop Up - Modification de l'agenda -->
+<div id="editAgendaModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="closeEditAgenda">&times;</span>
+        <h2>Modifier le nom de l'agenda:</h2>
+        <form id="editAgendaForm">
+            <label for="new-agenda-name">Nom de l'agenda:</label>
+            <input type="text" id="new-agenda-name" name="new-agenda-name" required>
+            <button type="submit" class="submit-btn">Mettre à jour</button>
+        </form>
     </div>
+</div>
 
+
+<script type="module" src="/js/agenda/agendaCreation.js"></script>
+<script>
+  const agenda = {
+    agendaId: "<%= agenda.agendaId %>",
+    color: "<%= agenda.color %>",
+    name: "<%= agenda.name %>"
+  };
+</script>
+<script type="module" src="/js/agenda/agendaEdition.js"></script>
+<link rel="stylesheet" href="/css/agenda.css">
+
+<%- include('calendar') %>
 <%- include('partials/footer') %>
 </body>
-
 </html>

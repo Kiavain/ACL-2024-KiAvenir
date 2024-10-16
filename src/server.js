@@ -7,6 +7,9 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import { authenticate } from "./controllers/accountController.js";
+import { devDatabase } from "../data/script.js";
+import session from "express-session";
+import flash from "connect-flash";
 
 // Permet de charger les variables d'environnement
 import dotenv from "dotenv";
@@ -16,7 +19,13 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/**
+ * Classe principale de l'application
+ */
 class KiAvenir {
+  /**
+   * Crée une instance de l'application
+   */
   constructor() {
     this.app = express();
     this.PORT = 3000;
@@ -24,6 +33,10 @@ class KiAvenir {
     this.database = new Database(this);
   }
 
+  /**
+   * Initialise l'application
+   * @returns {Promise<void>} Une promesse
+   */
   async init() {
     this.app
       .use(bodyParser.json())
@@ -35,9 +48,29 @@ class KiAvenir {
       })
       .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
 
-
     await this.database.load();
+    if (process.env.NODE_ENV === "development") {
+      await devDatabase(this);
+    }
+    await this.initNotifs();
     console.log("Base de données chargée !");
+  }
+  async initNotifs() {
+    // Configurer la session
+    this.app.use(
+      session({
+        secret: "secret-key", // Utilise une clé secrète pour signer la session
+        resave: false,
+        saveUninitialized: true
+      })
+    );
+    // Configurer connect-flash
+    this.app.use(flash());
+    // Middleware pour rendre les flash messages accessibles dans les vues
+    this.app.use((req, res, next) => {
+      res.locals.notifications = req.flash("notifications");
+      next();
+    });
   }
 
   /**
@@ -83,12 +116,14 @@ class KiAvenir {
     });
   }
 
+  /**
+   * Démarre le serveur
+   * @returns {Promise<void>} Une promesse
+   */
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {
-      console.log(
-        `Serveur en cours d'exécution : http://localhost:${this.PORT}`
-      );
+      console.log(`Serveur en cours d'exécution : http://localhost:${this.PORT}`);
     });
   }
 }

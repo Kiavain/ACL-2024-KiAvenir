@@ -1,4 +1,4 @@
-import { checkPassword } from "./utils.js";
+import { checkPassword } from "../utils.js";
 const accountForm = document.forms["accountEdition"];
 accountForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -13,9 +13,7 @@ accountForm.addEventListener("submit", async (e) => {
 async function validateAccountCreation(e) {
   const passwordMessage = document.getElementById("passwordMessage");
   const passwordRepeated = document.getElementById("passwordRepeated");
-  const passwordRepeatedMessage = document.getElementById(
-    "passwordRepeatedMessage"
-  );
+  const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
   passwordMessage.textContent = "";
   passwordRepeatedMessage.textContent = "";
 
@@ -23,13 +21,7 @@ async function validateAccountCreation(e) {
   let passwordConfirmation = passwordRepeated["value"];
 
   if (password !== "") {
-    await checkPassword(
-      password,
-      passwordMessage,
-      passwordConfirmation,
-      passwordRepeatedMessage,
-      accountForm
-    );
+    await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
   } else {
     accountForm.submit();
   }

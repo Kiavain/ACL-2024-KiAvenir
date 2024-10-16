@@ -4,9 +4,8 @@
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
-    "run": "npm install && nodemon index.js",
-    "start": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "cross-env NODE_ENV=development nodemon --trace-deprecation index.js",
+    "start": "cross-env NODE_ENV=production node index.js"
   },
   "authors": [
     "ARIA Aéna",
@@ -20,6 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.12.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.31.0",
@@ -30,16 +30,20 @@
   },
   "dependencies": {
     "body-parser": "^1.20.3",
+    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
+    "express-session": "^1.18.1",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
     "kiavenir": "file:",
+    "moment": "^2.30.1",
     "morgan": "^1.10.0",
     "nodemon": "^3.1.7",
-    "sequelize": "^6.37.3",
+    "rotating-file-stream": "^3.2.5",
+    "sequelize": "^6.37.4",
     "sqlite3": "^5.1.7"
   },
   "overrides": {
