@@ -79,6 +79,10 @@ export class AccountController extends Controller {
 
       // Défini le token dans le cookie et redirige
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash(
+        "notifications",
+        "Votre compte a bien été créé, bienvenue " + username + "."
+      );
       res.redirect("/");
     }
   }
@@ -100,6 +104,7 @@ export class AccountController extends Controller {
       const token = await createJWT(user);
       res.locals.user = token;
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash("notifications", "Bienvenue à vous " + user.username + ".");
       res.redirect("/");
     } else {
       res.render("login", {
@@ -118,6 +123,7 @@ export class AccountController extends Controller {
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
     res.locals.user = null;
+    req.flash("notifications", "Déconnexion réussie.");
     res.redirect("/");
   }
 
@@ -361,9 +367,11 @@ export function authenticate(req, res, next) {
       res.locals.user = null;
       return next();
     }
-    res.locals.user = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    console.log("Erreur: aucun token d'accès trouvé dans le cookie\n", error);
+
+    res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
+  } catch (err) {
+    console.error("Erreur lors de l'authentification :", err);
+    res.locals.user = null;
   }
   next();
 }
