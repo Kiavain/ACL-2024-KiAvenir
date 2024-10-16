@@ -1,90 +1,14 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const modal = document.getElementById("eventModal");
-  const closeButton = modal.querySelector(".close");
-  const saveButton = document.getElementById("updateEvent");
-  const deleteButton = document.getElementById("deleteEvent");
+// Initialiser la langue de moment.js
+moment.locale("fr");
 
-  moment.locale("fr");
-
-  // Utilitaires pour sélectionner les éléments
-  const getElement = (id) => document.getElementById(id);
-  const setInputValue = (id, value) => (getElement(id).value = value);
-  const getInputValue = (id) => getElement(id).value;
-
-  // Fonction pour ouvrir la modale et afficher les détails de l'événement
-  const openModal = (eventData) => {
-    setInputValue("eventTitle", eventData.title);
-    setInputValue("eventDetails", eventData.extendedProps.description || "Pas de détails disponibles.");
-    setInputValue("startEventTime", moment(eventData.start).add(2, "hour").toISOString().substring(0, 16));
-    setInputValue("endEventTime", moment(eventData.end).add(2, "hour").toISOString().substring(0, 16));
-
-    saveButton.dataset.eventId = eventData.extendedProps.eventId;
-    modal.style.display = "block";
-  };
-
-  // Fonction pour fermer la modale
-  const closeModal = () => {
-    modal.style.display = "none";
-  };
-
-  // Fonction pour gérer la fermeture du menu contextuel
-  const handleOutsideClick = (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
-  };
-
-  // Fonction pour enregistrer les modifications d'un événement
-  const saveEvent = (fullCalendar) => {
-    const eventId = saveButton.dataset.eventId;
-    const updatedData = {
-      title: getInputValue("eventTitle"),
-      description: getInputValue("eventDetails"),
-      start: getInputValue("startEventTime"),
-      end: getInputValue("endEventTime")
-    };
-
-    fetch(`/api/events/update/${eventId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedData)
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          fullCalendar.refetchEvents();
-          alert("Événement mis à jour avec succès!");
-          window.location.reload();
-        } else {
-          alert("Échec de la mise à jour de l'événement.");
-        }
-      })
-      .catch((error) => console.error("Erreur:", error));
-  };
-
-  const deleteEvent = (fullCalendar) => {
-    const eventId = saveButton.dataset.eventId;
-
-    fetch(`/api/events/delete/${eventId}`, { method: "DELETE" })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          fullCalendar.refetchEvents();
-          window.location.reload();
-        } else {
-          alert("Échec de la suppression de l'événement.");
-        }
-      })
-      .catch((error) => console.error("Erreur:", error));
-  };
-
-  // Initialisation du calendrier FullCalendar
+// Fonction pour créer et initialiser le calendrier
+export const initCalendar = (agenda) => {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) {
-    return;
+    console.error("Element #calendar non trouvé");
+    return null;
   }
 
-  // Récupère les événements depuis l'API pour les afficher dans le calendrier
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
@@ -102,27 +26,95 @@ document.addEventListener("DOMContentLoaded", () => {
       list: "Liste"
     },
     eventColor: agenda.color,
-    // Demande les événements à l'API avec un agendaId facultatif
     events: `/api/events/${agenda.agendaId}`,
     eventClick: (info) => {
-      openModal(info.event); // Double clic pour ouvrir la modale
+      openModal(info.event);
     }
   });
 
-  setInterval(() => {
-    calendar.refetchEvents();
-  }, 1000);
-
   calendar.render();
+  return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
+};
 
-  closeButton.onclick = closeModal;
-  window.onclick = handleOutsideClick;
+// Fonction pour ouvrir la modale
+export const openModal = (eventData) => {
+  const modal = document.getElementById("eventModal");
+  if (!modal) {
+    return;
+  }
 
-  // Rendre le calendrier responsive lors du redimensionnement
-  window.addEventListener("resize", () => {
-    calendar.updateSize(); // Met à jour la taille du calendrier
-  });
+  document.getElementById("eventTitle").value = eventData.title;
+  document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
+  document.getElementById("startEventTime").value = moment(eventData.start)
+    .add(2, "hour")
+    .toISOString()
+    .substring(0, 16);
+  document.getElementById("endEventTime").value = moment(eventData.end).add(2, "hour").toISOString().substring(0, 16);
 
-  saveButton.onclick = () => saveEvent(calendar);
-  deleteButton.onclick = () => deleteEvent(calendar);
-});
+  const saveButton = document.getElementById("updateEvent");
+  saveButton.dataset.eventId = eventData.extendedProps.eventId;
+
+  modal.style.display = "block";
+};
+
+// Fonction pour fermer la modale
+export const closeModal = () => {
+  const modal = document.getElementById("eventModal");
+  modal.style.display = "none";
+};
+
+// Fonction pour gérer la fermeture du menu contextuel
+export const handleOutsideClick = (event) => {
+  const modal = document.getElementById("eventModal");
+  if (event.target === modal) {
+    closeModal();
+  }
+};
+
+// Fonction pour mettre à jour un événement
+export const saveEvent = (calendar) => {
+  const saveButton = document.getElementById("updateEvent");
+  const eventId = saveButton.dataset.eventId;
+
+  const updatedData = {
+    title: document.getElementById("eventTitle").value,
+    description: document.getElementById("eventDetails").value,
+    start: document.getElementById("startEventTime").value,
+    end: document.getElementById("endEventTime").value
+  };
+
+  fetch(`/api/events/update/${eventId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updatedData)
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        calendar.refetchEvents();
+        alert("Événement mis à jour avec succès!");
+        window.location.reload();
+      } else {
+        alert("Échec de la mise à jour de l'événement.");
+      }
+    })
+    .catch((error) => console.error("Erreur:", error));
+};
+
+// Fonction pour supprimer un événement
+export const deleteEvent = (calendar) => {
+  const saveButton = document.getElementById("updateEvent");
+  const eventId = saveButton.dataset.eventId;
+
+  fetch(`/api/events/delete/${eventId}`, { method: "DELETE" })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        calendar.refetchEvents();
+        window.location.reload();
+      } else {
+        alert("Échec de la suppression de l'événement.");
+      }
+    })
+    .catch((error) => console.error("Erreur:", error));
+};
