@@ -1,5 +1,3 @@
-console.log("Agenda ID:", agenda.agendaId);
-
 const editAgendaButton = document.getElementById("editAgenda");
 const editAgendaModal = document.getElementById("editAgendaModal");
 const closeEditAgendaButton = document.getElementById("closeEditAgenda");

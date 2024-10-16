@@ -34,7 +34,8 @@
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
                         <div id="menuAgendas" class="buttons-nav">
-                            <button class="icon-button" id="menu-button" onclick="toggleMenu()">
+                            <script type="module" src="/js/agenda/agendaMenu.js"></script>
+                            <button class="icon-button" id="menu-button">
                                 <span class="material-symbols-outlined">menu</span>
                             </button>
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
@@ -54,7 +55,7 @@
                             </div>
                         </div>
                     <% } %>
-                    <script src="/js/agenda/events/Events.js"></script>
+                    <script type="module" src="/js/agenda/events/Events.js"></script>
                     <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
                             add
@@ -74,7 +75,11 @@
                             <li><a class="dropdown-item <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Mes agendas</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <script src="/js/logout.js"></script>
+                                <script>
+                                  function sendLogout() {
+                                    document.getElementById("logoutForm").submit();
+                                  }
+                                </script>
                                 <a class="dropdown-item"  href="#" onclick="sendLogout()">Déconnexion</a>
                                 <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
