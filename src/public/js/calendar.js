@@ -1,8 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("eventModal");
-  const contextMenu = document.getElementById("eventContextMenu");
   const closeButton = modal.querySelector(".close");
-  const saveButton = document.getElementById("saveEvent");
+  const saveButton = document.getElementById("updateEvent");
   const deleteButton = document.getElementById("deleteEvent");
 
   moment.locale("fr");
@@ -41,8 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleOutsideClick = (event) => {
     if (event.target === modal) {
       closeModal();
-    } else if (event.target !== contextMenu) {
-      contextMenu.style.display = "none";
     }
   };
 
@@ -97,6 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Récupère les événements depuis l'API pour les afficher dans le calendrier
+  const agendaId = calendarEl.dataset["agendaid"];
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
@@ -112,11 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
       day: "Jour",
       list: "Liste"
     },
-    events: "/api/events",
+    // Demande les événements à l'API avec un agendaId facultatif
+    events: `/api/events/${agendaId}`,
     eventClick: (info) => {
       openModal(info.event); // Double clic pour ouvrir la modale
     }
   });
+
+  setInterval(() => {
+    calendar.refetchEvents();
+  }, 1000);
 
   calendar.render();
 

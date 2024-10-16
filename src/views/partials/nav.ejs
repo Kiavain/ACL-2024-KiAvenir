@@ -1,4 +1,4 @@
-<% /* global locals,currentPath */ %>
+<% /* global locals,currentPath,agendas */ %>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container-fluid">
@@ -51,6 +51,43 @@
 
                         </ul>
                     </li>
+
+                    <!-- Fenêtre modale si on est dans le /agenda -->
+                    <% if (currentPath === '/agenda') { %>
+                        <div id="modal" class="modal">
+                            <div class="modal-content">
+                                <span class="close-btn" id="close-btn">&times;</span>
+                                <h2>Ajouter un événement</h2>
+                                <form>
+                                    <label for="event-name">Nom de l'événement:</label>
+                                    <input type="text" id="event-name" name="event-name" required>
+
+                                    <label for="event-date">Date de début:</label>
+                                    <input type="datetime-local" id="event-date" name="event-date" required>
+
+                                    <label for="event-date-end">Date de fin:</label>
+                                    <input type="datetime-local" id="event-date-end" name="event-date" required>
+
+                                    <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
+
+                                    <label for="event-agenda">Agenda:</label>
+                                    <select id="event-agenda" name="event-agenda" required>
+                                        <option value="" selected disabled>---Veuillez choisir un agenda---</option>
+                                        <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
+                                        .forEach(agenda => { %>
+                                            <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
+                                        <% }) %>
+                                    </select>
+
+
+                                    <label for="event-description">Description:</label>
+                                    <textarea  id="event-description" name="event-description" rows = "3"></textarea>
+
+                                    <button id="saveEvent" class="submit-btn">Enregistrer</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% } %>
                 <% } else { %>
                     <li class="nav-item">
                         <a class="nav-link" href="/login">Connexion</a>

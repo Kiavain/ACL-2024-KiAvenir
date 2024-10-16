@@ -23,11 +23,12 @@
         <input type="datetime-local" id="endEventTime" class="input-field" />
 
         <!-- Boutons pour enregistrer ou annuler -->
-        <button id="saveEvent">Enregistrer les modifications</button>
+        <button id="updateEvent">Enregistrer les modifications</button>
         <button id="deleteEvent">Supprimer l'événement</button>
     </div>
 </div>
 
-<div id="calendar">
+<!-- Met l'agendaId dans les data -->
+<div id="calendar" data-agendaid="<%= agendaId %>">
 </div>
 
