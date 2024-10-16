@@ -12,12 +12,13 @@
   });
 </script>
 
-<% if (notifications && notifications.length > 0) { %>
-    <% notifications.forEach(function(message) { %>
-        <div class="alert-notif">
-            <%= message %>
-        </div>
-    <% }) %>
-<% } %>
-
+<div class="flash-container">
+    <% if (notifications && notifications.length > 0) { %>
+        <% notifications.forEach(function(message) { %>
+            <div class="alert-notif">
+                <%= message %>
+            </div>
+        <% }) %>
+    <% } %>
+</div>
 
