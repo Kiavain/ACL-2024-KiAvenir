@@ -1,0 +1,34 @@
+
+<link rel="stylesheet" href="/css/calendar.css">
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
+<script src="/js/calendar.js"></script>
+
+<!-- Modale pour afficher les informations de l'événement -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Modifier l'événement</h2>
+        <label for="eventTitle">Titre :</label>
+        <input type="text" id="eventTitle" class="input-field" />
+
+        <label for="eventDetails">Détails :</label>
+        <textarea id="eventDetails" class="input-field"></textarea>
+
+        <label for="startEventTime">Date de début :</label>
+        <input type="datetime-local" id="startEventTime" class="input-field" />
+
+        <label for="endEventTime">Date de fin :</label>
+        <input type="datetime-local" id="endEventTime" class="input-field" />
+
+        <!-- Boutons pour enregistrer ou annuler -->
+        <button id="updateEvent">Enregistrer les modifications</button>
+        <button id="deleteEvent">Supprimer l'événement</button>
+    </div>
+</div>
+
+<!-- Met l'agendaId dans les data -->
+<div id="calendar" data-agendaid="<%= agenda.agendaId %>">
+</div>
+
