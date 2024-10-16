@@ -26,7 +26,7 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.put("/api/events/update/:eventId", async (req, res) => {
+    this.router.put("/api/events/update/:eventId", (req, res) => {
       const event = this.server.database.tables
         .get("events")
         .get(req.params.eventId);
@@ -39,10 +39,25 @@ export default class EventRouteur extends Routeur {
       };
 
       if (event) {
-        await event.update(fields);
-        res.json({ success: true });
+        event
+          .update(fields)
+          .then(() => {
+            res.json({
+              success: true,
+              message: "Événement mis à jour avec succès"
+            });
+          })
+          .catch(() => {
+            res.json({
+              success: false,
+              message: "Erreur lors de la mise à jour de l'événement"
+            });
+          });
       } else {
-        res.json({ success: false });
+        res.json({
+          success: false,
+          message: "Erreur lors de la mise à jour de l'événement"
+        });
       }
     });
 
@@ -66,18 +81,27 @@ export default class EventRouteur extends Routeur {
           success: false,
           message: "Erreur lors de la création de l'événement"
         });
+      }
+    });
 
-    this.router.get("/api/events", async (req, res) => {
+    this.router.get("/api/events/:agendaId", async (req, res) => {
       // Récupère le start et le end
       const start = req.query.start;
       const end = req.query.end;
 
+      const agendaId = req.params.agendaId;
+      const agenda = await this.server.database.tables
+        .get("agendas")
+        .get(agendaId);
+      if (!agenda) {
+        return res.json([]);
+      }
+
       // Vérifie si le start et le end sont définis
       if (start && end) {
         // Récupère les événements entre le start et le end
-        const events = await this.server.database.tables
-          .get("events")
-          .getAll()
+        const events = await agenda
+          .getEvents()
           .filter((e) => {
             return (
               moment(e.startDate).isBetween(start, end) ||
@@ -96,18 +120,15 @@ export default class EventRouteur extends Routeur {
         res.json(events);
       } else {
         // Récupère tous les événements
-        const events = await this.server.database.tables
-          .get("events")
-          .getAll()
-          .map((e) => {
-            return {
-              eventId: e.eventId,
-              description: e.description,
-              title: e.name,
-              start: moment(e.startDate).format(),
-              end: moment(e.endDate).format()
-            };
-          });
+        const events = await agenda.getEvents().map((e) => {
+          return {
+            eventId: e.eventId,
+            description: e.description,
+            title: e.name,
+            start: moment(e.startDate).format(),
+            end: moment(e.endDate).format()
+          };
+        });
         res.json(events);
       }
     });

@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let verifs = false;
     e.preventDefault();
 
-    console.log(description);
     if (dateFin < dateDebut) {
       errorElement.style.display = "block";
     } else {

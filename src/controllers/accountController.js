@@ -347,8 +347,9 @@ export function authenticate(req, res, next) {
       return next();
     }
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
-  } catch {
-    res.redirect("/logout");
+  } catch (err) {
+    console.error("Erreur lors de l'authentification :", err);
+    res.locals.user = null;
   }
   next();
 }
