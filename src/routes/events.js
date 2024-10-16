@@ -39,14 +39,25 @@ export default class EventRouteur extends Routeur {
     });
 
     // Route pour créer un événement
-    this.router.put("/api/events/create", async (req, res) => {
-      const newEvent = await this.server.database.tables.get("events");
+    this.router.post("/api/events/create", (req, res) => {
+      const newEvent = this.server.database.tables.get("events");
       if (newEvent) {
-        await newEvent.create(req.body);
-        req.flash("notifications", "Événement créé avec succès");
-        res.redirect("/agenda");
+        newEvent
+          .create(req.body)
+          .then(() => {
+            res.json({ success: true, message: "Événement créé avec succès" });
+          })
+          .catch(() => {
+            res.json({
+              success: false,
+              message: "Erreur lors de la création de l'événement"
+            });
+          });
       } else {
-        res.json({ success: false });
+        res.json({
+          success: false,
+          message: "Erreur lors de la création de l'événement"
+        });
       }
     });
   }
