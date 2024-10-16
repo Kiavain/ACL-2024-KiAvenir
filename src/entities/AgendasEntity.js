@@ -25,6 +25,9 @@ export default class UsersEntity extends Entity {
       name: {
         type: DataTypes.STRING(32)
       },
+      description: {
+        type: DataTypes.STRING(255)
+      },
       color: {
         type: DataTypes.STRING(7),
         defaultValue: "#2196f3"

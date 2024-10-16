@@ -1,5 +1,6 @@
 import Routeur from "../structures/Routeur.js";
 import moment from "moment";
+import { AgendaController } from "../controllers/agendaController.js";
 
 /**
  * Les routes liées à la page de l'agenda
@@ -7,19 +8,40 @@ import moment from "moment";
 // noinspection JSUnusedGlobalSymbols // Utilisé par le serveur
 export default class AgendaRouteur extends Routeur {
   constructor(server) {
-    super(server, null);
+    super(server, new AgendaController(server));
   }
 
   /**
    * Construit la route
    */
   build() {
+    // Redirection vers l'agenda par défaut - id 1
     this.router.get("/agenda", (req, res) => {
-      const agendas = this.server.database.tables.get("agendas");
-      res.render("agenda", {
-        agendas
-      });
+      // Récupérer le premier agenda de la liste pour l'utilisateur courant
+      const agenda = this.server.database.tables
+        .get("agendas")
+        .filter((agenda) => agenda.ownerId === res.locals.user.id);
+      console.log("agenda:", res.locals);
+      res.redirect("/agenda/" + agenda[0].agendaId);
     });
+
+    this.router.get("/agenda/:agendaId", async (req, res) => {
+      const agenda = await this.server.database.tables
+        .get("agendas")
+        .get(req.params.agendaId);
+      const agendas = this.server.database.tables.get("agendas");
+      if (agenda) {
+        res.render("agenda", { agenda, agendas });
+      } else {
+        res.status(404).json({ success: false, message: "Agenda non trouvé" });
+      }
+    });
+
+    this.router.put("/api/agenda/create", this.controller.createAgenda);
+    this.router.put(
+      "/api/agenda/:agendaId/update",
+      this.controller.updateAgenda
+    );
 
     this.router.get("/agenda_test", (req, res) => {
       const view = req.query.view || "month"; // Par défaut, on affiche la vue du mois
