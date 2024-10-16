@@ -29,17 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
       modal.style.display = "none";
     }
   });
+
   createButton.onclick = (e) => {
     const name = getInputValue("event-name");
     const dateDebut = getInputValue("event-date");
-    const description = getInputValue("event-description") ? null : " ";
+    const description = getInputValue("event-description") || " ";
     const dateFin = getInputValue("event-date-end");
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
     let verifs = false;
+    e.preventDefault();
+
+    console.log(description);
     if (dateFin < dateDebut) {
       errorElement.style.display = "block";
-      e.preventDefault();
     } else {
       errorElement.style.display = "none";
       verifs = true;
@@ -60,13 +63,43 @@ document.addEventListener("DOMContentLoaded", () => {
         endDate: dateFin
       };
 
+      modal.style.display = "none";
+      popup.classList.toggle("show");
+
       fetch("/api/events/create", {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
       })
-        .then((response) => response.json())
-        .catch((error) => console.error("Erreur:", error));
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(
+              `Erreur ${response.status}: ${response.statusText}`
+            );
+          }
+          return response.json();
+        })
+        .then((data) => {
+          addFlashMessage(data.message);
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la requête:", error);
+        });
     }
   };
 });
+
+function addFlashMessage(message) {
+  const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
+
+  const flashMessage = document.createElement("div");
+  flashMessage.className = "alert-notif";
+  flashMessage.innerText = message;
+
+  flashContainer.appendChild(flashMessage);
+
+  // Affiche avec un timer, comme dans le script existant
+  setTimeout(() => {
+    flashMessage.remove();
+  }, 3000); // 3 secondes
+}

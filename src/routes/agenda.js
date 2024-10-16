@@ -17,7 +17,8 @@ export default class AgendaRouteur extends Routeur {
     this.router.get("/agenda", (req, res) => {
       const agendas = this.server.database.tables.get("agendas");
       res.render("agenda", {
-        agendas
+        agendas,
+        notifications: req.flash("notifications")
       });
     });
 
