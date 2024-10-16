@@ -23,6 +23,15 @@
 
             <ul class="navbar-nav">
                 <% if (locals.user) { %>
+                    <button class="icon-button" id="createAgendaOrEvent">
+                        <span class="material-symbols-outlined">
+                            add
+                        </span>
+                    </button>
+                    <div id="agendaEventWindow">
+                        <button id="createAgenda">Nouvel agenda</button>
+                        <button id="createEvent">Nouvel événement</button>
+                    </div>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img src="/img/account.jpg" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
