@@ -11,6 +11,14 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
+        <!-- Conteneur centré pour le nom de l'agenda -->
+        <% if (currentPath.includes("/agenda")) { %>
+            <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
+                <span class="header-title"><%= agenda.name %></span>
+                <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+            </div>
+        <% } %>
+
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
@@ -23,6 +31,29 @@
 
             <ul class="navbar-nav">
                 <% if (locals.user) { %>
+                    <!-- Fenêtre modale si on est dans le /agenda -->
+                    <% if (currentPath.includes("/agenda")) { %>
+                        <div id="menuAgendas" class="buttons-nav">
+                            <button class="icon-button" id="menu-button" onclick="toggleMenu()">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                            <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
+                            <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
+                                <h3 class="agenda-title">Agendas</h3>
+                                <ul class="agenda-list">
+                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.agendaId !== locals.agenda.agendaId).
+                                    forEach(agenda => { %>
+                                        <li class="agenda-item">
+                                            <a href="/agenda/<%= agenda.agendaId %>">
+                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
+                                                <%= agenda.name %>
+                                            </a>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                        </div>
+                    <% } %>
                     <script src="/js/agenda/events/Events.js"></script>
                     <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
@@ -49,12 +80,9 @@
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 </form>
                             </li>
-
                         </ul>
                     </li>
-
-                    <!-- Fenêtre modale si on est dans le /agenda -->
-                    <% if (currentPath.includes("/agenda")) { %>
+                    <% if(currentPath.includes("/agenda")) { %>
                         <div id="modal" class="modal">
                             <div class="modal-content">
                                 <span class="close-btn" id="close-btn">&times;</span>
@@ -80,7 +108,6 @@
                                         <% }) %>
                                     </select>
 
-
                                     <label for="event-description">Description:</label>
                                     <textarea  id="event-description" name="event-description" rows = "3"></textarea>
 
@@ -89,7 +116,7 @@
                             </div>
                         </div>
                     <% } %>
-                <% } else { %>
+                    <% } else { %>
                     <li class="nav-item">
                         <a class="nav-link" href="/login">Connexion</a>
                     </li>

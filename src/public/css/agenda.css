@@ -21,6 +21,7 @@ body {
 
 .header-left, .header-middle, .header-right {
   display: flex;
+  justify-content: center;
   align-items: center;
 }
 
@@ -159,11 +160,17 @@ body {
 }
 
 .dropdown-menu {
-  position: absolute;
+  position: relative;
+  top:70px;
+  transition: max-height 0.3s ease-out;
   background-color: white;
   border: 1px solid #ccc;
   z-index: 1000;
   display: none; /* Menu déroulant caché par défaut */
+}
+
+#menuAgendas {
+  position: relative;
 }
 
 /* Afficher le menu de boutons */

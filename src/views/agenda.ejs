@@ -13,32 +13,6 @@
 <% /* global locals,agenda,agendas */ %>
 <%- include('partials/header') %>
 
-<div class="header-middle">
-    <span class="header-title"><%= agenda.name %></span>
-    <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
-</div>
-
-<div id="menuAgendas" class="buttons-nav">
-    <button class="icon-button" id="menu-button" onclick="toggleMenu()">
-        <span class="material-symbols-outlined">menu</span>
-    </button>
-    <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
-    <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
-        <h3 class="agenda-title">Agendas</h3>
-        <ul class="agenda-list">
-            <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.agendaId !== locals.agenda.agendaId).
-            forEach(agenda => { %>
-                <li class="agenda-item">
-                    <a href="/agenda/<%= agenda.agendaId %>">
-                        <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
-                        <%= agenda.name %>
-                    </a>
-                </li>
-            <% }) %>
-        </ul>
-    </div>
-</div>
-
 <!-- Pop Up - Création de l'agenda -->
 <div id="newAgenda" class="modal">
     <div class="modal-content">
@@ -85,7 +59,7 @@
   };
 </script>
 <script src="/js/agenda/agendaEdition.js"></script>
-<link rel="stylesheet" href="css/agenda.css">
+<link rel="stylesheet" href="/css/agenda.css">
 
 <%- include('calendar') %>
 <%- include('partials/footer') %>
