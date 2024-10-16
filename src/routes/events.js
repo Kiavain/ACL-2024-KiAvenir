@@ -14,8 +14,15 @@ export default class EventRouteur extends Routeur {
    */
   build() {
     this.router.delete("/api/events/delete/:eventId", async (req, res) => {
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
+      // Vérifie si l'utilisateur est connecté
+      if (!res.locals.user) {
+        return res.json({
+          success: false,
+          message: "Vous devez être connecté pour effectuer cette action"
+        });
+      }
 
+      const event = this.server.database.tables.get("events").get(req.params.eventId);
       if (event) {
         await event.delete();
         res.json({ success: true });
@@ -25,8 +32,15 @@ export default class EventRouteur extends Routeur {
     });
 
     this.router.put("/api/events/update/:eventId", (req, res) => {
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
+      // Vérifie si l'utilisateur est connecté
+      if (!res.locals.user) {
+        return res.json({
+          success: false,
+          message: "Vous devez être connecté pour effectuer cette action"
+        });
+      }
 
+      const event = this.server.database.tables.get("events").get(req.params.eventId);
       const fields = {
         name: req.body.title,
         description: req.body.description,
@@ -59,6 +73,14 @@ export default class EventRouteur extends Routeur {
 
     // Route pour créer un événement
     this.router.post("/api/events/create", (req, res) => {
+      // Vérifie si l'utilisateur est connecté
+      if (!res.locals.user) {
+        return res.json({
+          success: false,
+          message: "Vous devez être connecté pour effectuer cette action"
+        });
+      }
+
       const newEvent = this.server.database.tables.get("events");
       if (newEvent) {
         newEvent
@@ -81,6 +103,11 @@ export default class EventRouteur extends Routeur {
     });
 
     this.router.get("/api/events/:agendaId", async (req, res) => {
+      // Vérifie si l'utilisateur est connecté
+      if (!res.locals.user) {
+        return res.json([]);
+      }
+
       // Récupère le start et le end
       const start = req.query.start;
       const end = req.query.end;

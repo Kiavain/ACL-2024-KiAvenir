@@ -127,6 +127,11 @@ export class AccountController extends Controller {
    * @param res {Response} La réponse
    */
   logout(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
     res.locals.user = null;
@@ -141,6 +146,11 @@ export class AccountController extends Controller {
    * @returns {Promise<void>}
    */
   async editAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     // On récupère les nouvelles informations envoyées par l'utilisateur
     const { email, username, password } = req.body;
 
@@ -229,6 +239,11 @@ export class AccountController extends Controller {
    * @returns {Promise<void>}
    */
   async deleteAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     const localUser = res.locals.user;
     const user = this.database.get("users").find((user) => user.username === localUser.username);
 
@@ -252,6 +267,11 @@ export class AccountController extends Controller {
   }
 
   renderAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     res.render("account");
   }
 }
