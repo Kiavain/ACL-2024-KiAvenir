@@ -58,11 +58,24 @@ export class AccountController extends Controller {
         updatedAt
       };
 
+      const createdUser = await this.database.get("users").create(newUser);
+
+      // On associe également un agenda par défaut à l'utilisateur
+      const defaultAgenda = {
+        name: "Mon agenda",
+        description: "Agenda par défaut",
+        ownerId: createdUser.id,
+        color: "#2196f3",
+        createdAt,
+        updatedAt
+      };
+
       // Ajoute l'utilisateur à la base
-      await this.database.get("users").create(newUser);
+      await this.database.get("agendas").create(defaultAgenda);
 
       // Créer un token JWT
-      const token = await createJWT(newUser);
+      const token = await createJWT(createdUser);
+      res.locals.user = token;
 
       // Défini le token dans le cookie et redirige
       res.cookie("accessToken", token, { httpOnly: true });
@@ -89,6 +102,7 @@ export class AccountController extends Controller {
     // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
       const token = await createJWT(user);
+      res.locals.user = token;
       res.cookie("accessToken", token, { httpOnly: true });
       req.flash("notifications", "Bienvenue à vous " + user.username + ".");
       res.redirect("/");
@@ -108,6 +122,7 @@ export class AccountController extends Controller {
   logout(req, res) {
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
+    res.locals.user = null;
     req.flash("notifications", "Déconnexion réussie.");
     res.redirect("/");
   }
@@ -352,6 +367,7 @@ export function authenticate(req, res, next) {
       res.locals.user = null;
       return next();
     }
+
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
   } catch (err) {
     console.error("Erreur lors de l'authentification :", err);
