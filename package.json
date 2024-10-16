@@ -4,7 +4,7 @@
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "dev": "cross-env NODE_ENV=development nodemon --trace-deprecation index.js",
     "start": "cross-env NODE_ENV=production node index.js"
   },
   "authors": [

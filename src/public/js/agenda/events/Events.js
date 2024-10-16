@@ -46,14 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
       errorElement.style.display = "none";
       verifs = true;
     }
-    if (
-      verifs === true &&
-      name &&
-      dateDebut &&
-      description &&
-      dateFin &&
-      agendaValue
-    ) {
+    if (verifs === true && name && dateDebut && description && dateFin && agendaValue) {
       const data = {
         name: name,
         agendaId: agendaValue,
@@ -72,9 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       })
         .then((response) => {
           if (!response.ok) {
-            throw new Error(
-              `Erreur ${response.status}: ${response.statusText}`
-            );
+            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
           }
           return response.json();
         })

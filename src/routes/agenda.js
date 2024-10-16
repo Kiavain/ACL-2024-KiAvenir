@@ -14,13 +14,10 @@ export default class AgendaRouteur extends Routeur {
    * Construit la route
    */
   build() {
-    // Redirection vers l'agenda par défaut - id 1
+    // Redirection vers l'agenda par défaut : le premier de la liste
     this.router.get("/agenda", (req, res) => {
       if (!res.locals.user) {
-        req.flash(
-          "notifications",
-          "Vous devez être connecté pour accéder à cette page."
-        );
+        req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
         return res.redirect("/login");
       }
 
@@ -33,16 +30,11 @@ export default class AgendaRouteur extends Routeur {
 
     this.router.get("/agenda/:agendaId", async (req, res) => {
       if (!res.locals.user) {
-        req.flash(
-          "notifications",
-          "Vous devez être connecté pour accéder à cette page."
-        );
+        req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
         return res.redirect("/login");
       }
 
-      const agenda = await this.server.database.tables
-        .get("agendas")
-        .get(req.params.agendaId);
+      const agenda = await this.server.database.tables.get("agendas").get(req.params.agendaId);
       const agendas = this.server.database.tables.get("agendas");
       if (agenda) {
         res.render("agenda", { agenda, agendas });
@@ -52,9 +44,6 @@ export default class AgendaRouteur extends Routeur {
     });
 
     this.router.put("/api/agenda/create", this.controller.createAgenda);
-    this.router.put(
-      "/api/agenda/:agendaId/update",
-      this.controller.updateAgenda
-    );
+    this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
   }
 }

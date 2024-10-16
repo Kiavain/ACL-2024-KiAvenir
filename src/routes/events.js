@@ -14,9 +14,7 @@ export default class EventRouteur extends Routeur {
    */
   build() {
     this.router.delete("/api/events/delete/:eventId", async (req, res) => {
-      const event = this.server.database.tables
-        .get("events")
-        .get(req.params.eventId);
+      const event = this.server.database.tables.get("events").get(req.params.eventId);
 
       if (event) {
         await event.delete();
@@ -27,9 +25,7 @@ export default class EventRouteur extends Routeur {
     });
 
     this.router.put("/api/events/update/:eventId", (req, res) => {
-      const event = this.server.database.tables
-        .get("events")
-        .get(req.params.eventId);
+      const event = this.server.database.tables.get("events").get(req.params.eventId);
 
       const fields = {
         name: req.body.title,
@@ -90,9 +86,7 @@ export default class EventRouteur extends Routeur {
       const end = req.query.end;
 
       const agendaId = parseInt(req.params.agendaId);
-      const agenda = await this.server.database.tables
-        .get("agendas")
-        .get(agendaId);
+      const agenda = await this.server.database.tables.get("agendas").get(agendaId);
       if (!agenda) {
         return res.json([]);
       }
@@ -105,11 +99,7 @@ export default class EventRouteur extends Routeur {
       await this.server.database.load();
 
       console.log(agendaId);
-      console.log(
-        this.server.database.tables
-          .get("events")
-          .filter((e) => e.agendaId === agendaId).length
-      );
+      console.log(this.server.database.tables.get("events").filter((e) => e.agendaId === agendaId).length);
 
       // Récupère les événements entre le start et le end
       const events = agenda
@@ -117,8 +107,7 @@ export default class EventRouteur extends Routeur {
         .filter((e) => {
           return (
             agendaId === e.agendaId &&
-            (moment(e.startDate).isBetween(start, end) ||
-              moment(e.endDate).isBetween(start, end))
+            (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end))
           );
         })
         .map((e) => {

@@ -193,9 +193,7 @@ export default class Entity {
    */
   async create(data) {
     const created = await this.table.create(data);
-    const key = this.identifierColumns
-      .map((c) => created.dataValues[c])
-      .join(":");
+    const key = this.identifierColumns.map((c) => created.dataValues[c]).join(":");
 
     const structure = new this.entityStructure(this, created.dataValues);
 
@@ -232,10 +230,7 @@ export default class Entity {
       const data = row.dataValues;
       const key = this.identifierColumns.map((c) => data[c]).join(":");
 
-      await this.cache.set(
-        `${this.tableName}:${key}`,
-        new this.entityStructure(this, data)
-      );
+      await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
     }
 
     return updatedRows.map((u) => new this.entityStructure(this, u.dataValues));

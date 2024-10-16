@@ -10,8 +10,7 @@ async function validateAccountLogin(e) {
   passwordMessage.textContent = "";
 
   if (accountForm.password.value.length < 8) {
-    passwordMessage.textContent =
-      "Le mot de passe doit contenir au moins 8 caractères.";
+    passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
   } else {
     const rawValue = accountForm.password.value;
     accountForm.password.value = await hashSHA256(rawValue);

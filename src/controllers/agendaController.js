@@ -30,9 +30,7 @@ export class AgendaController extends Controller {
     const agendas = this.database.get("agendas").getAll();
 
     // Vérifie si un agenda avec le même nom existe déjà pour cet utilisateur
-    const agendaAlreadyExists = agendas.find(
-      (agenda) => agenda.name === name && agenda.ownerId === userId
-    );
+    const agendaAlreadyExists = agendas.find((agenda) => agenda.name === name && agenda.ownerId === userId);
 
     if (agendaAlreadyExists) {
       return res.json({
@@ -100,8 +98,6 @@ export class AgendaController extends Controller {
 
     const updatedAt = Date.now();
     await agenda.update({ name, updatedAt });
-    return res
-      .status(200)
-      .json({ success: true, message: "Agenda mis à jour avec succès" });
+    return res.status(200).json({ success: true, message: "Agenda mis à jour avec succès" });
   }
 }

@@ -123,9 +123,7 @@ class KiAvenir {
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {
-      console.log(
-        `Serveur en cours d'exécution : http://localhost:${this.PORT}`
-      );
+      console.log(`Serveur en cours d'exécution : http://localhost:${this.PORT}`);
     });
   }
 }

@@ -14,18 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fonction pour ouvrir la modale et afficher les détails de l'événement
   const openModal = (eventData) => {
     setInputValue("eventTitle", eventData.title);
-    setInputValue(
-      "eventDetails",
-      eventData.extendedProps.description || "Pas de détails disponibles."
-    );
-    setInputValue(
-      "startEventTime",
-      moment(eventData.start).add(2, "hour").toISOString().substring(0, 16)
-    );
-    setInputValue(
-      "endEventTime",
-      moment(eventData.end).add(2, "hour").toISOString().substring(0, 16)
-    );
+    setInputValue("eventDetails", eventData.extendedProps.description || "Pas de détails disponibles.");
+    setInputValue("startEventTime", moment(eventData.start).add(2, "hour").toISOString().substring(0, 16));
+    setInputValue("endEventTime", moment(eventData.end).add(2, "hour").toISOString().substring(0, 16));
 
     saveButton.dataset.eventId = eventData.extendedProps.eventId;
     modal.style.display = "block";

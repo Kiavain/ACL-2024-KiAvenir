@@ -10,10 +10,7 @@ document.addEventListener("click", function (event) {
   const dropdownMenu = document.getElementById("dropdown-menu");
   const menuButton = document.getElementById("menu-button");
 
-  if (
-    !dropdownMenu.contains(event.target) &&
-    !menuButton.contains(event.target)
-  ) {
+  if (!dropdownMenu.contains(event.target) && !menuButton.contains(event.target)) {
     dropdownMenu.style.display = "none";
   }
 });

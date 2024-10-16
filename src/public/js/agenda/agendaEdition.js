@@ -33,9 +33,7 @@ editAgendaForm.onsubmit = async function (e) {
     document.querySelector(".header-title").textContent = newAgendaName;
     editAgendaModal.style.display = "none";
   } else {
-    alert(
-      "Erreur lors de la mise à jour : le nom est peut-être déjà pris ou vide."
-    );
+    alert("Erreur lors de la mise à jour : le nom est peut-être déjà pris ou vide.");
   }
 };
 
