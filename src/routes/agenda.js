@@ -14,7 +14,7 @@ export default class AgendaRouteur extends Routeur {
    */
   build() {
     this.router.get("/agenda", (req, res) => {
-      if (!req.cookies["accessToken"]) {
+      if (!res.locals.user) {
         req.flash(
           "notifications",
           "Vous devez être connecté pour accéder à cette page."

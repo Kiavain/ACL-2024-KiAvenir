@@ -66,6 +66,10 @@ export class AccountController extends Controller {
 
       // Défini le token dans le cookie et redirige
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash(
+        "notifications",
+        "Votre compte a bien été créé, bienvenue " + username + "."
+      );
       res.redirect("/");
     }
   }
@@ -86,6 +90,7 @@ export class AccountController extends Controller {
     if (user && user.checkPassword(password)) {
       const token = await createJWT(user);
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash("notifications", "Bienvenue à vous " + user.username + ".");
       res.redirect("/");
     } else {
       res.render("login", {
@@ -103,6 +108,7 @@ export class AccountController extends Controller {
   logout(req, res) {
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
+    req.flash("notifications", "Déconnexion réussie.");
     res.redirect("/");
   }
 
