@@ -1,4 +1,6 @@
 // Initialiser la langue de moment.js
+import { addFlashMessage } from "./events/Events.js";
+
 moment.locale("fr");
 
 // Fonction pour créer et initialiser le calendrier
@@ -74,6 +76,7 @@ export const handleOutsideClick = (event) => {
 // Fonction pour mettre à jour un événement
 export const saveEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
+  const errorMessages = document.getElementById("error-update-event");
   const eventId = saveButton.dataset.eventId;
 
   const updatedData = {
@@ -82,6 +85,12 @@ export const saveEvent = (calendar) => {
     start: document.getElementById("startEventTime").value,
     end: document.getElementById("endEventTime").value
   };
+
+  // Vérifie si la date de fin est supérieure à la date de début
+  if (new Date(updatedData.start) >= new Date(updatedData.end)) {
+    errorMessages.innerText = "La date de fin doit être supérieure à la date de début.";
+    return;
+  }
 
   fetch(`/api/events/update/${eventId}`, {
     method: "PUT",
@@ -92,8 +101,8 @@ export const saveEvent = (calendar) => {
     .then((data) => {
       if (data.success) {
         calendar.refetchEvents();
-        alert("Événement mis à jour avec succès!");
-        window.location.reload();
+        closeModal();
+        addFlashMessage("Événement mis à jour avec succès");
       } else {
         alert("Échec de la mise à jour de l'événement.");
       }

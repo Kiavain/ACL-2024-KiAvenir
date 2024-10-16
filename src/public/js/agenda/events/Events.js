@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-function addFlashMessage(message) {
+export function addFlashMessage(message) {
   const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
 
   const flashMessage = document.createElement("div");
