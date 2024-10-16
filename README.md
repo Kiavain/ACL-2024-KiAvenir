@@ -13,6 +13,10 @@ npm install && npm start
 - Créer un compte
 - Se connecter / Se déconnecter
 - Modifier son profil
+- Ajouter un événement / agenda
+- Sélectionner un agenda
+- Voir les événements d'un agenda
+- Modifier/Supprimer un événement
 
 ## Projets et backlog associé
 - [Fonctionnalités](https://github.com/orgs/Kiavain/projects/2/views/1?filterQuery=fonc)

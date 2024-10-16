@@ -34,9 +34,7 @@ class Routeur {
    * Construit la route (à implémenter dans les classes enfants)
    */
   build() {
-    throw new Error(
-      "Oubli d'implémentation de la méthode 'build' dans une route !"
-    );
+    throw new Error("Oubli d'implémentation de la méthode 'build' dans une route !");
   }
 }
 

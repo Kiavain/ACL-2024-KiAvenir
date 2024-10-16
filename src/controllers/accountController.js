@@ -29,20 +29,32 @@ export class AccountController extends Controller {
     const { email, username, password } = req.body;
 
     // Récupère les utilisateurs de la base de données
-    const users = this.database.get("users").getAll();
-
+    const users = this.database.get("users");
     const usernameAlreadyTaken = users.find((u) => u.username === username);
     const emailAlreadyTaken = users.find((u) => u.email === email);
 
+    // Si le pseudo ou l'email est déjà pris, on renvoie une erreur
     if (usernameAlreadyTaken) {
       return res.render("signin", {
         usernameTaken: "Ce nom d'utilisateur est déjà pris.",
         email: email,
         username: username
       });
-    } else if (emailAlreadyTaken) {
+    }
+
+    // Si l'email est déjà pris, on renvoie une erreur
+    else if (emailAlreadyTaken) {
       return res.render("signin", {
         emailTaken: "Un compte existe déjà pour cette adresse mail.",
+        email: email,
+        username: username
+      });
+    }
+
+    // Si le mot de passe est trop court, on renvoie une erreur
+    else if (password.length < 8) {
+      return res.render("signin", {
+        passwordTooShort: "Le mot de passe doit contenir au moins 8 caractères.",
         email: email,
         username: username
       });
@@ -58,14 +70,28 @@ export class AccountController extends Controller {
         updatedAt
       };
 
+      const createdUser = await users.create(newUser);
+
+      // On associe également un agenda par défaut à l'utilisateur
+      const defaultAgenda = {
+        name: "Mon agenda",
+        description: "Agenda par défaut",
+        ownerId: createdUser.id,
+        color: "#2196f3",
+        createdAt,
+        updatedAt
+      };
+
       // Ajoute l'utilisateur à la base
-      await this.database.get("users").create(newUser);
+      await this.database.get("agendas").create(defaultAgenda);
 
       // Créer un token JWT
-      const token = await createJWT(newUser);
+      const token = await createJWT(createdUser);
+      res.locals.user = token;
 
       // Défini le token dans le cookie et redirige
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash("notifications", "Votre compte a bien été créé, bienvenue " + username + ".");
       res.redirect("/");
     }
   }
@@ -78,14 +104,14 @@ export class AccountController extends Controller {
    */
   async login(req, res) {
     const { username, password } = req.body;
-    const user = this.database
-      .get("users")
-      .find((user) => user.username === username);
+    const user = this.database.get("users").find((user) => user.username === username);
 
     // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
       const token = await createJWT(user);
+      res.locals.user = token;
       res.cookie("accessToken", token, { httpOnly: true });
+      req.flash("notifications", "Bienvenue à vous " + user.username + ".");
       res.redirect("/");
     } else {
       res.render("login", {
@@ -101,8 +127,15 @@ export class AccountController extends Controller {
    * @param res {Response} La réponse
    */
   logout(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
+    res.locals.user = null;
+    req.flash("notifications", "Déconnexion réussie.");
     res.redirect("/");
   }
 
@@ -113,6 +146,11 @@ export class AccountController extends Controller {
    * @returns {Promise<void>}
    */
   async editAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     // On récupère les nouvelles informations envoyées par l'utilisateur
     const { email, username, password } = req.body;
 
@@ -125,20 +163,15 @@ export class AccountController extends Controller {
 
     if (!user) {
       return res.render("account", {
-        errorMessage:
-          "Il y a eu un problème dans l'enregistrement de vos modifications.",
+        errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
         email: email,
         username: username
       });
     }
 
     // Vérifie si le nouveau pseudo est déjà existant
-    const usernameAlreadyTaken = users.find(
-      (u) => u.username === username && u.username !== localUser.username
-    );
-    const emailAlreadyTaken = users.find(
-      (u) => u.email === email && u.email !== localUser.email
-    );
+    const usernameAlreadyTaken = users.find((u) => u.username === username && u.username !== localUser.username);
+    const emailAlreadyTaken = users.find((u) => u.email === email && u.email !== localUser.email);
 
     // On empêche bien sûr de changer de pseudo ou de mail pour un déjà existant
     if (usernameAlreadyTaken) {
@@ -178,9 +211,7 @@ export class AccountController extends Controller {
       if (userIsUpdated) {
         try {
           await user.update(newUser);
-          const u = this.database
-            .get("users")
-            .find((u) => u.email === newUser.email);
+          const u = this.database.get("users").find((u) => u.email === newUser.email);
 
           // Générer un nouveau token JWT avec les informations mises à jour
           const newToken = await createJWT(u);
@@ -192,8 +223,7 @@ export class AccountController extends Controller {
           res.redirect("/");
         } catch {
           return res.render("account", {
-            errorMessage:
-              "Il y a eu un problème dans l'enregistrement de vos modifications.",
+            errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
             email: email,
             username: username
           });
@@ -209,10 +239,13 @@ export class AccountController extends Controller {
    * @returns {Promise<void>}
    */
   async deleteAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     const localUser = res.locals.user;
-    const user = this.database
-      .get("users")
-      .find((user) => user.username === localUser.username);
+    const user = this.database.get("users").find((user) => user.username === localUser.username);
 
     try {
       await user.delete(); // Supprime l'utilisateur de la base de données
@@ -234,6 +267,11 @@ export class AccountController extends Controller {
   }
 
   renderAccount(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    if (!res.locals.user) {
+      return res.render("401");
+    }
+
     res.render("account");
   }
 }
@@ -346,10 +384,10 @@ export function authenticate(req, res, next) {
       res.locals.user = null;
       return next();
     }
+
     res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
-  } catch (error) {
-    console.log("Erreur: aucun token d'accès trouvé dans le cookie\n", error);
-    // res.status(401).send("Unauthorized");
+  } catch {
+    res.locals.user = null;
   }
   next();
 }
