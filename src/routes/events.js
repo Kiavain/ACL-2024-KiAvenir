@@ -98,9 +98,6 @@ export default class EventRouteur extends Routeur {
 
       await this.server.database.load();
 
-      console.log(agendaId);
-      console.log(this.server.database.tables.get("events").filter((e) => e.agendaId === agendaId).length);
-
       // Récupère les événements entre le start et le end
       const events = agenda
         .getEvents()
@@ -120,7 +117,6 @@ export default class EventRouteur extends Routeur {
           };
         });
 
-      console.log(events);
       res.json(events);
     });
   }

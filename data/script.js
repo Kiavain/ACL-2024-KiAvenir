@@ -1,3 +1,5 @@
+import { hashSHA256 } from "../src/public/js/utils.js";
+
 /**
  * Construit la base de données de développement
  * @param server {KiAvenir} Le serveur

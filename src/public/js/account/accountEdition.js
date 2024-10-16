@@ -1,13 +1,12 @@
-import { checkPassword } from "./utils.js";
-
-const accountForm = document.forms["accountCreation"];
+import { checkPassword } from "../utils.js";
+const accountForm = document.forms["accountEdition"];
 accountForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   await validateAccountCreation(e);
 });
 
 /**
- * Valide la création
+ * Valide la création d'un compte
  * @param e {Event} L'événement de soumission du formulaire
  * @returns {Promise<void>}
  */
@@ -19,11 +18,13 @@ async function validateAccountCreation(e) {
   passwordRepeatedMessage.textContent = "";
 
   let password = accountForm.password.value;
-  let passwordConfirmation = passwordRepeated.value;
+  let passwordConfirmation = passwordRepeated["value"];
 
-  console.log("Vérification du mot de passe :", password, passwordConfirmation);
-  await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
-  console.log("Vérifié !");
+  if (password !== "") {
+    await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
+  } else {
+    accountForm.submit();
+  }
 
   // Empêche la soumission du formulaire si un champ est incorrect
   if (!accountForm.checkValidity()) {

@@ -49,8 +49,7 @@
 </div>
 
 
-<script src="/js/agenda/agendaCreation.js"></script>
-<script src="/js/agenda/agendaMenu.js"></script>
+<script type="module" src="/js/agenda/agendaCreation.js"></script>
 <script>
   const agenda = {
     agendaId: "<%= agenda.agendaId %>",
@@ -58,7 +57,7 @@
     name: "<%= agenda.name %>"
   };
 </script>
-<script src="/js/agenda/agendaEdition.js"></script>
+<script type="module" src="/js/agenda/agendaEdition.js"></script>
 <link rel="stylesheet" href="/css/agenda.css">
 
 <%- include('calendar') %>

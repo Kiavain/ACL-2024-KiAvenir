@@ -1,4 +1,5 @@
-import { hashSHA256 } from "./utils.js";
+import { hashSHA256 } from "../utils.js";
+
 const accountForm = document.forms["accountLogin"];
 accountForm.addEventListener("submit", async (e) => {
   e.preventDefault();

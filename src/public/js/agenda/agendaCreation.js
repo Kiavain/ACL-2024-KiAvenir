@@ -1,5 +1,3 @@
-console.log("agendaCreation.js chargé");
-
 document.addEventListener("DOMContentLoaded", () => {
   const createAgenda = document.getElementById("createAgenda");
   const viewCreateAgenda = document.getElementById("newAgenda");

@@ -45,6 +45,8 @@ export default class Database {
    * @return {Promise<void>} The promise
    */
   async load() {
+    // Connecte la base de données
+    this.tables.clear();
     this.connector = new Sequelize({
       dialect: "sqlite",
       storage: "data/db.sqlite",
