@@ -1,3 +1,5 @@
+import { initCalendar } from "../calendar.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   // Utilitaires pour sélectionner les éléments
   const getElement = (id) => document.getElementById(id);
@@ -70,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return response.json();
         })
         .then((data) => {
+          initCalendar(agenda);
           addFlashMessage(data.message);
         })
         .catch((error) => {
