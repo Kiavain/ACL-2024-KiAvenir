@@ -102,7 +102,7 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.get("/api/events/:agendaId", async (req, res) => {
+    this.router.get("/api/events/:agendaId", (req, res) => {
       // Vérifie si l'utilisateur est connecté
       if (!res.locals.user) {
         return res.json([]);
@@ -113,7 +113,7 @@ export default class EventRouteur extends Routeur {
       const end = req.query.end;
 
       const agendaId = parseInt(req.params.agendaId);
-      const agenda = await this.server.database.tables.get("agendas").get(agendaId);
+      const agenda = this.server.database.tables.get("agendas").get(agendaId);
       if (!agenda) {
         return res.json([]);
       }
@@ -122,8 +122,6 @@ export default class EventRouteur extends Routeur {
       if (!start || !end) {
         return res.json([]);
       }
-
-      await this.server.database.sync();
 
       // Récupère les événements entre le start et le end
       const events = agenda
