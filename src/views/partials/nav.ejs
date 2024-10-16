@@ -23,6 +23,7 @@
 
             <ul class="navbar-nav">
                 <% if (locals.user) { %>
+                    <script src="/js/agenda/events/Events.js"></script>
                     <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
                             add
@@ -53,7 +54,7 @@
                     </li>
 
                     <!-- Fenêtre modale si on est dans le /agenda -->
-                    <% if (currentPath === '/agenda') { %>
+                    <% if (currentPath.includes("/agenda")) { %>
                         <div id="modal" class="modal">
                             <div class="modal-content">
                                 <span class="close-btn" id="close-btn">&times;</span>

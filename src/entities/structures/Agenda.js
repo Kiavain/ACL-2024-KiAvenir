@@ -82,7 +82,7 @@ export default class Agenda extends EntityStructure {
 
   /**
    * Récupère les événements de l'agenda
-   * @returns {Event} Les événements
+   * @returns {Event[]} Les événements
    */
   getEvents() {
     return this.events.getAll((x) => x.agendaId === this.agendaId);
