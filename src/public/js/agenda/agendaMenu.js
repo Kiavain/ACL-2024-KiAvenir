@@ -30,10 +30,8 @@ for (let i = 0; i < agendaItems.length; i++) {
   });
 }
 function toggleMenuShareOrExport(val, name) {
-  console.log("toggleMenuShareOrExport");
   shareOrExport.style.display = "flex";
   toggleMenu();
   shareOrExport.value = val;
-  console.log(shareOrExport.value);
   document.getElementById("agendaName").textContent = name;
 }
