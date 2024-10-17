@@ -25,7 +25,6 @@ for (let i = 0; i < agendaItems.length; i++) {
   const agendaItem = agendaItems[i];
   const agendaItemValue = agendaItem.querySelector("button").value;
   const agendaItemName = agendaItem.querySelector("a").textContent;
-  console.log(agendaItemName);
   agendaItem.addEventListener("click", () => {
     toggleMenuShareOrExport(agendaItemValue, agendaItemName);
   });
