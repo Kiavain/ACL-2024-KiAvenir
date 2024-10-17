@@ -22,15 +22,19 @@ document.addEventListener("click", function (event) {
 });
 const agendaItems = document.getElementById("agenda-list").children;
 for (let i = 0; i < agendaItems.length; i++) {
-  const agendaItem = agendaItems[i].querySelector("button");
-  console.log(agendaItem.value);
+  const agendaItem = agendaItems[i];
+  const agendaItemValue = agendaItem.querySelector("button").value;
+  const agendaItemName = agendaItem.querySelector("a").textContent;
+  console.log(agendaItemName);
   agendaItem.addEventListener("click", () => {
-    toggleMenuShareOrExport(agendaItem.value);
+    toggleMenuShareOrExport(agendaItemValue, agendaItemName);
   });
 }
-function toggleMenuShareOrExport(val) {
+function toggleMenuShareOrExport(val, name) {
   console.log("toggleMenuShareOrExport");
-  shareOrExport.style.display = "block";
+  shareOrExport.style.display = "flex";
+  toggleMenu();
   shareOrExport.value = val;
   console.log(shareOrExport.value);
+  document.getElementById("agendaName").textContent = name;
 }

@@ -30,6 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target === modal) {
       modal.style.display = "none";
     }
+    if (
+      !createAgendaOrEvent.contains(event.target) &&
+      !popup.contains(event.target) &&
+      popup.classList.contains("show")
+    ) {
+      popup.classList.toggle("show");
+    }
   });
 
   createButton.onclick = (e) => {

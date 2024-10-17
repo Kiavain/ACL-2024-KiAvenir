@@ -57,9 +57,10 @@
                                 </ul>
                             </div>
                         </div>
-                        <div id="shareOrExport" style="display: none;">
-                            <button id="shareAgenda">Share agenda</button>
-                            <button id="exportAgenda">Export agenda</button>
+                        <div id="shareOrExport" class="popUpWindow">
+                            <span id="agendaName" style="text-align: center;">Agenda name</span>
+                            <button id="shareAgenda">Partager l'agenda</button>
+                            <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
                         </div>
                         <script type="module" src="/js/agenda/events/Events.js"></script>
                         <button class="icon-button" id="createAgendaOrEvent">
@@ -67,7 +68,7 @@
                             add
                         </span>
                         </button>
-                        <div id="agendaEventWindow">
+                        <div id="agendaEventWindow" class="popUpWindow">
                             <button id="createAgenda">Nouvel agenda</button>
                             <button id="createEvent">Nouvel événement</button>
                         </div>

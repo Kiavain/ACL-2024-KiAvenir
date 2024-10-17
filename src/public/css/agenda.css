@@ -232,7 +232,7 @@ body {
 }
 
 /* Styles pour la fenêtre pop-up */
-#agendaEventWindow {
+.popUpWindow {
   position: absolute;
   top:60px;
   background-color: #ffffff;
