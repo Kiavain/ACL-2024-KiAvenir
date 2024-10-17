@@ -46,7 +46,7 @@ class KiAvenir {
         res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar).
         next();
       })
-      .use(authenticate); // Permet de récupérer le token s'il existe (voir accountController.js)
+      .use((req, res, next) => authenticate(req, res, next, this.database));
 
     await this.database.load();
     if (process.env.NODE_ENV === "development") {
@@ -55,6 +55,7 @@ class KiAvenir {
     await this.initNotifs();
     console.log("Base de données chargée !");
   }
+
   async initNotifs() {
     // Configurer la session
     this.app.use(

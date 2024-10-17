@@ -7,7 +7,7 @@
 - [ ] Visualisation simultanée de plusieurs agendas.(Responsables : Sarah et Esteban)
 
 # Nouvelles fonctionnalités à implémenter
-- [ ] Création de rendez-vous récurrents.
+- [ ] Création de rendez-vous récurrents. (Responsable : Nicolas)
 - [ ] Recherche de rendez-vous avec des filtres. (Responsable : Thomas)
 - [ ] Partage d'agenda entre utilisateur (annulation possible). (Responsable : Rayan)
 - [ ] Import/export d'agenda au format voulu. (Responsable : Rayan)

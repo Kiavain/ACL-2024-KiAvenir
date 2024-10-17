@@ -59,15 +59,11 @@ export class AccountController extends Controller {
         username: username
       });
     } else {
-      const createdAt = Date.now();
-      const updatedAt = createdAt;
 
       const newUser = {
         email,
         username,
-        password,
-        createdAt,
-        updatedAt
+        password
       };
 
       const createdUser = await users.create(newUser);
@@ -77,9 +73,7 @@ export class AccountController extends Controller {
         name: "Mon agenda",
         description: "Agenda par défaut",
         ownerId: createdUser.id,
-        color: "#2196f3",
-        createdAt,
-        updatedAt
+        color: "#2196f3"
       };
 
       // Ajoute l'utilisateur à la base
@@ -372,20 +366,32 @@ function parseCookies(request) {
  * Authentifie un utilisateur à partir d'un token JWT
  * @param req {Request} La requête
  * @param res {Response} La réponse
- * @param next {Function} La fonction suivante
- * @returns {function} La fonction suivante
+ * @param next {NextFunction} La fonction suivante
+ * @param database {Database} La base de données
+ * @returns {void} La fonction suivante
  */
-export function authenticate(req, res, next) {
+export function authenticate(req, res, next, database) {
   const cookies = parseCookies(req);
+  res.locals.user = null;
 
   try {
     const token = cookies["accessToken"];
     if (!token) {
-      res.locals.user = null;
       return next();
     }
 
-    res.locals.user = jwt.verify(token, process.env.JWT_SECRET); // On a authentifié l'utilisateur
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    if (!payload) {
+      return next();
+    }
+
+    const user = database.tables.get("users").find((u) => u.id === payload.id);
+    if (!user) {
+      return next();
+    }
+
+    // On a authentifié l'utilisateur
+    res.locals.user = payload;
   } catch {
     res.locals.user = null;
   }
