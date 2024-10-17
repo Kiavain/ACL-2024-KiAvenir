@@ -59,15 +59,11 @@ export class AccountController extends Controller {
         username: username
       });
     } else {
-      const createdAt = Date.now();
-      const updatedAt = createdAt;
 
       const newUser = {
         email,
         username,
-        password,
-        createdAt,
-        updatedAt
+        password
       };
 
       const createdUser = await users.create(newUser);
@@ -77,9 +73,7 @@ export class AccountController extends Controller {
         name: "Mon agenda",
         description: "Agenda par défaut",
         ownerId: createdUser.id,
-        color: "#2196f3",
-        createdAt,
-        updatedAt
+        color: "#2196f3"
       };
 
       // Ajoute l'utilisateur à la base

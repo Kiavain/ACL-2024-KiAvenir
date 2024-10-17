@@ -37,15 +37,11 @@ export class AgendaController extends Controller {
         message: "Un agenda avec ce nom existe déjà."
       });
     } else {
-      const createdAt = Date.now();
-      const updatedAt = createdAt;
       const newAgenda = {
         name: name,
         description: description,
         ownerId: userId,
-        color: color,
-        createdAt: createdAt,
-        updatedAt: updatedAt
+        color: color
       };
 
       this.database
@@ -92,9 +88,7 @@ export class AgendaController extends Controller {
         message: "Le nom de l'agenda est requis."
       });
     }
-
-    const updatedAt = Date.now();
-    await agenda.update({ name, updatedAt });
+    await agenda.update({ name });
     return res.status(200).json({ success: true, message: "Agenda mis à jour avec succès" });
   }
 }
