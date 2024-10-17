@@ -46,9 +46,12 @@
                                     forEach(agenda => { %>
                                         <li class="agenda-item">
                                             <a href="/agenda/<%= agenda.agendaId %>">
-                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
+                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
                                                 <%= agenda.name %>
                                             </a>
+                                            <button id="shareOrExportButton<% agenda.agendaId %>" value="<% agenda.agendaId %>" class="icon-button" style="padding: 5px" >
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                                            </button>
                                         </li>
                                     <% }) %>
                                 </ul>
