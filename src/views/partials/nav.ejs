@@ -41,21 +41,25 @@
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
                             <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
                                 <h3 class="agenda-title">Mes agendas</h3>
-                                <ul class="agenda-list">
+                                <ul class="agenda-list" id="agenda-list">
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id).
                                     forEach(agenda => { %>
-                                        <li class="agenda-item"  style="<%= currentPath === '/agenda/' + (agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;;' : '' %>">
+                                        <li class="agenda-list"  style="<%= currentPath === '/agenda/' + (agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;;' : '' %>">
                                             <a href="/agenda/<%= agenda.agendaId %>">
                                                 <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
                                                 <%= agenda.name %>
                                             </a>
-                                            <button id="shareOrExportButton<% agenda.agendaId %>" value="<% agenda.agendaId %>" class="icon-button" style="padding: 5px" >
+                                            <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" >
                                                 <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
                                             </button>
                                         </li>
                                     <% }) %>
                                 </ul>
                             </div>
+                        </div>
+                        <div id="shareOrExport" style="display: none;">
+                            <button id="shareAgenda">Share agenda</button>
+                            <button id="exportAgenda">Export agenda</button>
                         </div>
                         <script type="module" src="/js/agenda/events/Events.js"></script>
                         <button class="icon-button" id="createAgendaOrEvent">
