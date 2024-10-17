@@ -1,6 +1,12 @@
 # IDEA
 .idea
 
+# VSCode
+.vscode
+
+# Database
+data/*.sqlite
+
 # Logs
 logs
 *.log

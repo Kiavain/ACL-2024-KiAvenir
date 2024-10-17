@@ -1,0 +1,134 @@
+<% /* global locals,currentPath,agendas */ %>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="/img/favicon.ico" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
+            <span class="ms-2">KiAvenir</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Conteneur centré pour le nom de l'agenda -->
+        <% if (currentPath.includes("/agenda")) { %>
+            <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
+                <span class="header-title"><%= agenda.name %></span>
+                <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+            </div>
+        <% } %>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPath === '/' ? 'active' : '' %>" aria-current="page" href="/">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Agenda</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <% if (locals.user) { %>
+                    <!-- Fenêtre modale si on est dans le /agenda -->
+                    <% if (currentPath.includes("/agenda")) { %>
+                        <div id="menuAgendas" class="buttons-nav">
+                            <script type="module" src="/js/agenda/agendaMenu.js"></script>
+                            <button class="icon-button" id="menu-button">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                            <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
+                            <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
+                                <h3 class="agenda-title">Agendas</h3>
+                                <ul class="agenda-list">
+                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.agendaId !== locals.agenda.agendaId).
+                                    forEach(agenda => { %>
+                                        <li class="agenda-item">
+                                            <a href="/agenda/<%= agenda.agendaId %>">
+                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
+                                                <%= agenda.name %>
+                                            </a>
+                                        </li>
+                                    <% }) %>
+                                </ul>
+                            </div>
+                        </div>
+                        <script type="module" src="/js/agenda/events/Events.js"></script>
+                        <button class="icon-button" id="createAgendaOrEvent">
+                        <span class="material-symbols-outlined">
+                            add
+                        </span>
+                        </button>
+                        <div id="agendaEventWindow">
+                            <button id="createAgenda">Nouvel agenda</button>
+                            <button id="createEvent">Nouvel événement</button>
+                        </div>
+                    <% } %>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/img/account.jpg" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
+                            <span class="ms-2"><%= locals.user.username %></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item <%= currentPath === '/account' ? 'active' : '' %>" href="/account">Mon compte</a></li>
+                            <li><a class="dropdown-item <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Mes agendas</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <script type="module" src="/js/account/logout.js"></script>
+                                <a id="logout_link" class="dropdown-item"  href="#">Déconnexion</a>
+                                <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
+                                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <% if(currentPath.includes("/agenda")) { %>
+                        <div id="modal" class="modal">
+                            <div class="modal-content">
+                                <span class="close-btn" id="close-btn">&times;</span>
+                                <h2>Ajouter un événement</h2>
+                                <form>
+                                    <label for="event-name">Nom de l'événement:</label>
+                                    <input type="text" id="event-name" name="event-name" required>
+
+                                    <label for="event-date">Date de début:</label>
+                                    <input type="datetime-local" id="event-date" name="event-date" required>
+
+                                    <label for="event-date-end">Date de fin:</label>
+                                    <input type="datetime-local" id="event-date-end" name="event-date" required>
+
+                                    <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
+
+                                    <label for="event-agenda">Agenda:</label>
+                                    <select id="event-agenda" name="event-agenda" required>
+                                        <option value="" selected disabled>---Veuillez choisir un agenda---</option>
+                                        <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
+                                        .forEach(agenda => { %>
+                                            <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
+                                        <% }) %>
+                                    </select>
+
+                                    <label for="event-description">Description:</label>
+                                    <textarea  id="event-description" name="event-description" rows = "3"></textarea>
+
+                                    <button id="saveEvent" class="submit-btn">Enregistrer</button>
+                                </form>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Connexion</a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-separator"></span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signin">Inscription</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
