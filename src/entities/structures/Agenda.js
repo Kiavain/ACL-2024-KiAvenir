@@ -69,6 +69,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<void>} Une promesse
    */
   async delete() {
+    this.getEvents().map((event) => event.delete());
     return this.entity.delete((x) => x.agendaId === this.agendaId);
   }
 
