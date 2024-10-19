@@ -3,8 +3,19 @@
         <span class="close-btn" id="shareAgenda-close-btn">&times;</span>
         <h2>Partager un agenda</h2>
 
-        <label for="event-name">Mail de l'utilisateur à qui partager l'agenda :</label>
-        <input type="text" id="event-name" name="event-name" required>
+        <label for="email-share">Mail de l'utilisateur à qui partager l'agenda :</label>
+        <input type="email" id="email-share" name="email-share" required>
+
+        <label for="access-shared-users">Utlisateurs avec accès :</label>
+        <ul id="access-shared-users">
+            <li>Vous : Propriétaire</li>
+        </ul>
+
+        <label for="role-share-agenda">Rôle à attribuer :</label>
+        <select id="role-share-agenda" name="role-share-agenda" required>
+            <option value="Lecteur" selected>Lecteur</option>
+            <option value="Editeur">Editeur</option>
+        </select>
 
         <button id="shareAgendaConfirm" class="submit-btn">Partager</button>
 

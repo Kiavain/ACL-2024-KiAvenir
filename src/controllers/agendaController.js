@@ -5,6 +5,7 @@ export class AgendaController extends Controller {
     super(server);
     this.createAgenda = this.createAgenda.bind(this);
     this.updateAgenda = this.updateAgenda.bind(this);
+    this.shareAgenda = this.shareAgenda.bind(this);
   }
 
   /**
@@ -90,5 +91,59 @@ export class AgendaController extends Controller {
     }
     await agenda.update({ name });
     return res.status(200).json({ success: true, message: "Agenda mis à jour avec succès" });
+  }
+
+  /**
+   * Partage un agenda
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  async shareAgenda(req, res) {
+    const userId = res.locals.user.id;
+    const agendaId = req.params.agendaId;
+    const { mail, role } = req.body;
+    const agenda = await this.database.get("agendas").get(agendaId);
+    const sharedUser = await this.database.get("users").find((user) => user.email === mail);
+
+    if (!agenda) {
+      return res.status(404).json({
+        success: false,
+        message: "Agenda non trouvé."
+      });
+    }
+    if (!mail || mail.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "L'email est requis."
+      });
+    }
+    /*if (role !== "Lecteur" || role.trim() !== "Editeur") {
+      return res.status(400).json({
+        success: false,
+        message: "Rôle inconnu."
+      });
+    }*/
+    if (!sharedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Utilisateur non trouvé."
+      });
+    }
+    if (agenda.ownerId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Vous n'êtes pas autorisé à partager cet agenda."
+      });
+    }
+    if (sharedUser.id === userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Vous ne pouvez partager cet agenda à vous même."
+      });
+    }
+    await console.log("Vérifs réussis !");
+    req.flash("notifications", "Agenda partagé avec succès à " + sharedUser.username);
+    return res.status(200).json({ success: true, message: "Agenda partagé avec succès à " + sharedUser.username });
   }
 }
