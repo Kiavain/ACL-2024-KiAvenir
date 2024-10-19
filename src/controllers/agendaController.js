@@ -105,6 +105,22 @@ export class AgendaController extends Controller {
     const { mail, role } = req.body;
     const agenda = await this.database.get("agendas").get(agendaId);
     const sharedUser = await this.database.get("users").find((user) => user.email === mail);
+    const guests = this.database.get("guests").getAll();
+
+    // Vérifie si l'utilisateur n'a pas déjà accès à l'agenda
+    const alreadyShared = guests.find((guest) => guest.agendaId === agendaId && guest.guestId === sharedUser.id);
+
+    if (alreadyShared) {
+      return res.status(404).json({
+        success: false,
+        message: "L'agenda à déjà été partagé avec cet utilisateur."
+      });
+    }
+    const newGuest = {
+      agendaId: agendaId,
+      guestId: sharedUser.id,
+      role: role
+    };
 
     if (!agenda) {
       return res.status(404).json({
@@ -118,12 +134,12 @@ export class AgendaController extends Controller {
         message: "L'email est requis."
       });
     }
-    /*if (role !== "Lecteur" || role.trim() !== "Editeur") {
+    if (role !== "Lecteur" && role !== "Editeur") {
       return res.status(400).json({
         success: false,
         message: "Rôle inconnu."
       });
-    }*/
+    }
     if (!sharedUser) {
       return res.status(404).json({
         success: false,
@@ -142,8 +158,13 @@ export class AgendaController extends Controller {
         message: "Vous ne pouvez partager cet agenda à vous même."
       });
     }
-    await console.log("Vérifs réussis !");
-    req.flash("notifications", "Agenda partagé avec succès à " + sharedUser.username);
-    return res.status(200).json({ success: true, message: "Agenda partagé avec succès à " + sharedUser.username });
+    await this.database
+      .get("guests")
+      .create(newGuest)
+      .then(() => {
+        req.flash("notifications", "Agenda partagé avec succès à " + sharedUser.username);
+        return res.status(200).json({ success: true, message: "Agenda partagé avec succès à " + sharedUser.username });
+      })
+      .catch((error) => res(500).json({ success: false, message: error }));
   }
 }
