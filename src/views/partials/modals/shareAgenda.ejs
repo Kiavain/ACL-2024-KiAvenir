@@ -5,6 +5,7 @@
 
         <label for="email-share">Mail de l'utilisateur à qui partager l'agenda :</label>
         <input type="email" id="email-share" name="email-share" required>
+        <p id="mail-error" class="error">Erreur e-mail.</p>
 
         <label for="access-shared-users">Utlisateurs avec accès :</label>
         <ul id="access-shared-users">
@@ -16,6 +17,9 @@
             <option value="Lecteur" selected>Lecteur</option>
             <option value="Editeur">Editeur</option>
         </select>
+        <p id="role-error" class="error">Erreur Rôle.</p>
+
+        <p id="other-error" class="error">Autre erreur.</p>
 
         <button id="shareAgendaConfirm" class="submit-btn">Partager</button>
 

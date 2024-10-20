@@ -269,6 +269,12 @@ body {
   animation: fadeIn 0.3s forwards;
 }
 
+.error{
+  color: red;
+  font-style: italic;
+  display: none;
+}
+
 /* Animation de fondu */
 @keyframes fadeIn {
   from {

@@ -106,12 +106,19 @@ export class AgendaController extends Controller {
     const agenda = await this.database.get("agendas").get(agendaId);
     const sharedUser = await this.database.get("users").find((user) => user.email === mail);
     const guests = this.database.get("guests").getAll();
+    //Vérifie si l'email correpond à un utilisateur
+    if (!sharedUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Utilisateur non trouvé."
+      });
+    }
 
     // Vérifie si le guest n'a pas déjà accès à l'agenda
     const alreadyShared = guests.find((guest) => guest.agendaId === agendaId || guest.guestId === sharedUser.id);
 
     if (alreadyShared) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
         message: "L'agenda à déjà été partagé avec cet utilisateur."
       });
@@ -135,25 +142,20 @@ export class AgendaController extends Controller {
       });
     }
     if (role !== "Lecteur" && role !== "Editeur") {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "Rôle inconnu."
       });
     }
-    if (!sharedUser) {
-      return res.status(404).json({
-        success: false,
-        message: "Utilisateur non trouvé."
-      });
-    }
+
     if (agenda.ownerId !== userId) {
-      return res.status(403).json({
+      return res.status(404).json({
         success: false,
         message: "Vous n'êtes pas autorisé à partager cet agenda."
       });
     }
     if (sharedUser.id === userId) {
-      return res.status(403).json({
+      return res.status(400).json({
         success: false,
         message: "Vous ne pouvez partager cet agenda à vous même."
       });
