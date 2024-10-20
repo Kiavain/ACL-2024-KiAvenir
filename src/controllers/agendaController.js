@@ -107,11 +107,11 @@ export class AgendaController extends Controller {
     const sharedUser = await this.database.get("users").find((user) => user.email === mail);
     const guests = this.database.get("guests").getAll();
 
-    // Vérifie si l'utilisateur n'a pas déjà accès à l'agenda
-    const alreadyShared = guests.find((guest) => guest.agendaId === agendaId && guest.guestId === sharedUser.id);
+    // Vérifie si le guest n'a pas déjà accès à l'agenda
+    const alreadyShared = guests.find((guest) => guest.agendaId === agendaId || guest.guestId === sharedUser.id);
 
     if (alreadyShared) {
-      return res.status(404).json({
+      return res.status(403).json({
         success: false,
         message: "L'agenda à déjà été partagé avec cet utilisateur."
       });
