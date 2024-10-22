@@ -13,8 +13,8 @@
             <li>Vous : Propriétaire</li>
             <% guests.filter(guest => guest.agendaId === 2).
             forEach(guest => { %>
-                <li value="<%= guest.id %>">
-                    <div class="guest-item">
+                <li>
+                    <div class="guest-item" data-guest-id="<%= guest.id %>">
                         <span class="username"><%= guest.getGuest().username %></span>
                         <div>
                             <button class="icon-button role-button">

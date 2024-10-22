@@ -1,6 +1,3 @@
-import {addFlashMessage} from "./events/Events.js";
-import {closeModal} from "./calendar.js";
-
 const shareAgendaButton = document.getElementById("shareAgenda");
 const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
 const shareAgendaCloseButton = document.getElementById("shareAgenda-close-btn");
@@ -60,7 +57,7 @@ function submitShareAgenda() {
         roleError.style.display = "none";
         mailError.style.display = "none";
         otherError.style.display = "none";
-        window.location.href = "/agenda/" + agendaId;
+        window.location.reload();
       } else {
         if (isMailError) {
           mailError.textContent = data.message;
@@ -114,8 +111,14 @@ document.querySelectorAll(".role-dropdown li").forEach((li) => {
     });
     event.target.querySelector(".check-icon").style.visibility = "visible";
 
+    const updatedData = {
+      guestId: guestItem.dataset.guestId,
+      role: roleText.textContent
+    };
+    // Fermer le dropdown après sélection
+    dropdown.style.display = "none";
     // Mise à jour de la BDD
-    fetch(`/api/events/update/${eventId}`, {
+    fetch("/api/agenda/updateGuest", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedData)
@@ -123,16 +126,11 @@ document.querySelectorAll(".role-dropdown li").forEach((li) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          calendar.refetchEvents();
-          closeModal();
-          addFlashMessage("Événement mis à jour avec succès");
+          console.log(data.message);
         } else {
-          alert("Échec de la mise à jour de l'événement.");
+          console.log("Chelou y'a une erreur là");
         }
       })
       .catch((error) => console.error("Erreur:", error));
-
-    // Fermer le dropdown après sélection
-    dropdown.style.display = "none";
   });
 });

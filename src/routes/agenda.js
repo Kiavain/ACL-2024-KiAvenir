@@ -43,7 +43,6 @@ export default class AgendaRouteur extends Routeur {
         res.status(404).json({ success: false, message: "Agenda non trouvé" });
       }
     });
-
     this.router.put("/api/agenda/create", this.controller.createAgenda);
     this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
     this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);

@@ -177,7 +177,9 @@ export class AgendaController extends Controller {
    * @returns {Promise<*>}
    */
   async updateGuest(req, res) {
-    const { guestId, newRole } = req.body;
+    console.log("Updating");
+    const guestId = req.params.guestId;
+    const { newRole } = req.body;
     const guest = await this.database.get("guest").get(guestId);
 
     if (!guest) {
@@ -192,7 +194,7 @@ export class AgendaController extends Controller {
         message: "Rôle inconnu."
       });
     }
-    if(newRole === guest.role) {
+    if (newRole === guest.role) {
       return res.status(401).json({
         success: false,
         message: "Rôle identique."
