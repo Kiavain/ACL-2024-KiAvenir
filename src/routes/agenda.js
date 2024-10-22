@@ -43,6 +43,28 @@ export default class AgendaRouteur extends Routeur {
         res.status(404).json({ success: false, message: "Agenda non trouvé" });
       }
     });
+    // Nouvelle route avec agendaId et sharedAgendaId
+    this.router.get("/agenda/:agendaId/:sharedAgendaId", async (req, res) => {
+      console.log("INSANE ?");
+      if (!res.locals.user) {
+        req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+        return res.redirect("/login");
+      }
+
+      const { agendaId, sharedAgendaId } = req.params;
+      const agenda = await this.server.database.tables.get("agendas").get(agendaId);
+      const sharedAgenda = await this.server.database.tables.get("agendas").get(sharedAgendaId);
+      const agendas = this.server.database.tables.get("agendas");
+      const guests = this.server.database.tables.get("guests");
+
+      if (agenda && sharedAgenda) {
+        //res.render("agenda", { sharedAgenda });
+        console.log("INSANE ???");
+      } else {
+        res.status(404).json({ success: false, message: "Agenda partagé non trouvé ou invalide" });
+      }
+    });
+
     this.router.put("/api/agenda/create", this.controller.createAgenda);
     this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
     this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);
