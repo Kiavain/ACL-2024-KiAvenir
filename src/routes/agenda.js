@@ -36,8 +36,9 @@ export default class AgendaRouteur extends Routeur {
 
       const agenda = await this.server.database.tables.get("agendas").get(req.params.agendaId);
       const agendas = this.server.database.tables.get("agendas");
+      const guests = this.server.database.tables.get("guests");
       if (agenda) {
-        res.render("agenda", { agenda, agendas });
+        res.render("agenda", { agenda, agendas, guests });
       } else {
         res.status(404).json({ success: false, message: "Agenda non trouvé" });
       }
@@ -46,5 +47,6 @@ export default class AgendaRouteur extends Routeur {
     this.router.put("/api/agenda/create", this.controller.createAgenda);
     this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
     this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);
+    this.router.put("/api/agenda/updateGuest", this.controller.updateGuest);
   }
 }

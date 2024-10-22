@@ -6,6 +6,7 @@ export class AgendaController extends Controller {
     this.createAgenda = this.createAgenda.bind(this);
     this.updateAgenda = this.updateAgenda.bind(this);
     this.shareAgenda = this.shareAgenda.bind(this);
+    this.updateGuest = this.updateGuest.bind(this);
   }
 
   /**
@@ -168,5 +169,37 @@ export class AgendaController extends Controller {
         return res.status(200).json({ success: true, message: "Agenda partagé avec succès à " + sharedUser.username });
       })
       .catch((error) => res(500).json({ success: false, message: error }));
+  }
+  /**
+   * Met à jour le rôle d'un Guest
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  async updateGuest(req, res) {
+    const { guestId, newRole } = req.body;
+    const guest = await this.database.get("guest").get(guestId);
+
+    if (!guest) {
+      return res.status(404).json({
+        success: false,
+        message: "Guest non trouvé."
+      });
+    }
+    if (newRole !== "Lecteur" && newRole !== "Editeur") {
+      return res.status(401).json({
+        success: false,
+        message: "Rôle inconnu."
+      });
+    }
+    if(newRole === guest.role) {
+      return res.status(401).json({
+        success: false,
+        message: "Rôle identique."
+      });
+    }
+
+    await guest.update({ newRole });
+    return res.status(200).json({ success: true, message: "Guest mis à jour avec succès" });
   }
 }

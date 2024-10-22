@@ -1,3 +1,6 @@
+import {addFlashMessage} from "./events/Events.js";
+import {closeModal} from "./calendar.js";
+
 const shareAgendaButton = document.getElementById("shareAgenda");
 const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
 const shareAgendaCloseButton = document.getElementById("shareAgenda-close-btn");
@@ -72,3 +75,64 @@ function submitShareAgenda() {
     })
     .catch((error) => console.error("Erreur:", error));
 }
+
+document.querySelectorAll(".role-button").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    const dropdown = event.target.closest(".guest-item").querySelector(".role-dropdown");
+
+    // Toggle la visibilité de la div dropdown
+    if (dropdown.style.display === "none" || dropdown.style.display === "") {
+      dropdown.style.display = "block";
+    } else {
+      dropdown.style.display = "none";
+    }
+
+    // Fermer la dropdown si on clique ailleurs
+    document.addEventListener("click", function handleClickOutside(event) {
+      if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.style.display = "none";
+        document.removeEventListener("click", handleClickOutside);
+      }
+    });
+  });
+});
+
+// Gérer le changement de rôle
+document.querySelectorAll(".role-dropdown li").forEach((li) => {
+  li.addEventListener("click", (event) => {
+    const selectedRole = event.target.getAttribute("data-role");
+    const guestItem = event.target.closest(".guest-item");
+
+    // Met à jour le texte du rôle dans le bouton
+    const roleText = guestItem.querySelector(".role-text");
+    roleText.textContent = selectedRole;
+
+    // Met à jour les icônes de check
+    const dropdown = guestItem.querySelector(".role-dropdown");
+    dropdown.querySelectorAll(".check-icon").forEach((icon) => {
+      icon.style.visibility = "hidden";
+    });
+    event.target.querySelector(".check-icon").style.visibility = "visible";
+
+    // Mise à jour de la BDD
+    fetch(`/api/events/update/${eventId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedData)
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          calendar.refetchEvents();
+          closeModal();
+          addFlashMessage("Événement mis à jour avec succès");
+        } else {
+          alert("Échec de la mise à jour de l'événement.");
+        }
+      })
+      .catch((error) => console.error("Erreur:", error));
+
+    // Fermer le dropdown après sélection
+    dropdown.style.display = "none";
+  });
+});
