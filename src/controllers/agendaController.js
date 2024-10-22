@@ -177,10 +177,8 @@ export class AgendaController extends Controller {
    * @returns {Promise<*>}
    */
   async updateGuest(req, res) {
-    console.log("Updating");
-    const guestId = req.params.guestId;
-    const { newRole } = req.body;
-    const guest = await this.database.get("guest").get(guestId);
+    const { guestId, role } = req.body;
+    const guest = await this.database.get("guests").get(guestId);
 
     if (!guest) {
       return res.status(404).json({
@@ -188,20 +186,20 @@ export class AgendaController extends Controller {
         message: "Guest non trouvé."
       });
     }
-    if (newRole !== "Lecteur" && newRole !== "Editeur") {
+    if (role !== "Lecteur" && role !== "Editeur") {
       return res.status(401).json({
         success: false,
         message: "Rôle inconnu."
       });
     }
-    if (newRole === guest.role) {
+    if (role === guest.role) {
       return res.status(401).json({
         success: false,
         message: "Rôle identique."
       });
     }
 
-    await guest.update({ newRole });
+    await guest.update({ role });
     return res.status(200).json({ success: true, message: "Guest mis à jour avec succès" });
   }
 }

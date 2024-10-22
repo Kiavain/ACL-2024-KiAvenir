@@ -67,7 +67,7 @@ function submitShareAgenda() {
         } else if (isOtherError) {
           otherError.style.display = "block";
         }
-        console.log("ERREUR ????? " + data.message);
+        console.log("Erreur partage d'agenda : " + data.message);
       }
     })
     .catch((error) => console.error("Erreur:", error));
@@ -110,10 +110,11 @@ document.querySelectorAll(".role-dropdown li").forEach((li) => {
       icon.style.visibility = "hidden";
     });
     event.target.querySelector(".check-icon").style.visibility = "visible";
-
+    const guestId = guestItem.dataset.guestId;
+    const role = roleText.textContent;
     const updatedData = {
-      guestId: guestItem.dataset.guestId,
-      role: roleText.textContent
+      guestId: guestId,
+      role: role
     };
     // Fermer le dropdown après sélection
     dropdown.style.display = "none";
@@ -124,13 +125,6 @@ document.querySelectorAll(".role-dropdown li").forEach((li) => {
       body: JSON.stringify(updatedData)
     })
       .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          console.log(data.message);
-        } else {
-          console.log("Chelou y'a une erreur là");
-        }
-      })
       .catch((error) => console.error("Erreur:", error));
   });
 });
