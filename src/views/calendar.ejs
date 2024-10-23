@@ -8,18 +8,6 @@
 <!-- Modale pour afficher les informations de l'événement -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
-        <%
-            let cantEdit = true;
-            if(agenda.ownerId === locals.user.id) {
-                cantEdit = false;
-            } else {
-                let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
-                if(matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
-                    cantEdit = false;
-                }
-            }
-        %>
-
         <span class="close">&times;</span>
         <h2>Modifier l'événement</h2>
         <label for="eventTitle">Titre :</label>

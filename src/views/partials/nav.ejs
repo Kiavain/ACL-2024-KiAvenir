@@ -1,5 +1,15 @@
-<% /* global locals,currentPath,agendas */ %>
-
+<% /* global locals,currentPath,agendas,cantEdit */ %>
+<%
+    cantEdit = true;
+    if(agenda.ownerId === locals.user.id) {
+        cantEdit = false;
+    } else {
+        let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
+        if(matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
+            cantEdit = false;
+        }
+    }
+%>
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="/">
@@ -86,7 +96,7 @@
                         </button>
                         <div id="agendaEventWindow" class="popUpWindow">
                             <button id="createAgenda">Nouvel agenda</button>
-                            <button id="createEvent">Nouvel événement</button>
+                            <button id="createEvent" <% if(cantEdit) {%> disabled <%}%>>Nouvel événement</button>
                         </div>
                     <% } %>
                     <li class="nav-item dropdown">
