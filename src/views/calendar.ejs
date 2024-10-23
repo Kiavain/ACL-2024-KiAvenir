@@ -8,24 +8,36 @@
 <!-- Modale pour afficher les informations de l'événement -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
+        <%
+            let cantEdit = true;
+            if(agenda.ownerId === locals.user.id) {
+                cantEdit = false;
+            } else {
+                let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
+                if(matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
+                    cantEdit = false;
+                }
+            }
+        %>
+
         <span class="close">&times;</span>
         <h2>Modifier l'événement</h2>
         <label for="eventTitle">Titre :</label>
-        <input type="text" id="eventTitle" class="input-field" />
+        <input type="text" id="eventTitle" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <label for="eventDetails">Détails :</label>
-        <textarea id="eventDetails" class="input-field"></textarea>
+        <textarea id="eventDetails" class="input-field" <% if(cantEdit) {%> disabled <%}%>></textarea>
 
         <label for="startEventTime">Date de début :</label>
-        <input type="datetime-local" id="startEventTime" class="input-field" />
+        <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <label for="endEventTime">Date de fin :</label>
-        <input type="datetime-local" id="endEventTime" class="input-field" />
+        <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
         <label id="error-update-event" class="form-label text-danger"></label>
 
         <!-- Boutons pour enregistrer ou annuler -->
-        <button id="updateEvent">Enregistrer les modifications</button>
-        <button id="deleteEvent">Supprimer l'événement</button>
+        <button id="updateEvent" <% if(cantEdit) {%> hidden <%}%>>Enregistrer les modifications</button>
+        <button id="deleteEvent" <% if(cantEdit) {%> hidden <%}%>>Supprimer l'événement</button>
     </div>
 </div>
 

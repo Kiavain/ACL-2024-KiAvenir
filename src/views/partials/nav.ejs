@@ -15,7 +15,9 @@
         <% if (currentPath.includes("/agenda")) { %>
             <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
                 <span class="header-title"><%= agenda.name %></span>
-                <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+                <% if (agenda.ownerId === locals.user.id) {%>
+                    <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+                <% } %>
             </div>
         <% } %>
 
@@ -54,6 +56,20 @@
                                             </button>
                                         </li>
                                     <% }) %>
+                                </ul>
+                                <h3 class="agenda-title">Agendas partagées</h3>
+                                <ul class="agenda-list" id="agenda-list">
+                                    <% guestsShared.forEach(guest => {
+                                        const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
+                                    if (agenda) { %>
+                                        <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                            <a href="/agenda/<%= agenda.agendaId %>">
+                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
+                                                <%= agenda.name %>
+                                            </a>
+                                        </li>
+                                    <% }
+                                    }) %>
                                 </ul>
                             </div>
                         </div>

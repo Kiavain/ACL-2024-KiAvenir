@@ -19,17 +19,6 @@ function shareAgenda() {
   const sharedAgendaId = document.getElementById("shareOrExport").value;
   console.log("Id de l'agenda à partager : " + sharedAgendaId);
   modal.style.display = "block";
-  const currentUrl = window.location.href;
-  const newUrl = `${currentUrl}/${sharedAgendaId}`;
-  // Appel vers la nouvelle route
-  fetch(newUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Données de l'agenda partagé :", data);
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la récupération de l'agenda partagé :", error);
-    });
 }
 
 function submitShareAgenda() {
