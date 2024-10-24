@@ -24,7 +24,7 @@ const agendaItems = document.getElementById("agenda-list").children;
 for (let i = 0; i < agendaItems.length; i++) {
   const agendaItem = agendaItems[i];
   const agendaItemValue = agendaItem.querySelector("button").value;
-  const agendaItemName = agendaItem.querySelector("a").textContent;
+  const agendaItemName = agendaItem.querySelector("a").dataset.agendaName;
   agendaItem.addEventListener("click", () => {
     toggleMenuShareOrExport(agendaItemValue, agendaItemName);
   });
