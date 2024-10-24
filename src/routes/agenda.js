@@ -49,6 +49,7 @@ export default class AgendaRouteur extends Routeur {
     this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
     this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);
     this.router.put("/api/agenda/updateGuest", this.controller.updateGuest);
+    this.router.delete("/api/agenda/removeGuest", this.controller.removeGuest);
 
     this.router.get("/getGuests", (req, res) => {
       const agendaId = parseInt(req.query.agendaId);

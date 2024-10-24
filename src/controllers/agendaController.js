@@ -7,6 +7,7 @@ export class AgendaController extends Controller {
     this.updateAgenda = this.updateAgenda.bind(this);
     this.shareAgenda = this.shareAgenda.bind(this);
     this.updateGuest = this.updateGuest.bind(this);
+    this.removeGuest = this.removeGuest.bind(this);
   }
 
   /**
@@ -201,5 +202,24 @@ export class AgendaController extends Controller {
 
     await guest.update({ role });
     return res.status(200).json({ success: true, message: "Guest mis à jour avec succès" });
+  }
+  /**
+   * Supprime un Guest
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  async removeGuest(req, res) {
+    const { guestId } = req.body;
+    const guest = await this.database.get("guests").get(guestId);
+
+    if (!guest) {
+      return res.status(404).json({
+        success: false,
+        message: "Guest non trouvé."
+      });
+    }
+    await guest.delete();
+    return res.status(200).json({ success: true, message: "Guest supprimé avec succès" });
   }
 }

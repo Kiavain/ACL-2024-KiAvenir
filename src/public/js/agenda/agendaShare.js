@@ -59,7 +59,7 @@ function shareAgenda() {
                 </div>
 
               </div>
-              <button class="icon-button">
+              <button class="icon-button remove-guest-button">
                 <span class="material-symbols-outlined">delete</span>
               </button>
             </div>
@@ -127,6 +127,33 @@ function submitShareAgenda() {
 }
 
 function applyRoleDropdownListeners() {
+  // Écouteur pour les boutons de suppression
+  document.querySelectorAll(".remove-guest-button").forEach((button) => {
+    //Ecouteur pour la suppression d'un guest
+    button.addEventListener("click", (event) => {
+      const guestItem = event.target.closest(".guest-item");
+      const guestListItem = guestItem.closest("li");
+      const guestId = guestItem.dataset.guestId;
+      const updatedData = {
+        guestId: guestId
+      };
+
+      // Mise à jour de la BDD
+      fetch("/api/agenda/removeGuest", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData)
+      })
+        .then((response) => {
+          if (response.ok) {
+            // Suppression réussie, on supprime la ligne
+            guestListItem.remove();
+          }
+        })
+        .catch((error) => console.error("Erreur:", error));
+    });
+  });
+
   // Écouteur pour les boutons de rôle
   document.querySelectorAll(".role-button").forEach((button) => {
     button.addEventListener("click", (event) => {
