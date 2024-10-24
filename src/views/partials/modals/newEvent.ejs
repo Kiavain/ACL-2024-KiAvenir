@@ -21,6 +21,10 @@
                 .forEach(agenda => { %>
                     <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
                 <% }) %>
+                <% guestsShared.filter(guest => guest.role === "Editeur")
+                .forEach(guest => { %>
+                    <option value="<%= guest.agendaId %>"><%= guest.getAgenda().name %></option>
+                <% }) %>
             </select>
 
             <label for="event-description">Description:</label>
