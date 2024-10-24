@@ -1,5 +1,4 @@
 import Entity from "../structures/Entity.js";
-import Agenda from "./structures/Agenda.js";
 import { DataTypes } from "sequelize";
 import Guest from "./structures/Guest.js";
 

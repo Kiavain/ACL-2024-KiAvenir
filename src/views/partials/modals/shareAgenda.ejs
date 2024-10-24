@@ -11,45 +11,7 @@
         <label for="access-shared-users">Utlisateurs avec accès :</label>
         <ul id="access-shared-users">
             <li>Vous : Propriétaire</li>
-            <% guests.filter(guest => guest.agendaId === 2).
-            forEach(guest => { %>
-                <li>
-                    <div class="guest-item" data-guest-id="<%= guest.id %>">
-                        <span class="username"><%= guest.getGuest().username %></span>
-                        <div>
-                            <button class="icon-button role-button">
-                                <div style="display: inline-flex;">
-                                    <span class="role-text">
-                                        <%= guest.getRole() %>
-                                    </span>
-                                    <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Q6yead QJZfhe mig17c "><path d="M7 10l5 5 5-5H7z"></path></svg>
-                                </div>
-                            </button>
-
-                            <!-- Div cachée avec la liste des rôles -->
-                            <div class="role-dropdown" style="display: none; position: absolute;">
-                                <p style="font-weight: bold;">Rôle</p>
-                                <ul>
-                                    <li data-role="Lecteur">
-                                      <span class="material-symbols-outlined check-icon" style="visibility: <%= guest.getRole() === 'Lecteur' ? 'visible' : 'hidden' %>;">
-                                        check
-                                      </span> Lecteur
-                                    </li>
-                                    <li data-role="Editeur">
-                                      <span class="material-symbols-outlined check-icon" style="visibility: <%= guest.getRole() === 'Editeur' ? 'visible' : 'hidden' %>;">
-                                        check
-                                      </span> Editeur
-                                    </li>
-                                </ul>
-                            </div>
-
-                        </div>
-                        <button class="icon-button">
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-                    </div>
-                </li>
-            <% }) %>
+            <!-- Les invités seront ajoutés ici dynamiquement par le JavaScript -->
         </ul>
 
         <label for="role-share-agenda">Rôle à attribuer :</label>

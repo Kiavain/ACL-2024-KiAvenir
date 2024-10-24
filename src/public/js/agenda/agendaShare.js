@@ -17,7 +17,59 @@ shareAgendaConfirmButton.addEventListener("click", () => {
 
 function shareAgenda() {
   const sharedAgendaId = document.getElementById("shareOrExport").value;
-  console.log("Id de l'agenda à partager : " + sharedAgendaId);
+
+  // Faire une requête AJAX pour récupérer les invités associés à cet agenda
+  fetch(`/getGuests?agendaId=${sharedAgendaId}`)
+    .then((response) => response.json())
+    .then((guests) => {
+      const guestList = document.getElementById("access-shared-users");
+      guestList.innerHTML = "<li>Vous : Propriétaire</li>"; // Remettre "Propriétaire" et vider le reste
+
+      // Ajouter les invités filtrés
+      guests.forEach((guest) => {
+        const listItem = document.createElement("li");
+        listItem.innerHTML = `
+            <div class="guest-item" data-guest-id="${guest.id}">
+              <span class="username">${guest.username}</span>
+              <div>
+                <button class="icon-button role-button">
+                  <div style="display: inline-flex;">
+                    <span class="role-text">${guest.role}</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class="Q6yead QJZfhe mig17c">
+                      <path d="M7 10l5 5 5-5H7z"></path>
+                    </svg>
+                  </div>
+                </button>
+
+                <!-- Div cachée avec la liste des rôles -->
+                <div class="role-dropdown" style="display: none; position: absolute;">
+                  <p style="font-weight: bold;">Rôle</p>
+                  <ul>
+                    <li data-role="Lecteur">
+                      <span class="material-symbols-outlined check-icon" style="visibility: ${guest.role === "Lecteur" ? "visible" : "hidden"};">
+                        check
+                      </span> Lecteur
+                    </li>
+                    <li data-role="Editeur">
+                      <span class="material-symbols-outlined check-icon" style="visibility: ${guest.role === "Editeur" ? "visible" : "hidden"};">
+                        check
+                      </span> Editeur
+                    </li>
+                  </ul>
+                </div>
+
+              </div>
+              <button class="icon-button">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          `;
+        guestList.appendChild(listItem);
+      });
+    })
+    .catch((err) => console.error("Erreur lors du chargement des invités:", err));
+
+  // Afficher la modale
   modal.style.display = "block";
 }
 
