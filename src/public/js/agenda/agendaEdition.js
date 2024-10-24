@@ -3,10 +3,12 @@ const editAgendaModal = document.getElementById("editAgendaModal");
 const closeEditAgendaButton = document.getElementById("closeEditAgenda");
 const editAgendaForm = document.getElementById("editAgendaForm");
 
-editAgendaButton.onclick = function () {
-  editAgendaModal.style.display = "block";
-  document.getElementById("new-agenda-name").value = agenda.name;
-};
+if (editAgendaButton) {
+  editAgendaButton.onclick = function () {
+    editAgendaModal.style.display = "block";
+    document.getElementById("new-agenda-name").value = agenda.name;
+  };
+}
 
 closeEditAgendaButton.onclick = function () {
   editAgendaModal.style.display = "none";
