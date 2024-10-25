@@ -76,12 +76,6 @@ body {
   padding: 5px;
   justify-content: space-between;
   border-bottom: 1px solid #bbb;
-    background-color: #d0d7df;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    justify-content: space-between;
-    border-bottom: 1px solid #bbb;
 }
 
 .nav-buttons {
@@ -286,3 +280,5 @@ body {
     transform: translateY(0);
   }
 }
+
+.requis {color: red;}
