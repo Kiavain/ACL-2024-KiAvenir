@@ -82,29 +82,7 @@ class KiAvenir {
           saveUninitialized: true
         })
       )
-      .use((req, res, next) => {
-        // Initialisation des notifications
-        if (!req.session.flashMessages) {
-          req.session.flashMessages = {};
-        }
-
-        // Pour ajouter des notifications
-        req.flash = (type, message) => {
-          if (!req.session.flashMessages[type]) {
-            req.session.flashMessages[type] = [];
-          }
-          req.session.flashMessages[type].push(message);
-        };
-
-        // Pour récupérer les notifications dans les vues
-        res.locals.getFlashMessages = () => {
-          const flashMessages = req.session.flashMessages;
-          req.session.flashMessages = {};
-          return flashMessages;
-        };
-
-        next();
-      });
+      .use(this.flash);
   }
 
   /**
@@ -214,6 +192,36 @@ class KiAvenir {
         this.logger.info(message);
       }
     });
+
+    next();
+  }
+
+  /**
+   * Middleware pour les notifications flash
+   * @param req La requête
+   * @param res La réponse
+   * @param next La fonction suivante
+   */
+  flash(req, res, next) {
+    // Initialisation des notifications
+    if (!req.session.flashMessages) {
+      req.session.flashMessages = {};
+    }
+
+    // Fonction pour ajouter des notifications
+    req.flash = (type, message) => {
+      if (!req.session.flashMessages[type]) {
+        req.session.flashMessages[type] = [];
+      }
+      req.session.flashMessages[type].push(message);
+    };
+
+    // Fonction pour récupérer les notifications dans les vues
+    res.locals.getFlashMessages = () => {
+      const flashMessages = req.session.flashMessages;
+      req.session.flashMessages = {};
+      return flashMessages;
+    };
 
     next();
   }
