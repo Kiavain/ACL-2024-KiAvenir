@@ -117,7 +117,7 @@ export class AgendaController extends Controller {
     }
 
     // Vérifie si le guest n'a pas déjà accès à l'agenda
-    const alreadyShared = guests.find((guest) => guest.agendaId === agendaId || guest.guestId === sharedUser.id);
+    const alreadyShared = guests.find((guest) => guest.agendaId === agendaId && guest.guestId === sharedUser.id);
 
     if (alreadyShared) {
       return res.status(400).json({

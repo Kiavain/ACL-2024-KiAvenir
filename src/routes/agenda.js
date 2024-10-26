@@ -60,7 +60,7 @@ export default class AgendaRouteur extends Routeur {
       // Retourner les invités filtrés en JSON
       res.json(
         guests.map((guest) => ({
-          id: guest.getGuest().id,
+          id: guest.id,
           username: guest.getGuest().username,
           role: guest.getRole()
         }))
