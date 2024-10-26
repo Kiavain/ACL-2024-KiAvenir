@@ -10,10 +10,10 @@ import session from "express-session";
 import flash from "connect-flash";
 import KiLogger from "./components/KiLogger.js";
 import { getSecret } from "./utils/index.js";
-
-// Permet de charger les variables d'environnement
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+
+// Charge les variables d'environnement
 dotenv.config();
 
 // Créez l'équivalent de __dirname
@@ -63,12 +63,16 @@ class KiAvenir {
     await this.initNotifs();
   }
 
+  /**
+   * Initialise les notifications
+   * @returns {Promise<void>} Une promesse
+   */
   async initNotifs() {
     // Configurer la session
     this.app
       .use(
         session({
-          secret: "secret-key", // Utilise une clé secrète pour signer la session
+          secret: await getSecret(this.logger, "SESSION_SECRET"),
           resave: false,
           saveUninitialized: true
         })
@@ -200,7 +204,7 @@ class KiAvenir {
 
     try {
       const payload = jwt.verify(token, await getSecret(this.logger, "JWT_SECRET"));
-      const user = this.database.tables.get("users").find((u) => u.id === payload.id);
+      const user = this.database.tables.get("users").get(payload.id);
       if (user) {
         res.locals.user = payload;
       }

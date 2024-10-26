@@ -30,7 +30,7 @@ export default class KiLogger {
 
     if (latestLogExist) {
       const stat = await fs.stat(latestLogFilepath);
-      const parsedDate = parseDate(stat.ctime).pretty;
+      const parsedDate = parseDate(stat.ctime);
       const pathLogs = path.join(__dirname, "../logs/", `${parsedDate.year}-${parsedDate.month}-${parsedDate.day}`);
       const pathLogsExist = await existsAsync(pathLogs);
       if (!pathLogsExist) {
@@ -68,8 +68,9 @@ export default class KiLogger {
     this.winston = createLogger({
       levels: customLevels.levels,
       format: format.combine(
+        format.timestamp({ format: "DD/MM/YYYY à HH:mm:ss" }),
         format.printf((info) => {
-          return `${parseDate().message} | KiAvenir - ${info.level.toUpperCase()} » ${info.message}`;
+          return `${info.timestamp} | KiAvenir - ${info.level.toUpperCase()} » ${info.message}`;
         }),
         format.colorize({ all: true })
       ),
@@ -126,20 +127,16 @@ export default class KiLogger {
 /**
  * Parse la date
  * @param date {Date} La date
- * @returns {{pretty: {month: number, hour: number, year: number, minutes: number, day: number, secondes: number}, message: string}}
+ * @returns {{month: number, hour: (string|number), year: number, minutes: (string|number), day: (string|number), secondes: (string|number)}}
  */
 function parseDate(date = new Date()) {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hour = date.getHours();
-  const minutes = date.getMinutes();
-  const secondes = date.getSeconds();
+  const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
 
-  return {
-    message: `${day}/${month}/${year} à ${hour}:${minutes}:${secondes}`,
-    pretty: { year, month, day, hour, minutes, secondes }
-  };
+  const hour = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
+  const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+  const secondes = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
+
+  return { year, month, day, hour, minutes, secondes };
 }
-
-export const logger = new KiLogger();
