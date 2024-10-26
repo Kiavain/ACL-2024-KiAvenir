@@ -1,17 +1,16 @@
 import express from "express";
-import bodyParser from "body-parser";
 import * as fs from "node:fs";
 import Database from "./components/Database.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { devDatabase } from "../data/script.js";
 import session from "express-session";
-import flash from "connect-flash";
+import RedisStore from "connect-redis";
 import KiLogger from "./components/KiLogger.js";
 import { getSecret } from "./utils/index.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import { createClient } from "redis";
 
 // Charge les variables d'environnement
 dotenv.config();
@@ -41,26 +40,27 @@ class KiAvenir {
    */
   async init() {
     this.app
-      .use(bodyParser.json())
-      .use(bodyParser.urlencoded({ extended: true }))
-      .use(express.static(path.join(__dirname, "public")))
+      .use(express.json())
+      .use(express.urlencoded({ extended: true }))
       .use((req, res, next) => {
-        res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar).
+        res.locals.currentPath = req.path;
         next();
       })
-      .use(this.authenticate.bind(this));
+      .use(cookieParser())
+      .use(this.authenticate.bind(this))
+      .use(express.static(path.join(__dirname, "public")));
 
-    // Initialisation du logger
-    await this.logger.load();
+    try {
+      // Chargement en parallèle du logger et de la base de données
+      await Promise.all([this.logger.load(), this.database.load()]);
+      this.logger.success("Base de données et logger chargés !");
 
-    // Initialisation de la base de données
-    await this.database.load();
-    if (process.env.NODE_ENV === "development") {
-      await devDatabase(this);
+      // Initialisation des notifications
+      await this.initNotifs();
+      this.logger.success("Notifications initialisées !");
+    } catch (error) {
+      this.logger.error("Erreur pendant l'initialisation de l'application :", error);
     }
-    this.logger.success("Base de données chargée !");
-
-    await this.initNotifs();
   }
 
   /**
@@ -68,19 +68,41 @@ class KiAvenir {
    * @returns {Promise<void>} Une promesse
    */
   async initNotifs() {
+    // Créez un client Redis
+    const redisClient = createClient();
+    await redisClient.connect();
+
     // Configurer la session
     this.app
       .use(
         session({
+          store: new RedisStore({ client: redisClient }),
           secret: await getSecret(this.logger, "SESSION_SECRET"),
           resave: false,
           saveUninitialized: true
         })
       )
-      // Configurer connect-flash
-      .use(flash())
       .use((req, res, next) => {
-        res.locals.notifications = req.flash("notifications");
+        // Initialisation des notifications
+        if (!req.session.flashMessages) {
+          req.session.flashMessages = {};
+        }
+
+        // Pour ajouter des notifications
+        req.flash = (type, message) => {
+          if (!req.session.flashMessages[type]) {
+            req.session.flashMessages[type] = [];
+          }
+          req.session.flashMessages[type].push(message);
+        };
+
+        // Pour récupérer les notifications dans les vues
+        res.locals.getFlashMessages = () => {
+          const flashMessages = req.session.flashMessages;
+          req.session.flashMessages = {};
+          return flashMessages;
+        };
+
         next();
       });
   }
@@ -111,28 +133,9 @@ class KiAvenir {
     // Dossier views avec view engine EJS
     this.app
       .set("view engine", "ejs")
-      .set("views", path.join(__dirname, "views"))
+      .set("views", this.getPath("views"))
       // Middleware pour logger les requêtes
-      .use((req, res, next) => {
-        const start = Date.now();
-
-        res.on("finish", () => {
-          const duration = Date.now() - start;
-          const statusCode = res.statusCode;
-
-          if (statusCode >= 500) {
-            this.logger.error(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`, err);
-          } else if (statusCode >= 400) {
-            this.logger.warn(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`);
-          } else {
-            this.logger.info(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`);
-          }
-        });
-
-        next();
-      })
-      // Middleware pour parser les cookies
-      .use(cookieParser());
+      .use(this.expressLog.bind(this));
 
     // Utilisation des routes
     for (const route of this.routes) {
@@ -157,35 +160,6 @@ class KiAvenir {
   }
 
   /**
-   * Parse les cookies
-   * @param request La requête
-   * @returns {{}} Les cookies
-   */
-  parseCookies(request) {
-    const cookies = {};
-    const cookieHeader = request.headers["cookie"];
-
-    // Retourne un objet vide si aucun cookie n'est présent
-    if (!cookieHeader) {
-      return cookies;
-    }
-
-    // Traite chaque cookie
-    cookieHeader.split(";").forEach((cookie) => {
-      const [name, ...rest] = cookie.split("=");
-      const trimmedName = name?.trim();
-      const value = rest.join("=").trim();
-
-      // Ajoute le cookie au résultat s'il a un nom et une valeur
-      if (trimmedName) {
-        cookies[trimmedName] = decodeURIComponent(value || "");
-      }
-    });
-
-    return cookies;
-  }
-
-  /**
    * Middleware d'authentification
    * @param req La requête
    * @param res La réponse
@@ -193,26 +167,64 @@ class KiAvenir {
    * @returns {Promise<void>}
    */
   async authenticate(req, res, next) {
-    const cookies = this.parseCookies(req);
     res.locals.user = null;
 
     // Vérifie si un cookie accessToken est présent
-    const token = cookies["accessToken"];
+    const token = req.cookies["accessToken"];
     if (!token) {
       return next();
     }
 
     try {
+      // Vérifie que le token est valide et correspond à un utilisateur valide également
       const payload = jwt.verify(token, await getSecret(this.logger, "JWT_SECRET"));
       const user = this.database.tables.get("users").get(payload.id);
       if (user) {
         res.locals.user = payload;
       }
-    } catch (error) {
-      this.logger.error("Erreur lors de l'authentification :", error);
+    } catch {
+      this.logger.error("Le token JWT de la session a expiré, la déconnexion est forcée.");
+      res.clearCookie("accessToken");
     }
 
     next();
+  }
+
+  /**
+   * Middleware de logging des requêtes
+   * @param req La requête
+   * @param res La réponse
+   * @param next La fonction suivante
+   * @returns {Promise<void>}
+   */
+  async expressLog(req, res, next) {
+    const start = Date.now();
+
+    // Log la requête à la fin de la réponse
+    res.on("finish", () => {
+      const duration = Date.now() - start;
+      const statusCode = res.statusCode;
+      const message = `${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`;
+
+      if (statusCode >= 500) {
+        this.logger.error(message);
+      } else if (statusCode >= 400) {
+        this.logger.warn(message);
+      } else {
+        this.logger.info(message);
+      }
+    });
+
+    next();
+  }
+
+  /**
+   * Retourne le chemin complet d'un dossier
+   * @param folder Le dossier
+   * @returns {string} Le chemin complet
+   */
+  getPath(folder) {
+    return path.join(__dirname, folder);
   }
 }
 

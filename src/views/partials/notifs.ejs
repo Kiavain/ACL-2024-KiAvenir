@@ -1,24 +1,27 @@
+<% /* global getFlashMessages, notifications*/%>
 <head>
     <link rel="stylesheet" href="/css/notifs.css">
+    <title>Notifications</title>
 </head>
+<body>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const notification = document.querySelector('.alert-notif');
-    if (notification) {
-      setTimeout(function() {
+    // Supprime les notifications après 3 secondes
+    const notifications = document.querySelectorAll('.alert-notif');
+    notifications.forEach((notification) => {
+      setTimeout(() => {
         notification.remove();
-      }, 3000); // .3 secondes
-    }
+      }, 3000); // 3 secondes
+    });
   });
 </script>
 
 <div class="flash-container">
-    <% if (notifications && notifications.length > 0) { %>
-        <% notifications.forEach(function(message) { %>
-            <div class="alert-notif">
-                <%= message %>
-            </div>
+    <% const messages = getFlashMessages(); %>
+    <% if (messages["notifications"]) { %>
+        <% messages["notifications"].forEach(msg => { %>
+            <div class="alert-notif"><%= msg %></div>
         <% }) %>
     <% } %>
 </div>
-
+</body>

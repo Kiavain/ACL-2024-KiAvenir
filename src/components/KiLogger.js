@@ -107,7 +107,7 @@ export default class KiLogger {
    * @param message {Error | String} le message d'erreur
    * @param err {Error} l'erreur
    */
-  error(message, err) {
+  error(message, err = null) {
     if (!err) {
       this.winston.error(message.stack || message);
     } else {
