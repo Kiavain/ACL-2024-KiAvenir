@@ -14,17 +14,17 @@ export default class Controller {
 
   /**
    * Récupère la base de données
-   * @returns {Database} La base de données
-   */
-  get db() {
-    return this.server.database;
-  }
-
-  /**
-   * Récupère la base de données
    * @returns {Map<String, Object>} La base de données
    */
   get database() {
-    return this.db.tables;
+    return this.server.database.tables;
+  }
+
+  /**
+   * Récupère le logger
+   * @returns {KiLogger} Le logger
+   */
+  get logger() {
+    return this.server.logger;
   }
 }

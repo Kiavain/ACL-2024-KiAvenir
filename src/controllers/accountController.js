@@ -1,9 +1,5 @@
 import jwt from "jsonwebtoken";
-import { encryptPassword } from "../utils/index.js";
-import { randomBytes } from "crypto";
-import dotenv from "dotenv";
-import { promises as fs } from "fs";
-import { join } from "path";
+import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./controller.js";
 
 export class AccountController extends Controller {
@@ -21,79 +17,92 @@ export class AccountController extends Controller {
 
   /**
    * Crée un compte utilisateur avec les informations du formulaire
-   * @param req {Request} La requête
-   * @param res {Response} La réponse
+   * @param req La requête
+   * @param res La réponse
    * @returns {Promise<void>}
    */
   async createAccount(req, res) {
     const { email, username, password } = req.body;
 
-    // Récupère les utilisateurs de la base de données
+    // Vérifie si les entrées de l'utilisateur sont valides
+    const validationResult = this.validateUserInput(username, email, password);
+    if (validationResult) {
+      return this.creationCheck(res, validationResult, { email, username, password });
+    }
+
+    // Crée un nouvel utilisateur avec les informations du formulaire
+    const createdUser = await this.database.get("users").create({ email, username, password });
+    await this.createDefaultAgenda(createdUser.id);
+    const token = await this.createJWT(createdUser);
+    res.locals.user = token;
+    res.cookie("accessToken", token, { httpOnly: true });
+    req.flash("notifications", "Votre compte a bien été créé, bienvenue " + username + ".");
+    res.redirect("/");
+  }
+
+  /**
+   * Crée un agenda par défaut pour un utilisateur
+   * @param userId {number} L'identifiant de l'utilisateur
+   * @returns {Promise<void>} Crée l'agenda par défaut
+   */
+  async createDefaultAgenda(userId) {
+    await this.database.get("agendas").create({
+      name: "Mon agenda",
+      description: "Agenda par défaut",
+      ownerId: userId,
+      color: "#2196f3"
+    });
+  }
+
+  /**
+   * Vérifie les états de création du compte utilisateur
+   * @param res {Response} La réponse
+   * @param states {boolean[]} Tableau d'états
+   * @param opt {Object} Options
+   * @returns {void} Rend la vue de création de compte
+   */
+  creationCheck(res, states, opt) {
+    const [usernameAlreadyTaken, emailAlreadyTaken, passwordTooShort] = states;
+
+    // Messages d'erreur associés aux états
+    const errorMessages = {
+      usernameTaken: usernameAlreadyTaken ? "Ce nom d'utilisateur est déjà pris." : undefined,
+      emailTaken: emailAlreadyTaken ? "Un compte existe déjà pour cette adresse mail." : undefined,
+      passwordTooShort: passwordTooShort ? "Le mot de passe doit contenir au moins 8 caractères." : undefined
+    };
+
+    // Filtrer les messages d'erreur définis et les ajouter à opt
+    Object.entries(errorMessages).forEach(([key, message]) => {
+      if (message) {
+        opt[key] = message;
+      }
+    });
+
+    res.render("signin", opt);
+  }
+
+  /**
+   * Valide les entrées de l'utilisateur
+   * @param username {string} Nom d'utilisateur
+   * @param email {string} Adresse email
+   * @param password {string} Mot de passe
+   * @returns {boolean[] | null} Tableau d'états de validation ou null
+   */
+  validateUserInput(username, email, password) {
     const users = this.database.get("users");
-    const usernameAlreadyTaken = users.find((u) => u.username === username);
-    const emailAlreadyTaken = users.find((u) => u.email === email);
+    const usernameAlreadyTaken = users.some((u) => u.username === username);
+    const emailAlreadyTaken = users.some((u) => u.email === email);
+    const passwordTooShort = password.length < 8;
 
-    // Si le pseudo ou l'email est déjà pris, on renvoie une erreur
-    if (usernameAlreadyTaken) {
-      return res.render("signin", {
-        usernameTaken: "Ce nom d'utilisateur est déjà pris.",
-        email: email,
-        username: username
-      });
-    }
-
-    // Si l'email est déjà pris, on renvoie une erreur
-    else if (emailAlreadyTaken) {
-      return res.render("signin", {
-        emailTaken: "Un compte existe déjà pour cette adresse mail.",
-        email: email,
-        username: username
-      });
-    }
-
-    // Si le mot de passe est trop court, on renvoie une erreur
-    else if (password.length < 8) {
-      return res.render("signin", {
-        passwordTooShort: "Le mot de passe doit contenir au moins 8 caractères.",
-        email: email,
-        username: username
-      });
-    } else {
-
-      const newUser = {
-        email,
-        username,
-        password
-      };
-
-      const createdUser = await users.create(newUser);
-
-      // On associe également un agenda par défaut à l'utilisateur
-      const defaultAgenda = {
-        name: "Mon agenda",
-        description: "Agenda par défaut",
-        ownerId: createdUser.id,
-        color: "#2196f3"
-      };
-
-      // Ajoute l'utilisateur à la base
-      await this.database.get("agendas").create(defaultAgenda);
-
-      // Créer un token JWT
-      const token = await createJWT(createdUser);
-      res.locals.user = token;
-
-      // Défini le token dans le cookie et redirige
-      res.cookie("accessToken", token, { httpOnly: true });
-      req.flash("notifications", "Votre compte a bien été créé, bienvenue " + username + ".");
-      res.redirect("/");
-    }
+    return usernameAlreadyTaken || emailAlreadyTaken || passwordTooShort
+      ? [usernameAlreadyTaken, emailAlreadyTaken, passwordTooShort]
+      : null;
   }
 
   /**
    * Connecte un utilisateur avec les informations du formulaire
-   * @param req {Request} La requête
-   * @param res {Response} La réponse
+   * @param req La requête
+   * @param res La réponse
    * @returns {Promise<void>}
    */
   async login(req, res) {
@@ -102,7 +111,7 @@ export class AccountController extends Controller {
 
     // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
-      const token = await createJWT(user);
+      const token = await this.createJWT(user);
       res.locals.user = token;
       res.cookie("accessToken", token, { httpOnly: true });
       req.flash("notifications", "Bienvenue à vous " + user.username + ".");
@@ -117,8 +126,8 @@ export class AccountController extends Controller {
 
   /**
    * Déconnecte l'utilisateur
-   * @param req {Request} La requête
-   * @param res {Response} La réponse
+   * @param req La requête
+   * @param res La réponse
    */
   logout(req, res) {
     // Vérifie si l'utilisateur est connecté
@@ -135,8 +144,8 @@ export class AccountController extends Controller {
 
   /**
    * Modifie les informations du compte de l'utilisateur connecté
-   * @param req {Request} La requête
-   * @param res {Response} La réponse
+   * @param req La requête
+   * @param res La réponse
    * @returns {Promise<void>}
    */
   async editAccount(req, res) {
@@ -148,11 +157,14 @@ export class AccountController extends Controller {
     // On récupère les nouvelles informations envoyées par l'utilisateur
     const { email, username, password } = req.body;
 
-    // On récupère l'utilisateur connecté
+    /**
+     * L'utilisateur connecté
+     * @type {Object}
+     */
     const localUser = res.locals.user;
 
     // On cherche cet utilisateur dans la base de données
-    const users = this.database.get("users").getAll();
+    const users = this.database.get("users");
     let user = users.find((user) => user.email === localUser.email);
 
     if (!user) {
@@ -205,10 +217,10 @@ export class AccountController extends Controller {
       if (userIsUpdated) {
         try {
           await user.update(newUser);
-          const u = this.database.get("users").find((u) => u.email === newUser.email);
+          const u = users.find((u) => u.email === newUser.email);
 
           // Générer un nouveau token JWT avec les informations mises à jour
-          const newToken = await createJWT(u);
+          const newToken = await this.createJWT(u);
           res.cookie("accessToken", newToken, { httpOnly: true });
 
           // Mettre à jour res.locals.user avec les informations actualisées
@@ -245,155 +257,58 @@ export class AccountController extends Controller {
       await user.delete(); // Supprime l'utilisateur de la base de données
       this.logout(req, res);
     } catch (err) {
-      console.error(err);
+      this.logger.error("Erreur lors de la suppression du compte :", err);
       res.render("account", {
         errorMessage: "Erreur: impossible de supprimer le compte."
       });
     }
   }
 
+  /**
+   * Rend la page d'inscription
+   * @param req La requête
+   * @param res La réponse
+   */
   renderSignin(req, res) {
     res.render("signin", { title: "Inscription" });
   }
 
+  /**
+   * Rend la page de connexion
+   * @param req La requête
+   * @param res La réponse
+   * @returns {void}
+   *
+   */
   renderLogin(req, res) {
     res.render("login", { title: "Connexion" });
   }
 
+  /**
+   * Rend la page de compte utilisateur
+   * @param req La requête
+   * @param res La réponse
+   * @returns {void}
+   */
   renderAccount(req, res) {
-    // Vérifie si l'utilisateur est connecté
-    if (!res.locals.user) {
-      return res.render("401");
-    }
-
-    res.render("account");
-  }
-}
-
-const envFilePath = join(process.cwd(), ".env");
-dotenv.config();
-
-/**
- * Lit le contenu du fichier .env
- * @returns {Promise<String>} Le contenu du fichier .env ou une chaîne vide si le fichier n'existe pas
- */
-async function readEnvFile() {
-  try {
-    return await fs.readFile(envFilePath, "utf-8");
-  } catch {
-    console.warn("Le fichier .env n'existe pas, il sera créé.");
-    return "";
-  }
-}
-
-/**
- * Écrit une nouvelle variable dans le fichier .env
- * @param key {String} Clé de la variable
- * @param value {String} Valeur de la variable
- * @returns {Promise<void>}
- */
-async function appendEnvVariable(key, value) {
-  try {
-    let envContent = await readEnvFile();
-    if (!envContent.includes(`${key}=`)) {
-      envContent += `\n${key}=${value}\n`;
-      await fs.writeFile(envFilePath, envContent, "utf-8");
-    }
-  } catch (err) {
-    console.error("Erreur lors de la mise à jour du fichier .env :", err);
-  }
-}
-
-/**
- * Récupère la clé secrète pour les JWT, en la générant si nécessaire
- * @returns {Promise<String>} Le secret JWT
- */
-async function getSecret() {
-  if (!process.env.JWT_SECRET) {
-    const newSecret = randomBytes(64).toString("hex");
-    await appendEnvVariable("JWT_SECRET", newSecret);
-    process.env.JWT_SECRET = newSecret;
-    console.warn("La clé secrète JWT a été générée et ajoutée au fichier .env");
-  }
-  return process.env.JWT_SECRET;
-}
-
-/**
- * Crée un token JWT pour un utilisateur
- * @param user {Object} L'utilisateur
- * @returns {Promise<String>} Le token JWT
- */
-async function createJWT(user) {
-  const payload = {
-    id: user.id,
-    email: user.email,
-    username: user.username
-  };
-
-  // Signe le token avec une clé secrète
-  return jwt.sign(payload, await getSecret(), { expiresIn: "1h" });
-}
-
-/**
- * Parse les cookies d'une requête
- * @param request {Request} La requête
- * @returns {{}} Les cookies
- */
-function parseCookies(request) {
-  const list = {};
-  const cookieHeader = request.headers["cookie"];
-  if (!cookieHeader) {
-    return list;
+    const page = !res.locals.user ? "401" : "account";
+    res.render(page);
   }
 
-  cookieHeader.split(";").forEach(function (cookie) {
-    let [name, ...rest] = cookie.split("=");
-    name = name?.trim();
-    if (!name) {
-      return;
-    }
-    const value = rest.join("=").trim();
-    if (!value) {
-      return;
-    }
-    list[name] = decodeURIComponent(value);
-  });
+  /**
+   * Crée un token JWT pour un utilisateur
+   * @param user {Object} L'utilisateur
+   * @returns {Promise<String>} Le token JWT
+   */
+  async createJWT(user) {
+    const jwtSecret = await getSecret(this.logger, "JWT_SECRET");
+    const payload = {
+      id: user.id,
+      email: user.email,
+      username: user.username
+    };
 
-  return list;
-}
-
-/**
- * Authentifie un utilisateur à partir d'un token JWT
- * @param req {Request} La requête
- * @param res {Response} La réponse
- * @param next {NextFunction} La fonction suivante
- * @param database {Database} La base de données
- * @returns {void} La fonction suivante
- */
-export function authenticate(req, res, next, database) {
-  const cookies = parseCookies(req);
-  res.locals.user = null;
-
-  try {
-    const token = cookies["accessToken"];
-    if (!token) {
-      return next();
-    }
-
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    if (!payload) {
-      return next();
-    }
-
-    const user = database.tables.get("users").find((u) => u.id === payload.id);
-    if (!user) {
-      return next();
-    }
-
-    // On a authentifié l'utilisateur
-    res.locals.user = payload;
-  } catch {
-    res.locals.user = null;
+    // Signe le token avec une clé secrète
+    return jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
   }
-  next();
 }

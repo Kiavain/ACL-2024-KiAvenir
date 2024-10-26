@@ -2,17 +2,18 @@ import express from "express";
 import bodyParser from "body-parser";
 import * as fs from "node:fs";
 import Database from "./components/Database.js";
-import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authenticate } from "./controllers/accountController.js";
 import { devDatabase } from "../data/script.js";
 import session from "express-session";
 import flash from "connect-flash";
+import KiLogger from "./components/KiLogger.js";
+import { getSecret } from "./utils/index.js";
 
 // Permet de charger les variables d'environnement
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 dotenv.config();
 
 // Créez l'équivalent de __dirname
@@ -31,6 +32,7 @@ class KiAvenir {
     this.PORT = 3000;
     this.routes = [];
     this.database = new Database(this);
+    this.logger = new KiLogger(this);
   }
 
   /**
@@ -40,38 +42,43 @@ class KiAvenir {
   async init() {
     this.app
       .use(bodyParser.json())
-      .use(bodyParser.urlencoded({ extended: true })) // For form data (application/x-www-form-urlencoded)
+      .use(bodyParser.urlencoded({ extended: true }))
       .use(express.static(path.join(__dirname, "public")))
       .use((req, res, next) => {
         res.locals.currentPath = req.path; // Pour récupérer l'url local (sert notamment pour la navbar).
         next();
       })
-      .use((req, res, next) => authenticate(req, res, next, this.database));
+      .use(this.authenticate.bind(this));
 
+    // Initialisation du logger
+    await this.logger.load();
+
+    // Initialisation de la base de données
     await this.database.load();
     if (process.env.NODE_ENV === "development") {
       await devDatabase(this);
     }
+    this.logger.success("Base de données chargée !");
+
     await this.initNotifs();
-    console.log("Base de données chargée !");
   }
 
   async initNotifs() {
     // Configurer la session
-    this.app.use(
-      session({
-        secret: "secret-key", // Utilise une clé secrète pour signer la session
-        resave: false,
-        saveUninitialized: true
-      })
-    );
-    // Configurer connect-flash
-    this.app.use(flash());
-    // Middleware pour rendre les flash messages accessibles dans les vues
-    this.app.use((req, res, next) => {
-      res.locals.notifications = req.flash("notifications");
-      next();
-    });
+    this.app
+      .use(
+        session({
+          secret: "secret-key", // Utilise une clé secrète pour signer la session
+          resave: false,
+          saveUninitialized: true
+        })
+      )
+      // Configurer connect-flash
+      .use(flash())
+      .use((req, res, next) => {
+        res.locals.notifications = req.flash("notifications");
+        next();
+      });
   }
 
   /**
@@ -85,7 +92,7 @@ class KiAvenir {
     for (const file of fs.readdirSync("src/routes")) {
       const route = await import(`./routes/${file}`);
       const routeInstance = new route.default(this);
-      console.log(`Route ${file} chargée !`);
+      this.logger.success(`Route ${file} chargée !`);
       this.routes.push(routeInstance.router);
     }
   }
@@ -102,7 +109,24 @@ class KiAvenir {
       .set("view engine", "ejs")
       .set("views", path.join(__dirname, "views"))
       // Middleware pour logger les requêtes
-      .use(morgan("dev"))
+      .use((req, res, next) => {
+        const start = Date.now();
+
+        res.on("finish", () => {
+          const duration = Date.now() - start;
+          const statusCode = res.statusCode;
+
+          if (statusCode >= 500) {
+            this.logger.error(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`, err);
+          } else if (statusCode >= 400) {
+            this.logger.warn(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`);
+          } else {
+            this.logger.info(`${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`);
+          }
+        });
+
+        next();
+      })
       // Middleware pour parser les cookies
       .use(cookieParser());
 
@@ -124,8 +148,67 @@ class KiAvenir {
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {
-      console.log(`Serveur en cours d'exécution : http://localhost:${this.PORT}`);
+      this.logger.success(`Serveur en cours d'exécution : http://localhost:${this.PORT}`);
     });
+  }
+
+  /**
+   * Parse les cookies
+   * @param request La requête
+   * @returns {{}} Les cookies
+   */
+  parseCookies(request) {
+    const cookies = {};
+    const cookieHeader = request.headers["cookie"];
+
+    // Retourne un objet vide si aucun cookie n'est présent
+    if (!cookieHeader) {
+      return cookies;
+    }
+
+    // Traite chaque cookie
+    cookieHeader.split(";").forEach((cookie) => {
+      const [name, ...rest] = cookie.split("=");
+      const trimmedName = name?.trim();
+      const value = rest.join("=").trim();
+
+      // Ajoute le cookie au résultat s'il a un nom et une valeur
+      if (trimmedName) {
+        cookies[trimmedName] = decodeURIComponent(value || "");
+      }
+    });
+
+    return cookies;
+  }
+
+  /**
+   * Middleware d'authentification
+   * @param req La requête
+   * @param res La réponse
+   * @param next La fonction suivante
+   * @returns {Promise<void>}
+   */
+  async authenticate(req, res, next) {
+    const cookies = this.parseCookies(req);
+    res.locals.user = null;
+
+    // Vérifie si un cookie accessToken est présent
+    const token = cookies["accessToken"];
+    if (!token) {
+      return next();
+    }
+
+    try {
+      const payload = jwt.verify(token, await getSecret(this.logger, "JWT_SECRET"));
+      const user = this.database.tables.get("users").find((u) => u.id === payload.id);
+      if (user) {
+        res.locals.user = payload;
+      }
+    } catch (error) {
+      this.logger.error("Erreur lors de l'authentification :", error);
+    }
+
+    next();
   }
 }
 
