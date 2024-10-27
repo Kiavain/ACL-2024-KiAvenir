@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
-import Controller from "./controller.js";
+import Controller from "./Controller.js";
 
 export class AccountController extends Controller {
   /**

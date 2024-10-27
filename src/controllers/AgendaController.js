@@ -1,4 +1,4 @@
-import Controller from "./controller.js";
+import Controller from "./Controller.js";
 
 export class AgendaController extends Controller {
   constructor(server) {
@@ -8,6 +8,49 @@ export class AgendaController extends Controller {
     this.shareAgenda = this.shareAgenda.bind(this);
     this.updateGuest = this.updateGuest.bind(this);
     this.removeGuest = this.removeGuest.bind(this);
+    this.getGuests = this.getGuests.bind(this);
+    this.renderAgenda = this.renderAgenda.bind(this);
+    this.renderAgendaId = this.renderAgendaId.bind(this);
+  }
+
+  /**
+   * Redirige vers l'agenda par défaut : le premier de la liste
+   * @param req La requête
+   * @param res La réponse
+   * @returns {*}
+   */
+  renderAgenda(req, res) {
+    if (!res.locals.user) {
+      req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+      return res.redirect("/login");
+    }
+
+    // Récupérer le premier agenda de la liste pour l'utilisateur courant
+    const agenda = this.database.get("agendas").filter((agenda) => agenda.ownerId === res.locals.user.id);
+    res.redirect("/agenda/" + agenda[0].agendaId);
+  }
+
+  /**
+   * Rend la page de l'agenda
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<*>}
+   */
+  async renderAgendaId(req, res) {
+    if (!res.locals.user) {
+      req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+      return res.redirect("/login");
+    }
+
+    const agendas = this.database.get("agendas");
+    const agenda = agendas.get(req.params.agendaId);
+    const guests = this.database.get("guests");
+    const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
+    if (agenda) {
+      res.render("agenda", { agenda, agendas, guests, guestsShared });
+    } else {
+      res.status(404).json({ success: false, message: "Agenda non trouvé" });
+    }
   }
 
   /**
@@ -221,5 +264,26 @@ export class AgendaController extends Controller {
     }
     await guest.delete();
     return res.status(200).json({ success: true, message: "Guest supprimé avec succès" });
+  }
+
+  /**
+   * Récupère les invités pour un agenda
+   * @param req La requête
+   * @param res La réponse
+   */
+  getGuests(req, res) {
+    const agendaId = parseInt(req.query.agendaId);
+
+    // Filtrer les invités pour cet agenda (en utilisant ta base de données)
+    const guests = this.database.get("guests").filter((guest) => guest.agendaId === agendaId);
+
+    // Retourner les invités filtrés en JSON
+    res.json(
+      guests.map((guest) => ({
+        id: guest.id,
+        username: guest.getGuest().username,
+        role: guest.getRole()
+      }))
+    );
   }
 }

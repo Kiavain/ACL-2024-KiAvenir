@@ -7,6 +7,7 @@ export default class Controller {
   /**
    * Crée un contrôleur
    * @param server {KiAvenir} Le serveur
+   * @constructor
    */
   constructor(server) {
     this.server = server;
