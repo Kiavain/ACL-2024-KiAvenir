@@ -11,6 +11,7 @@ export class AgendaController extends Controller {
     this.getGuests = this.getGuests.bind(this);
     this.renderAgenda = this.renderAgenda.bind(this);
     this.renderAgendaId = this.renderAgendaId.bind(this);
+    this.deleteAgenda = this.deleteAgenda.bind(this);
   }
 
   /**
@@ -214,6 +215,43 @@ export class AgendaController extends Controller {
       })
       .catch((error) => res(500).json({ success: false, message: error }));
   }
+
+  /**
+   * Supprime un agenda
+   * @param req La requête
+   * @param res La réponse
+   */
+  deleteAgenda(req, res) {
+    const userId = res.locals.user.id;
+    const agendaId = req.params.agendaId;
+    const agenda = this.database.get("agendas").get(agendaId);
+
+    if (!agenda) {
+      return res.status(404).json({
+        success: false,
+        message: "Agenda non trouvé."
+      });
+    }
+
+    if (agenda.ownerId !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Vous n'êtes pas autorisé à supprimer cet agenda."
+      });
+    }
+
+    const agendas = this.database.get("agendas").filter((agenda) => agenda.ownerId === userId);
+    if (agendas.length === 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Vous ne pouvez pas supprimer votre seul agenda."
+      });
+    }
+
+    this.database.get("agendas").delete(agendaId);
+    return res.status(200).json({ success: true, message: "Agenda supprimé avec succès" });
+  }
+
   /**
    * Met à jour le rôle d'un Guest
    * @param req

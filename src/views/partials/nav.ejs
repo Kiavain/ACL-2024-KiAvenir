@@ -27,9 +27,13 @@
         <!-- Conteneur centré pour le nom de l'agenda -->
         <% if (currentPath.includes("/agenda")) { %>
             <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
+                <button class="icon-button" id="deleteAgenda">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+
                 <span class="header-title"><%= agenda.name %></span>
                 <% if (agenda.ownerId === locals.user.id) {%>
-                    <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+                    <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
                 <% } %>
             </div>
         <% } %>

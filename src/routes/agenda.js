@@ -29,6 +29,7 @@ export default class AgendaRouteur extends Routeur {
       // Gesion des agendas
       .put("/api/agenda/create", this.controller.createAgenda)
       .put("/api/agenda/:agendaId/update", this.controller.updateAgenda)
+      .delete("/api/agenda/:agendaId/delete", this.controller.deleteAgenda)
 
       // Gestion des invités
       .get("/getGuests", this.controller.getGuests)

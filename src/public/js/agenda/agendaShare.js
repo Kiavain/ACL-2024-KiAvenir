@@ -3,18 +3,24 @@ const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
 const shareAgendaCloseButton = document.getElementById("shareAgenda-close-btn");
 const modal = document.getElementById("shareAgendaModal");
 
-shareAgendaCloseButton.onclick = function () {
-  modal.style.display = "none";
-};
+// Vérifie si le document est chargé
+document.addEventListener("DOMContentLoaded", () => {
+  shareAgendaCloseButton.onclick = () => (modal.style.display = "none");
+  shareAgendaButton.onclick = () => shareAgenda();
+  shareAgendaConfirmButton.onclick = () => submitShareAgenda();
 
-shareAgendaButton.addEventListener("click", () => {
-  shareAgenda();
+  // Fermer la modale si on clique ailleurs (et enlève l'écouteur)
+  window.addEventListener("click", function handleClickOutside(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+      window.removeEventListener("click", handleClickOutside);
+    }
+  });
 });
 
-shareAgendaConfirmButton.addEventListener("click", () => {
-  submitShareAgenda();
-});
-
+/**
+ * Affiche la modale de partage d'agenda
+ */
 function shareAgenda() {
   const sharedAgendaId = document.getElementById("shareOrExport").value;
 

@@ -1,7 +1,36 @@
 const editAgendaButton = document.getElementById("editAgenda");
+const deleteAgendaButton = document.getElementById("deleteAgenda");
 const editAgendaModal = document.getElementById("editAgendaModal");
+const deleteAgendaModal = document.getElementById("deleteAgendaModal");
 const closeEditAgendaButton = document.getElementById("closeEditAgenda");
 const editAgendaForm = document.getElementById("editAgendaForm");
+const confirmDeleteButton = document.getElementById("confirmDeleteAgenda");
+const closeDeleteModal = document.getElementById("closeDeleteAgenda");
+const deleteMessage = document.getElementById("deleteMessage");
+
+if (deleteAgendaButton) {
+  deleteAgendaButton.onclick = function () {
+    deleteAgendaModal.style.display = "block";
+    deleteMessage.textContent = "";
+  };
+
+  confirmDeleteButton.onclick = async function () {
+    const response = await fetch(`/api/agenda/${agenda.agendaId}/delete`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      window.location.href = "/agenda";
+    } else {
+      const data = await response.json();
+      deleteMessage.textContent = data.message;
+    }
+  };
+
+  closeDeleteModal.onclick = function () {
+    deleteAgendaModal.style.display = "none";
+  };
+}
 
 if (editAgendaButton) {
   editAgendaButton.onclick = function () {
@@ -49,8 +78,11 @@ editAgendaForm.onsubmit = async function (e) {
   }
 };
 
-window.onclick = function (event) {
+document.onclick = function (event) {
+  // Si on clic en dehors de la modale, on la ferme
   if (event.target === editAgendaModal) {
     editAgendaModal.style.display = "none";
+  } else if (event.target === deleteAgendaModal) {
+    deleteAgendaModal.style.display = "none";
   }
 };
