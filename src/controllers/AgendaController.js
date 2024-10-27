@@ -227,7 +227,7 @@ export class AgendaController extends Controller {
    * @param req La requête
    * @param res La réponse
    */
-  deleteAgenda(req, res) {
+  async deleteAgenda(req, res) {
     const userId = res.locals.user.id;
     const agendaId = req.params.agendaId;
     const agenda = this.database.get("agendas").get(agendaId);
@@ -254,7 +254,7 @@ export class AgendaController extends Controller {
       });
     }
 
-    this.database.get("agendas").delete(agendaId);
+    await agenda.delete();
     return res.status(200).json({ success: true, message: "Agenda supprimé avec succès" });
   }
 
