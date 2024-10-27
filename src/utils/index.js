@@ -54,7 +54,7 @@ async function appendEnvVariable(logger, key, value) {
   try {
     let envContent = await readEnvFile(logger);
     if (!envContent.includes(`${key}=`)) {
-      envContent += `\n${key}=${value}\n`;
+      envContent += `${key}=${value}\n`;
       await fs.writeFile(envFilePath, envContent, "utf-8");
     }
   } catch (err) {
