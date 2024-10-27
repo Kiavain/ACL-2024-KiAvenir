@@ -74,7 +74,7 @@ export default class KiLogger {
         }),
         format.colorize({ all: true })
       ),
-      transports: [new transports.File(opt), new transports.Console()]
+      transports: [new transports.File(opt), new transports.Console({ level: "debug" })]
     });
   }
 
