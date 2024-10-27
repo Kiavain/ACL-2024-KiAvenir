@@ -59,7 +59,6 @@ label {
   display: block;
 }
 
-input[type="text"],
 textarea,
 input[type="datetime-local"],
 select {
