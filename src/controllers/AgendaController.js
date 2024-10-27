@@ -53,9 +53,9 @@ export class AgendaController extends Controller {
     const guestsShared = guests.filter((guest) => guest.guestId === localUser.id);
 
     if (!agenda) {
-      return res.redirect("/404");
+      return res.status(404).redirect("/404");
     } else if (!agenda.verifyAgendaAccess(localUser.id)) {
-      return res.redirect("/403");
+      return res.status(403).redirect("/403");
     }
     res.render("agenda", { agenda, agendas, guests, guestsShared });
   }

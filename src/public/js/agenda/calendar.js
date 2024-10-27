@@ -1,6 +1,5 @@
 // Initialiser la langue de moment.js
 import { addFlashMessage } from "./events/Events.js";
-
 moment.locale("fr");
 
 // Fonction pour créer et initialiser le calendrier

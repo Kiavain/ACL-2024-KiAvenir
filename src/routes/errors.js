@@ -17,13 +17,13 @@ export default class ErrorsRouteur extends Routeur {
   build() {
     this.router
       .get("/404", (req, res) => {
-        res.render("errors/404", { err: true });
+        res.render("errors/404");
       })
       .get("/403", (req, res) => {
-        res.render("errors/403", { err: true });
+        res.render("errors/403");
       })
       .get("/401", (req, res) => {
-        res.render("errors/401", { err: true });
+        res.render("errors/401");
       });
   }
 }

@@ -144,7 +144,7 @@ class KiAvenir {
 
     // Middleware pour gérer les erreurs 404
     this.app.use((req, res) => {
-      res.status(404).render("errors/404.ejs");
+      res.status(404).redirect("/404");
     });
   }
 

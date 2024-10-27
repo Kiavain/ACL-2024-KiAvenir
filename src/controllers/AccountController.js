@@ -136,7 +136,7 @@ export class AccountController extends Controller {
   logout(req, res) {
     // Vérifie si l'utilisateur est connecté
     if (!res.locals.user) {
-      return res.render("401");
+      return res.status(401).redirect("/401");
     }
 
     res.cookie("accessToken", null, { httpOnly: true });
@@ -155,7 +155,7 @@ export class AccountController extends Controller {
   async editAccount(req, res) {
     // Vérifie si l'utilisateur est connecté
     if (!res.locals.user) {
-      return res.render("401");
+      return res.status(401).redirect("/401");
     }
 
     // On récupère les nouvelles informations envoyées par l'utilisateur
@@ -244,15 +244,15 @@ export class AccountController extends Controller {
 
   /**
    * Supprime le compte de l'utilisateur connecté
-   * @param req {Request} La requête
-   * @param res {Response} La réponse
+   * @param req La requête
+   * @param res La réponse
    * @returns {Promise<void>}
    */
   async deleteAccount(req, res) {
     // Vérifie si l'utilisateur est connecté
     const localUser = res.locals.user;
     if (!localUser) {
-      return res.render("401");
+      return res.status(401).redirect("/401");
     }
 
     const user = this.database.get("users").get(localUser.id);
@@ -292,11 +292,13 @@ export class AccountController extends Controller {
    * Rend la page de compte utilisateur
    * @param req La requête
    * @param res La réponse
-   * @returns {void}
+   * @returns {*}
    */
   renderAccount(req, res) {
-    const page = !res.locals.user ? "401" : "account";
-    res.render(page);
+    if (!res.locals.user) {
+      return res.status(401).redirect("/401");
+    }
+    res.render("account");
   }
 
   /**
