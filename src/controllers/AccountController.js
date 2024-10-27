@@ -147,99 +147,109 @@ export class AccountController extends Controller {
   }
 
   /**
-   * Modifie les informations du compte de l'utilisateur connecté
+   * Modifie les informations du compte de l'utilisateur connecté.
    * @param req La requête
    * @param res La réponse
    * @returns {Promise<void>}
    */
   async editAccount(req, res) {
     // Vérifie si l'utilisateur est connecté
-    if (!res.locals.user) {
+    const localUser = res.locals.user;
+    if (!localUser) {
       return res.status(401).redirect("/401");
     }
 
-    // On récupère les nouvelles informations envoyées par l'utilisateur
+    // Récupère l'utilisateur connecté dans la base de données
+    const user = this.database.get("users").get(localUser.id);
     const { email, username, password } = req.body;
 
-    /**
-     * L'utilisateur connecté
-     * @type {Object}
-     */
-    const localUser = res.locals.user;
+    // Vérifie si les entrées de l'utilisateur sont valides
+    const { isUsernameTaken, isEmailTaken } = this.checkForDuplicates(email, username, user);
+    if (isUsernameTaken || isEmailTaken) {
+      return this.renderDuplicateError(res, email, username, isUsernameTaken, isEmailTaken);
+    }
 
-    // On cherche cet utilisateur dans la base de données
+    // Modifie les informations de l'utilisateur si des changements ont été effectués
+    const updatedUser = this.prepareUpdatedUser(user, email, username, password);
+    await this.updateUserAccount(res, user, updatedUser);
+  }
+
+  /**
+   * Vérifie les doublons pour le nom d'utilisateur et l'email
+   * @param email L'email
+   * @param username Le nom d'utilisateur
+   * @param user L'utilisateur
+   * @returns {{isUsernameTaken: boolean, isEmailTaken: boolean}} Les doublons
+   */
+  checkForDuplicates(email, username, user) {
     const users = this.database.get("users");
-    let user = users.find((user) => user.email === localUser.email);
+    return {
+      isUsernameTaken: users.some((u) => u.username === username && u.username !== user.username),
+      isEmailTaken: users.some((u) => u.email === email && u.email !== user.email)
+    };
+  }
 
-    if (!user) {
-      return res.render("account", {
-        errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
-        email: email,
-        username: username
-      });
+  /**
+   * Prépare l'objet utilisateur avec les modifications
+   * @param user L'utilisateur
+   * @param email Le nouvel email
+   * @param username Le nouveau nom d'utilisateur
+   * @param password Le nouveau mot de passe
+   */
+  prepareUpdatedUser(user, email, username, password) {
+    return {
+      email: email !== user.email ? email : user.email,
+      username: username !== user.username ? username : user.username,
+      password: password ? encryptPassword(password, user.salt) : user.password
+    };
+  }
+
+  /**
+   * Met à jour le compte utilisateur
+   * @param res La réponse
+   * @param user L'utilisateur
+   * @param updatedUser Les nouvelles données
+   */
+  async updateUserAccount(res, user, updatedUser) {
+    try {
+      await user.update(updatedUser);
+      const updatedToken = await this.createJWT(user);
+      res.cookie("accessToken", updatedToken, { httpOnly: true });
+      res.locals.user = updatedToken;
+      return res.redirect("/");
+    } catch (error) {
+      this.logger.error("Erreur lors de la mise à jour de l'utilisateur:", error);
+      this.renderError(
+        res,
+        user.email,
+        user.username,
+        "Il y a eu un problème dans l'enregistrement de vos modifications."
+      );
     }
+  }
 
-    // Vérifie si le nouveau pseudo est déjà existant
-    const usernameAlreadyTaken = users.find((u) => u.username === username && u.username !== localUser.username);
-    const emailAlreadyTaken = users.find((u) => u.email === email && u.email !== localUser.email);
+  /**
+   * Affiche un message d'erreur pour les doublons
+   * @param res La réponse
+   * @param email L'email
+   * @param username Le nom d'utilisateur
+   * @param isUsernameTaken Si le nom d'utilisateur est déjà pris
+   * @param isEmailTaken Si l'email est déjà
+   */
+  renderDuplicateError(res, email, username, isUsernameTaken, isEmailTaken) {
+    return res.render("account", {
+      usernameTaken: isUsernameTaken ? "Ce nom d'utilisateur est déjà pris." : undefined,
+      emailTaken: isEmailTaken ? "Un compte existe déjà pour cette adresse mail." : undefined,
+      email,
+      username
+    });
+  }
 
-    // On empêche bien sûr de changer de pseudo ou de mail pour un déjà existant
-    if (usernameAlreadyTaken) {
-      return res.render("account", {
-        usernameTaken: "Ce nom d'utilisateur est déjà pris.",
-        email: email,
-        username: username
-      });
-    } else if (emailAlreadyTaken) {
-      return res.render("account", {
-        emailTaken: "Un compte existe déjà pour cette adresse mail.",
-        email: email,
-        username: username
-      });
-    } else {
-      let userIsUpdated = false;
-
-      const newUser = {
-        email: user.email,
-        username: user.username,
-        password: user.password
-      };
-
-      if (email !== user.email) {
-        newUser.email = email;
-        userIsUpdated = true;
-      }
-      if (username !== user.username) {
-        newUser.username = username;
-        userIsUpdated = true;
-      }
-      if (password !== "" && !user.checkPassword(password)) {
-        newUser.password = encryptPassword(password, user.salt);
-        userIsUpdated = true;
-      }
-
-      if (userIsUpdated) {
-        try {
-          await user.update(newUser);
-          const u = users.find((u) => u.email === newUser.email);
-
-          // Générer un nouveau token JWT avec les informations mises à jour
-          const newToken = await this.createJWT(u);
-          res.cookie("accessToken", newToken, { httpOnly: true });
-
-          // Mettre à jour res.locals.user avec les informations actualisées
-          res.locals.user = newToken;
-
-          res.redirect("/");
-        } catch {
-          return res.render("account", {
-            errorMessage: "Il y a eu un problème dans l'enregistrement de vos modifications.",
-            email: email,
-            username: username
-          });
-        }
-      }
-    }
+  /**
+   * Rend la page avec un message d'erreur général.
+   */
+  renderError(res, email, username, errorMessage) {
+    return res.render("account", { errorMessage, email, username });
   }
 
   /**
@@ -255,10 +265,10 @@ export class AccountController extends Controller {
       return res.status(401).redirect("/401");
     }
 
-    const user = this.database.get("users").get(localUser.id);
-
     try {
-      await user.delete(); // Supprime l'utilisateur de la base de données
+      // Supprime l'utilisateur et le déconnecte
+      const user = this.database.get("users").get(localUser.id);
+      await user.delete();
       this.logout(req, res);
     } catch (err) {
       this.logger.error("Erreur lors de la suppression du compte :", err);
