@@ -38,20 +38,26 @@ export class AgendaController extends Controller {
    * @returns {Promise<*>}
    */
   async renderAgendaId(req, res) {
-    if (!res.locals.user) {
+    const localUser = res.locals.user;
+    if (!localUser) {
       req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
       return res.redirect("/login");
     }
 
+    // Récupère les tables de la base de données
     const agendas = this.database.get("agendas");
-    const agenda = agendas.get(req.params.agendaId);
     const guests = this.database.get("guests");
-    const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
-    if (agenda) {
-      res.render("agenda", { agenda, agendas, guests, guestsShared });
-    } else {
-      res.status(404).json({ success: false, message: "Agenda non trouvé" });
+
+    // Récupère les éléments nécessaires
+    const agenda = agendas.get(req.params.agendaId);
+    const guestsShared = guests.filter((guest) => guest.guestId === localUser.id);
+
+    if (!agenda) {
+      return res.redirect("/404");
+    } else if (!agenda.verifyAgendaAccess(localUser.id)) {
+      return res.redirect("/403");
     }
+    res.render("agenda", { agenda, agendas, guests, guestsShared });
   }
 
   /**

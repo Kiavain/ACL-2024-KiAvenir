@@ -85,6 +85,17 @@ export default class Agenda extends EntityStructure {
   }
 
   /**
+   * Vérifie l'accès à l'agenda
+   * @param userId {int} L'identifiant de l'utilisateur
+   * @returns {boolean} Vrai si l'accès est vérifié
+   */
+  verifyAgendaAccess(userId) {
+    const isOwner = this.ownerId === userId;
+    const isGuest = this.getGuests().some((x) => x.guestId === userId);
+
+    return isOwner || isGuest;
+  }
+  /**
    * Récupère le propriétaire de l'agenda
    * @returns {User} L'utilisateur
    */

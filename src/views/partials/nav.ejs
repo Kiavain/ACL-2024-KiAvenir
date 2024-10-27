@@ -1,17 +1,17 @@
-<% /* global locals,currentPath,agendas,cantEdit */ %>
+<% /* global locals,currentPath,agendas,cantEdit, err */ %>
 <%
-    if (currentPath.includes("/agenda")) {
-        cantEdit = true;
-        if (agenda.ownerId === locals.user.id) {
-            cantEdit = false;
-        } else {
-            let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
-            if (matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
-                cantEdit = false;
-            }
-    }
+if (currentPath.includes("/agenda")) {
 
+    cantEdit = true;
+    if (agenda.ownerId === locals.user.id) {
+        cantEdit = false;
+    } else {
+        let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
+        if (matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
+            cantEdit = false;
+        }
     }
+}
 %>
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container-fluid">
