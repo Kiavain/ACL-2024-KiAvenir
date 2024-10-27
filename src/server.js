@@ -32,6 +32,7 @@ class KiAvenir {
     this.routes = [];
     this.database = new Database(this);
     this.logger = new KiLogger(this);
+    this.redisClient = null;
   }
 
   /**
@@ -69,20 +70,41 @@ class KiAvenir {
    */
   async initNotifs() {
     // Créez un client Redis
-    const redisClient = createClient();
-    await redisClient.connect();
+    this.redisClient = createClient();
+    await this.redisClient.connect();
 
     // Configurer la session
     this.app
       .use(
         session({
-          store: new RedisStore({ client: redisClient }),
+          store: new RedisStore({ client: this.redisClient }),
           secret: await getSecret(this.logger, "SESSION_SECRET"),
           resave: false,
           saveUninitialized: true
         })
       )
       .use(this.flash);
+
+    this.setupShutdown();
+  }
+
+  /**
+   * Met en place la fermeture de l'application
+   */
+  setupShutdown() {
+    // Fonction pour fermer proprement l'application
+    const shutdown = async () => {
+      if (this.redisClient) {
+        await this.redisClient.quit();
+        this.logger.info("Redis déconnecté proprement.");
+      }
+      process.exit(0);
+    };
+
+    // Écouter les signaux pour une fermeture propre
+    process.on("SIGINT", shutdown);
+    process.on("SIGTERM", shutdown);
+    process.on("exit", shutdown);
   }
 
   /**
