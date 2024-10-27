@@ -282,7 +282,7 @@ export class AgendaController extends Controller {
       guests.map((guest) => ({
         id: guest.id,
         username: guest.getGuest().username,
-        role: guest.getRole()
+        role: guest.role
       }))
     );
   }

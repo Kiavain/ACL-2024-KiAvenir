@@ -2,6 +2,10 @@ import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
 
+/**
+ * Contrôleur pour les comptes utilisateurs
+ * @extends Controller
+ */
 export class AccountController extends Controller {
   /**
    * Crée un contrôleur pour les comptes utilisateurs
@@ -246,12 +250,12 @@ export class AccountController extends Controller {
    */
   async deleteAccount(req, res) {
     // Vérifie si l'utilisateur est connecté
-    if (!res.locals.user) {
+    const localUser = res.locals.user;
+    if (!localUser) {
       return res.render("401");
     }
 
-    const localUser = res.locals.user;
-    const user = this.database.get("users").find((user) => user.username === localUser.username);
+    const user = this.database.get("users").get(localUser.id);
 
     try {
       await user.delete(); // Supprime l'utilisateur de la base de données

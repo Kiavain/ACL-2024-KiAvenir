@@ -56,6 +56,14 @@ export default class Agenda extends EntityStructure {
   }
 
   /**
+   * Récupère les invités
+   * @returns {Object} Les invités
+   */
+  get guests() {
+    return this.entity.server.database.tables.get("guests");
+  }
+
+  /**
    * Met à jour les données de l'agenda
    * @param data {Object} Les données à mettre à jour
    * @returns {Promise<Agenda>} Une promesse de l'agenda
@@ -69,7 +77,10 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<void>} Une promesse
    */
   async delete() {
-    this.getEvents().map((event) => event.delete());
+    const eventDeletionPromises = this.getEvents().map((event) => event.delete());
+    const guestDeletionPromises = this.getGuests().map((guest) => guest.delete());
+
+    await Promise.all([...eventDeletionPromises, ...guestDeletionPromises]);
     return this.entity.delete((x) => x.agendaId === this.agendaId);
   }
 
@@ -87,5 +98,13 @@ export default class Agenda extends EntityStructure {
    */
   getEvents() {
     return this.events.getAll((x) => x.agendaId === this.agendaId);
+  }
+
+  /**
+   * Récupère les invités de l'agenda
+   * @returns {Guest[]} Les invités
+   */
+  getGuests() {
+    return this.guests.getAll((x) => x.agendaId === this.agendaId);
   }
 }

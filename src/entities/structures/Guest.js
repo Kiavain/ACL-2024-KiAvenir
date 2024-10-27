@@ -87,12 +87,4 @@ export default class Guest extends EntityStructure {
   getAgenda() {
     return this.agendas.get(this.agendaId);
   }
-
-  /**
-   * Récupère le rôle du guest
-   * @returns {string} Le rôle
-   */
-  getRole() {
-    return this.role;
-  }
 }
