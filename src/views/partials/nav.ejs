@@ -59,14 +59,14 @@ if (currentPath.includes("/agenda")) {
                             </button>
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
                             <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
-                                <h3 class="agenda-title">Mes agendas</h3>
+                                <h3 class="agenda-title" style="width: 200px">Mes agendas</h3>
                                 <ul class="agenda-list" id="agenda-list">
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id).
                                     forEach(agenda => { %>
                                         <li class="agenda-list"  style="<%= currentPath === '/agenda/' + (agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;;' : '' %>">
                                             <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>">
                                                 <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
-                                                <%= agenda.name %>
+                                                <span id="agenda-name-<%= agenda.agendaId %>"><%= agenda.name %></span>
                                             </a>
                                             <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" >
                                                 <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
@@ -74,20 +74,24 @@ if (currentPath.includes("/agenda")) {
                                         </li>
                                     <% }) %>
                                 </ul>
-                                <h3 class="agenda-title">Agendas partagées</h3>
-                                <ul class="agenda-list" id="agenda-list">
-                                    <% guestsShared.forEach(guest => {
-                                        const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
-                                    if (agenda) { %>
-                                        <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
-                                            <a href="/agenda/<%= agenda.agendaId %>">
-                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
-                                                <%= agenda.name %>
-                                            </a>
-                                        </li>
-                                    <% }
-                                    }) %>
-                                </ul>
+
+                                <!-- S'il y a au moins un partage qui le concerne -->
+                                <% if (guestsShared.length > 0) { %>
+                                    <h3 class="agenda-title">Agendas partagées</h3>
+                                    <ul class="agenda-list" id="share-agenda-list">
+                                        <% guestsShared.forEach(guest => {
+                                            const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
+                                        if (agenda) { %>
+                                            <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                                <a href="/agenda/<%= agenda.agendaId %>">
+                                                    <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
+                                                    <%= agenda.name %>
+                                                </a>
+                                            </li>
+                                        <% }
+                                        }) %>
+                                    </ul>
+                                <% }%>
                             </div>
                         </div>
                         <div id="shareOrExport" class="popUpWindow">

@@ -29,7 +29,7 @@ export class AgendaController extends Controller {
    */
   renderAgenda(req, res) {
     if (!res.locals.user) {
-      req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+      req.flash("Vous devez être connecté pour accéder à cette page.");
       return res.redirect("/login");
     }
 
@@ -47,7 +47,7 @@ export class AgendaController extends Controller {
   async renderAgendaId(req, res) {
     const localUser = res.locals.user;
     if (!localUser) {
-      req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+      req.flash("Vous devez être connecté pour accéder à cette page.");
       return res.redirect("/login");
     }
 
@@ -136,7 +136,7 @@ export class AgendaController extends Controller {
     }
 
     // Vérifie si le guest n'a pas déjà accès à l'agenda
-    const agendaId = req.params.agendaId;
+    const agendaId = parseInt(req.params.agendaId);
     const agenda = this.agendas.get(agendaId);
     const alreadyShared = this.guests.find((g) => g.agendaId === agendaId && g.guestId === sharedUser.id);
     if (alreadyShared) {
@@ -259,7 +259,7 @@ export class AgendaController extends Controller {
       return res.err(401, "Vous devez être connecté pour accéder à cette page.");
     }
 
-    const agendaId = req.params.agendaId;
+    const agendaId = req.query.agendaId;
     if (!agendaId) {
       return res.err(400, "L'identifiant de l'agenda est requis.");
     }

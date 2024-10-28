@@ -18,8 +18,8 @@
 
 <div class="flash-container">
     <% const messages = getFlashMessages(); %>
-    <% if (messages["notifications"]) { %>
-        <% messages["notifications"].forEach(msg => { %>
+    <% if (messages) { %>
+        <% messages.forEach(msg => { %>
             <div class="alert-notif"><%= msg %></div>
         <% }) %>
     <% } %>

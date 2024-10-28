@@ -1,3 +1,5 @@
+import { addFlashMessages } from "../utils.js";
+
 const editAgendaButton = document.getElementById("editAgenda");
 const deleteAgendaButton = document.getElementById("deleteAgenda");
 const editAgendaModal = document.getElementById("editAgendaModal");
@@ -46,36 +48,40 @@ closeEditAgendaButton.onclick = function () {
 editAgendaForm.onsubmit = async function (e) {
   e.preventDefault();
   const newAgendaName = document.getElementById("new-agenda-name").value;
+  const agendaName = document.getElementById(`agenda-name-${agenda.agendaId}`);
 
   // Vérifie que le nom n'est pas vide et qu'il n'est pas déjà pris
-  const response = await fetch(`/api/agenda/${agenda.agendaId}/update`, {
+  fetch(`/api/agenda/${agenda.agendaId}/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ name: newAgendaName })
-  });
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Affiche les messages flash et recharge la page après leur disparition
+      addFlashMessages(data.flashMessages);
 
-  if (response.ok) {
-    // Met à jour le nom de l'agenda sur la page sans recharger
-    agenda.name = newAgendaName;
-    document.querySelector(".header-title").textContent = newAgendaName;
-    editAgendaModal.style.display = "none";
+      // Met à jour le nom de l'agenda sur la page sans recharger
+      agenda.name = newAgendaName;
+      document.querySelector(".header-title").textContent = newAgendaName;
+      editAgendaModal.style.display = "none";
 
-    // Met à jour le nom de l'agenda dans la liste déroulante des agendas pour les évènements
-    const selectEvents = document.getElementById("event-agenda");
-    const agendaOptions = selectEvents.options;
-    for (let i = 0; i < agendaOptions.length; i++) {
-      if (agendaOptions[i].value === agenda.agendaId) {
-        agendaOptions[i].text = agenda.name;
-        console.log("agendaOptionId : " + agendaOptions[i].value);
-        console.log("agendaId : " + agenda.agendaId);
-        break;
+      // Met à jour le nom de l'agenda dans la liste déroulante des agendas pour créer un événement
+      const selectEvents = document.getElementById("event-agenda");
+      const agendaOptions = selectEvents.options;
+      for (let i = 0; i < agendaOptions.length; i++) {
+        if (agendaOptions[i].value === agenda.agendaId) {
+          agendaOptions[i].text = agenda.name;
+          break;
+        }
       }
-    }
-  } else {
-    alert("Erreur lors de la mise à jour : le nom est peut-être déjà pris ou vide.");
-  }
+
+      // Met à jour le nom de l'agenda dans la liste des agendas qu'on peut sélectionner/partager/exporter
+      agendaName.textContent = newAgendaName;
+    })
+    .catch((error) => console.error("Erreur:", error));
 };
 
 document.onclick = function (event) {

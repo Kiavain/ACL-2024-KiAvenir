@@ -40,7 +40,7 @@ export class AccountController extends Controller {
     const token = await this.createJWT(createdUser);
     res.locals.user = token;
     res.cookie("accessToken", token, { httpOnly: true });
-    req.flash("notifications", "Votre compte a bien été créé, bienvenue " + username + ".");
+    req.flash("Votre compte a bien été créé, bienvenue " + username + ".");
     res.redirect("/");
   }
 
@@ -118,7 +118,7 @@ export class AccountController extends Controller {
       const token = await this.createJWT(user);
       res.locals.user = token;
       res.cookie("accessToken", token, { httpOnly: true });
-      req.flash("notifications", "Bienvenue à vous " + user.username + ".");
+      req.flash("Bienvenue à vous " + user.username + ".");
       res.redirect("/");
     } else {
       res.render("login", {
@@ -142,7 +142,7 @@ export class AccountController extends Controller {
     res.cookie("accessToken", null, { httpOnly: true });
     res.clearCookie("accessToken");
     res.locals.user = null;
-    req.flash("notifications", "Déconnexion réussie.");
+    req.flash("Déconnexion réussie.");
     res.redirect("/");
   }
 

@@ -227,31 +227,32 @@ class KiAvenir {
   flash(req, res, next) {
     // Initialisation des notifications
     if (!req.session.flashMessages) {
-      req.session.flashMessages = {};
+      req.session.flashMessages = [];
     }
 
     // Fonctions pour les réponses
     res.err = (statusCode, message, opt = {}) => {
-      res.status(statusCode).json({ success: false, message, ...opt });
+      const flashMessages = req.session.flashMessages;
+      req.session.flashMessages = [];
+      res.status(statusCode).json({ success: false, message, flashMessages, ...opt });
     };
 
     res.success = (message, opt = {}) => {
-      req.flash("notifications", message);
-      res.status(200).json({ success: true, message, ...opt });
+      req.flash(message);
+      const flashMessages = req.session.flashMessages;
+      req.session.flashMessages = [];
+      res.status(200).json({ success: true, message, flashMessages, ...opt });
     };
 
     // Fonction pour ajouter des notifications
-    req.flash = (type, message) => {
-      if (!req.session.flashMessages[type]) {
-        req.session.flashMessages[type] = [];
-      }
-      req.session.flashMessages[type].push(message);
+    req.flash = (message) => {
+      req.session.flashMessages.push(message);
     };
 
     // Fonction pour récupérer les notifications dans les vues
     res.locals.getFlashMessages = () => {
       const flashMessages = req.session.flashMessages;
-      req.session.flashMessages = {};
+      req.session.flashMessages = [];
       return flashMessages;
     };
 

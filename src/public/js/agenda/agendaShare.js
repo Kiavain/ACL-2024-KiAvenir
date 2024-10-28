@@ -1,3 +1,5 @@
+import { addFlashMessages } from "../utils.js";
+
 const shareAgendaButton = document.getElementById("shareAgenda");
 const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
 const shareAgendaCloseButton = document.getElementById("shareAgenda-close-btn");
@@ -217,6 +219,9 @@ function applyRoleDropdownListeners() {
         body: JSON.stringify(updatedData)
       })
         .then((response) => response.json())
+        .then((data) => {
+          addFlashMessages(data.flashMessages);
+        })
         .catch((error) => console.error("Erreur:", error));
     });
   });

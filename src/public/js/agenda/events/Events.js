@@ -1,4 +1,5 @@
 import { initCalendar } from "../calendar.js";
+import { addFlashMessages } from "../../utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Utilitaires pour sélectionner les éléments
@@ -83,25 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((data) => {
         initCalendar(agenda);
-        addFlashMessage(data.message);
+        addFlashMessages([data.message]);
       })
       .catch((error) => {
         console.error("Erreur lors de la requête:", error);
       });
   };
 });
-
-export function addFlashMessage(message) {
-  const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
-
-  const flashMessage = document.createElement("div");
-  flashMessage.className = "alert-notif";
-  flashMessage.innerText = message;
-
-  flashContainer.appendChild(flashMessage);
-
-  // Affiche avec un timer, comme dans le script existant
-  setTimeout(() => {
-    flashMessage.remove();
-  }, 3000); // 3 secondes
-}
