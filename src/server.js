@@ -230,6 +230,16 @@ class KiAvenir {
       req.session.flashMessages = {};
     }
 
+    // Fonctions pour les réponses
+    res.err = (statusCode, message, opt = {}) => {
+      res.status(statusCode).json({ success: false, message, ...opt });
+    };
+
+    res.success = (message, opt = {}) => {
+      req.flash("notifications", message);
+      res.status(200).json({ success: true, message, ...opt });
+    };
+
     // Fonction pour ajouter des notifications
     req.flash = (type, message) => {
       if (!req.session.flashMessages[type]) {

@@ -28,4 +28,36 @@ export default class Controller {
   get logger() {
     return this.server.logger;
   }
+
+  /**
+   * Récupère les invités
+   * @returns {Object}
+   */
+  get guests() {
+    return this.database.get("guests");
+  }
+
+  /**
+   * Récupère les utilisateurs
+   * @returns {Object}
+   */
+  get users() {
+    return this.database.get("users");
+  }
+
+  /**
+   * Récupère les agendas
+   * @returns {Object}
+   */
+  get agendas() {
+    return this.database.get("agendas");
+  }
+
+  /**
+   * Récupère les événements
+   * @returns {Object}
+   */
+  get events() {
+    return this.database.get("events");
+  }
 }

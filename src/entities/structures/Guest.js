@@ -87,4 +87,12 @@ export default class Guest extends EntityStructure {
   getAgenda() {
     return this.agendas.get(this.agendaId);
   }
+
+  /**
+   * Récupère le propriétaire de l'agenda lié au partage
+   * @returns {User} L'utilisateur
+   */
+  getOwner() {
+    return this.getAgenda().getOwner();
+  }
 }
