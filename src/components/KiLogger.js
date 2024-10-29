@@ -25,7 +25,7 @@ export default class KiLogger {
    * @returns {Promise<void>}
    */
   async load() {
-    const latestLogFilepath = path.join(__dirname, "../logs/latest.log");
+    const latestLogFilepath = path.resolve(__dirname, "../logs/latest.log");
     const latestLogExist = await existsAsync(latestLogFilepath);
 
     if (latestLogExist) {
@@ -37,6 +37,7 @@ export default class KiLogger {
         await fs.mkdir(pathLogs, { recursive: true });
       }
       await fs.copyFile(latestLogFilepath, path.join(pathLogs, `KiAvenir-${stat.ctimeMs}.log`));
+      await fs.access(latestLogFilepath);
       await fs.unlink(latestLogFilepath);
     }
 
