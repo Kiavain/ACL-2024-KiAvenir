@@ -5,12 +5,10 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
-import RedisStore from "connect-redis";
 import KiLogger from "./components/KiLogger.js";
 import { getSecret } from "./utils/index.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import { createClient } from "redis";
 
 // Charge les variables d'environnement
 dotenv.config();
@@ -69,15 +67,10 @@ class KiAvenir {
    * @returns {Promise<void>} Une promesse
    */
   async initNotifs() {
-    // Créez un client Redis
-    this.redisClient = createClient();
-    await this.redisClient.connect();
-
     // Configurer la session
     this.app
       .use(
         session({
-          store: new RedisStore({ client: this.redisClient }),
           secret: await getSecret(this.logger, "SESSION_SECRET"),
           resave: false,
           saveUninitialized: true
