@@ -66,6 +66,12 @@ export default class KiLogger {
 
     addColors(customLevels.colors);
 
+    // Aucun transport de fichier sur Windows
+    let transportsArray = [new transports.File(opt), new transports.Console({ level: "debug" })];
+    if (process.platform === "win32" || process.platform === "win64") {
+      transportsArray = [new transports.Console({ level: "debug" })];
+    }
+
     this.winston = createLogger({
       levels: customLevels.levels,
       format: format.combine(
@@ -75,7 +81,7 @@ export default class KiLogger {
         }),
         format.colorize({ all: true })
       ),
-      transports: [new transports.File(opt), new transports.Console({ level: "debug" })]
+      transports: transportsArray
     });
   }
 
