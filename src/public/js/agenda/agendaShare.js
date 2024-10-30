@@ -124,8 +124,10 @@ function submitShareAgenda() {
           mailError.textContent = data.message;
           mailError.style.display = "block";
         } else if (isRoleError) {
+          roleError.textContent = data.message;
           roleError.style.display = "block";
         } else if (isOtherError) {
+          otherError.textContent = data.message;
           otherError.style.display = "block";
         }
         console.log("Erreur partage d'agenda : " + data.message);

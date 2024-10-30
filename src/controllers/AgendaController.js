@@ -133,7 +133,7 @@ export class AgendaController extends Controller {
     const { mail, role } = req.body;
     const sharedUser = this.users.find((user) => user.email === mail);
     if (!sharedUser) {
-      return res.err(404, "Utilisateur non trouvé.");
+      return res.err(400, "Utilisateur non trouvé.");
     }
 
     // Vérifie si le guest n'a pas déjà accès à l'agenda
