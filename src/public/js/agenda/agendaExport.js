@@ -29,4 +29,36 @@ function exportAgenda() {
 
 function submitExportAgenda() {
   console.log("Exportation de l'agenda en cours numéro :" + exportAgendaId);
+  const exportError = document.getElementById("format-error");
+  let isExportError = false;
+  const format = document.getElementById("format-export").value;
+  const data = {
+    format: format
+  };
+  fetch(`/api/agenda/${exportAgendaId}/exportAgenda`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+    .then((response) => {
+      //Vérifie la réponse d'erreur
+      if (response.status === 400) {
+        isExportError = true;
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        exportError.style.display = "none";
+        addFlashMessages(data.flashMessages);
+        modal.style.display = "none";
+      } else {
+        if (isExportError) {
+          exportError.textContent = data.message;
+          exportError.style.display = "block";
+        }
+        console.log("Erreur export agenda : " + data.message);
+      }
+    })
+    .catch((error) => console.error("Erreur:", error));
 }

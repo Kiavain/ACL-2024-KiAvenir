@@ -13,6 +13,7 @@ export class AgendaController extends Controller {
     this.createAgenda = this.createAgenda.bind(this);
     this.updateAgenda = this.updateAgenda.bind(this);
     this.shareAgenda = this.shareAgenda.bind(this);
+    this.exportAgenda = this.exportAgenda.bind(this);
     this.updateGuest = this.updateGuest.bind(this);
     this.removeGuest = this.removeGuest.bind(this);
     this.getGuests = this.getGuests.bind(this);
@@ -278,5 +279,29 @@ export class AgendaController extends Controller {
         role: guest.role
       }))
     );
+  }
+  /**
+   * Partage un agenda
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  exportAgenda(req, res) {
+    console.log("Export agenda controller : dans la fonction");
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+    console.log("Export agenda controller : je suis connecté");
+    const { format } = req.body;
+
+    // Vérifie si le guest n'a pas déjà accès à l'agenda
+    const agendaId = parseInt(req.params.agendaId);
+    const agenda = this.agendas.get(agendaId);
+    if (!agenda) {
+      return res.err(404, "Agenda non trouvé.");
+    }
+    console.log("Export agenda controller : agenda trouvé");
+    res.success(`L'agenda ${agenda.name} a été exporté avec succès au format ${format}.`);
   }
 }
