@@ -3,6 +3,13 @@ import { addFlashMessage } from "./events/Events.js";
 
 moment.locale("fr");
 
+function getEventsUrl() {
+  const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+    .map((checkbox) => checkbox.value)
+    .join(",");
+  return `/api/events/${selectedAgendaIds}`;
+}
+
 // Fonction pour créer et initialiser le calendrier
 export const initCalendar = (agenda) => {
   const calendarEl = document.getElementById("calendar");
@@ -27,11 +34,23 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    eventColor: agenda.color,
-    events: `/api/events/${agenda.agendaId}`,
+    events: getEventsUrl(),
+    eventDataTransform: (eventData) => {
+      return {
+        ...eventData,
+        color: eventData.color
+      };
+    },
     eventClick: (info) => {
       openModal(info.event);
     }
+  });
+
+  // Recharge les événements chaque fois qu'une case est cochée/décochée
+  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      calendar.refetchEvents(); // Recharge les événements
+    });
   });
 
   calendar.render();
