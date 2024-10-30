@@ -20,15 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function exportAgenda() {
-  console.log("exportAgenda");
   exportAgendaId = document.getElementById("shareOrExport").value;
-  console.log("ID de l'agenda à exporter :" + exportAgendaId);
   // Afficher la modale
   modal.style.display = "block";
 }
 
 function submitExportAgenda() {
-  console.log("Exportation de l'agenda en cours numéro :" + exportAgendaId);
   const exportError = document.getElementById("format-error");
   let isExportError = false;
   const format = document.getElementById("format-export").value;
@@ -57,7 +54,6 @@ function submitExportAgenda() {
           exportError.textContent = data.message;
           exportError.style.display = "block";
         }
-        console.log("Erreur export agenda : " + data.message);
       }
     })
     .catch((error) => console.error("Erreur:", error));
