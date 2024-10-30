@@ -36,6 +36,7 @@
     "express": "^4.21.0",
     "express-session": "^1.18.1",
     "fs-jetpack": "^5.1.0",
+    "ics": "^3.8.1",
     "jsonwebtoken": "^9.0.2",
     "kiavenir": "file:",
     "moment": "^2.30.1",

@@ -1,4 +1,7 @@
 import Controller from "./Controller.js";
+import path from "path";
+import * as os from "node:os";
+import * as fs from "node:fs";
 
 /**
  * Contrôleur pour les actions liées aux agendas
@@ -281,7 +284,7 @@ export class AgendaController extends Controller {
     );
   }
   /**
-   * Partage un agenda
+   * Exporter un agenda
    * @param req
    * @param res
    * @returns {Promise<*>}
@@ -302,6 +305,43 @@ export class AgendaController extends Controller {
       return res.err(404, "Agenda non trouvé.");
     }
     console.log("Export agenda controller : agenda trouvé");
+    if (format === "JSON") {
+      console.log(format);
+      //EXPORTER AGENDA et les evenements liés à l'agenda dans un fichier JSON
+      //Télécharger le fichier
+      // Crée une copie de l'objet agenda simple
+      const data = JSON.stringify({
+        id: agenda.id,
+        name: agenda.name,
+        description: agenda.description,
+        color: agenda.color,
+        events: agenda.events.map((event) => ({
+          name: event.name,
+          startDate: event.startDate,
+          description: event.description
+        }))
+      });
+      console.log(data);
+
+      const filename = `agenda_${agendaId}.json`;
+      const downloadsPath = path.join(os.homedir(), "Downloads", filename);
+
+      fs.writeFileSync(downloadsPath, data, "utf8");
+      console.log("Fichier JSON créé : " + downloadsPath);
+
+      return res.download(downloadsPath, filename, (err) => {
+        if (err) {
+          console.error("Erreur lors du téléchargement JSON :", err);
+        }
+        //fs.unlinkSync(downloadsPath); // Supprime le fichier après téléchargement
+      });
+    } else if (format === "ICAL") {
+      console.log(format);
+      //EXPORTER AGENDA et les evenements liés à l'agenda dans un fichier ICAL ou ICS
+      //Télécharger le fichier
+    } else {
+      return res.err(400, "Format inconnu.");
+    }
     res.success(`L'agenda ${agenda.name} a été exporté avec succès au format ${format}.`);
   }
 }
