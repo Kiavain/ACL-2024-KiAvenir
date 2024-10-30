@@ -100,6 +100,7 @@ if (currentPath.includes("/agenda")) {
                             <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
                         </div>
                         <script type="module" src="/js/agenda/events/Events.js"></script>
+                        <script type="module" src="/js/agenda/agendaImport.js"></script>
                         <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
                             add
@@ -108,6 +109,7 @@ if (currentPath.includes("/agenda")) {
                         <div id="agendaEventWindow" class="popUpWindow">
                             <button id="createAgenda">Nouvel agenda</button>
                             <button id="createEvent">Nouvel événement</button>
+                            <button id="importAgenda">Importer un agenda</button>
                         </div>
                     <% } %>
                     <li class="nav-item dropdown">
@@ -135,6 +137,8 @@ if (currentPath.includes("/agenda")) {
                         <%- include('modals/shareAgenda') %>
                         <!-- Fenêtre modale exporter un agenda -->
                         <%- include('modals/exportAgenda') %>
+                        <!-- Fenêtre modale importer un agenda -->
+                        <%- include('modals/importAgenda') %>
                     <% } %>
                 <% } else { %>
                     <li class="nav-item">

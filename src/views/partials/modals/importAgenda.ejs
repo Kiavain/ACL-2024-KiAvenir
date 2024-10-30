@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/css/shareAgendaWindow.css">
+<div id="importAgendaModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="importAgenda-close-btn">&times;</span>
+        <h2>Importer un agenda</h2>
+
+        <label for="format-import">Format :</label>
+        <input type="file" id="file-import" accept=".json,.ics" required>
+        <p id="format-error" class="error">Erreur e-mail.</p>
+
+
+        <button id="importAgendaConfirm" class="submit-btn">Exporter</button>
+
+    </div>
+</div>
+<script type="module" src="/js/agenda/agendaImport.js"></script>
