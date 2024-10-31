@@ -47,6 +47,7 @@ function submitImportAgenda() {
         importError.style.display = "none";
         addFlashMessages(data.flashMessages);
         modal.style.display = "none";
+        window.location.reload();
       } else {
         importError.textContent = data.message || "Erreur lors de l'importation.";
         importError.style.display = "block";
