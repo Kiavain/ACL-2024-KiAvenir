@@ -26,8 +26,9 @@ function importAgenda() {
 function submitImportAgenda() {
   console.log("Confirmation");
   const importError = document.getElementById("file-error");
-  const file = document.getElementById("file-import");
-  if (!file.value || file.value === "") {
+  const fileInput = document.getElementById("file-import");
+  const file = fileInput.files[0]; // Récupère le fichier directement
+  if (!file) {
     importError.textContent = "Veuillez sélectionner un fichier à importer.";
     importError.style.display = "block";
     return;

@@ -37,6 +37,11 @@ export default class Agenda extends EntityStructure {
      * @type {string}
      */
     this.color = data.color;
+    /**
+     * La description de l'agenda
+     * @type {string}
+     */
+    this.description = data.description;
   }
 
   /**

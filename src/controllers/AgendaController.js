@@ -311,14 +311,14 @@ export class AgendaController extends Controller {
         name: agenda.name,
         description: agenda.description,
         color: agenda.color,
-        events: agenda.events.map((event) => ({
+        events: agenda.getEvents().map((event) => ({
           name: event.name,
           startDate: event.startDate,
           endDate: event.endDate,
           description: event.description
         }))
       });
-
+      console.log(data);
       const filename = `agenda_${agendaId}.json`;
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
@@ -329,7 +329,7 @@ export class AgendaController extends Controller {
     } else if (format === "ICS") {
       // Crée un calendrier ICAL avec les événements
       const calendar = ical({ name: agenda.name, description: agenda.description });
-      agenda.events.map((event) => {
+      agenda.getEvents().map((event) => {
         calendar.createEvent({
           start: event.startDate,
           end: event.endDate,
@@ -360,16 +360,61 @@ export class AgendaController extends Controller {
    * @param res
    * @returns {Promise<*>}
    */
-  importAgenda(req, res) {
+  async importAgenda(req, res) {
     const localUser = res.locals.user;
     if (!localUser) {
       return res.err(401, "Vous devez être connecté pour accéder à cette page.");
     }
-    const { file } = req.body;
-    if (file === null || file === "") {
-      return res.err(400, "Vous devez importer un fichier valide.");
+    // On vérifie si le fichier est présent
+    const file = req.file;
+    if (!file) {
+      return res.err(401, "Vous devez importer un fichier valide.");
     }
-    console.log(file);
+    // On récupère l'extension du fichier
+    const fileExtension = path.extname(file.originalname).toLowerCase();
+    console.log("Extension du fichier :" + fileExtension);
+
+    //Traite le fichier
+    const fileContent = fs.readFileSync(file.path, "utf8");
+    if (fileExtension === ".json") {
+      //On traite l'import d'un agenda sous format json
+      const data = JSON.parse(fileContent);
+      console.log("Contenu du fichier JSON :" + fileContent);
+      console.log("Data du fichier JSON : " + data);
+      const { name, color, events, description } = data;
+      // On vérifie les champs de l'agenda
+      if (!name || !color || !Array.isArray(events)) {
+        return res.err(401, "Données de fichier JSON invalides.");
+      }
+      console.log(name);
+      console.log(description);
+      console.log(color);
+      console.log(events);
+      const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
+      if (alreadyExist) {
+        return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
+      }
+      const agenda = await this.agendas.create({ name, description, ownerId: localUser.id, color });
+      for (const event of events) {
+        const { name: eventName, startDate: startDate, endDate: endDate, description: eventDescription } = event;
+        // On vérifie les champs de chaque événement
+        if (!eventName || !startDate || !endDate || !eventDescription) {
+          return res.err(401, "Données de fichier JSON invalides.");
+        }
+        await this.events.create({
+          name: eventName,
+          agendaId: agenda.agendaId,
+          startDate: startDate,
+          endDate: endDate,
+          description: eventDescription
+        });
+      }
+    } else if (fileExtension === ".ics") {
+      //On traite l'import d'un agenda sous format ics
+      console.log("Contenu du fichier ICS :\n" + fileContent);
+    } else {
+      return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
+    }
     res.success("L'agenda a été importé avec succès.");
   }
 }

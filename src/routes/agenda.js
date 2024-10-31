@@ -1,5 +1,6 @@
 import Routeur from "../structures/Routeur.js";
 import { AgendaController } from "../controllers/AgendaController.js";
+import multer from "multer";
 
 /**
  * Les routes liées à la page de l'agenda
@@ -21,6 +22,7 @@ export default class AgendaRouteur extends Routeur {
    * @override
    */
   build() {
+    const upload = multer({ dest: "uploads/" });
     this.router
       // Rendu des pages
       .get("/agenda", this.controller.renderAgenda)
@@ -30,7 +32,7 @@ export default class AgendaRouteur extends Routeur {
       .put("/api/agenda/create", this.controller.createAgenda)
       .put("/api/agenda/:agendaId/update", this.controller.updateAgenda)
       .put("/api/agenda/:agendaId/exportAgenda", this.controller.exportAgenda)
-      .put("/api/agenda/importAgenda", this.controller.importAgenda)
+      .put("/api/agenda/importAgenda", upload.single("file"), this.controller.importAgenda)
       .delete("/api/agenda/:agendaId/delete", this.controller.deleteAgenda)
 
       // Gestion des invités
