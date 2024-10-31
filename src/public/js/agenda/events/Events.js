@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Utilitaires pour sélectionner les éléments
   const getElement = (id) => document.getElementById(id);
   const getInputValue = (id) => getElement(id).value;
+  const setElementValue = (id, value) => (getElement(id).value = value);
 
   const popup = document.getElementById("agendaEventWindow");
   const createAgendaOrEvent = getElement("createAgendaOrEvent");
@@ -83,6 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return response.json();
       })
       .then((data) => {
+        // Réinitialise le formulaire
+        setElementValue("event-name", "");
+        setElementValue("event-date", "");
+        setElementValue("event-date-end", "");
+        setElementValue("event-description", "");
+
         initCalendar(agenda);
         addFlashMessages([data.message]);
       })
