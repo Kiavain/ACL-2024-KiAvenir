@@ -1,0 +1,62 @@
+.guest-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+
+}
+
+.role-text {
+
+}
+
+.username {
+  flex-basis: 200px;
+  text-align: left;
+  font-weight: bold;
+}
+
+/* Le bouton contenant le rôle */
+.role-button {
+  display: inline-flex;
+  color: black;
+}
+/* Div pour le menu des rôles */
+.role-dropdown {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+  top: 80%;
+  z-index: 1;
+  width: 150px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.role-dropdown p {
+  margin: 0 0 5px 0;
+  font-weight: bold;
+}
+
+/* Style pour les rôles dans la liste */
+.role-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.role-dropdown li {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.role-dropdown li:hover {
+  background-color: #f0f0f0;
+}
+
+.check-icon {
+  margin-right: 10px;
+  visibility: hidden;
+}

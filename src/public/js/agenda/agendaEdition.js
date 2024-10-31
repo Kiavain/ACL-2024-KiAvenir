@@ -3,10 +3,12 @@ const editAgendaModal = document.getElementById("editAgendaModal");
 const closeEditAgendaButton = document.getElementById("closeEditAgenda");
 const editAgendaForm = document.getElementById("editAgendaForm");
 
-editAgendaButton.onclick = function () {
-  editAgendaModal.style.display = "block";
-  document.getElementById("new-agenda-name").value = agenda.name;
-};
+if (editAgendaButton) {
+  editAgendaButton.onclick = function () {
+    editAgendaModal.style.display = "block";
+    document.getElementById("new-agenda-name").value = agenda.name;
+  };
+}
 
 closeEditAgendaButton.onclick = function () {
   editAgendaModal.style.display = "none";
@@ -30,6 +32,18 @@ editAgendaForm.onsubmit = async function (e) {
     agenda.name = newAgendaName;
     document.querySelector(".header-title").textContent = newAgendaName;
     editAgendaModal.style.display = "none";
+
+    // Met à jour le nom de l'agenda dans la liste déroulante des agendas pour les évènements
+    const selectEvents = document.getElementById("event-agenda");
+    const agendaOptions = selectEvents.options;
+    for (let i = 0; i < agendaOptions.length; i++) {
+      if (agendaOptions[i].value === agenda.agendaId) {
+        agendaOptions[i].text = agenda.name;
+        console.log("agendaOptionId : " + agendaOptions[i].value);
+        console.log("agendaId : " + agenda.agendaId);
+        break;
+      }
+    }
   } else {
     alert("Erreur lors de la mise à jour : le nom est peut-être déjà pris ou vide.");
   }

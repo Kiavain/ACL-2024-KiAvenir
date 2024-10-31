@@ -75,12 +75,6 @@ body {
   padding: 5px;
   justify-content: space-between;
   border-bottom: 1px solid #bbb;
-    background-color: #d0d7df;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    justify-content: space-between;
-    border-bottom: 1px solid #bbb;
 }
 
 .nav-buttons {
@@ -196,6 +190,7 @@ body {
   border-bottom: 1px solid #ddd;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   transition: background-color 0.3s ease;
 }
 
@@ -235,7 +230,7 @@ body {
 }
 
 /* Styles pour la fenêtre pop-up */
-#agendaEventWindow {
+.popUpWindow {
   position: absolute;
   top:60px;
   background-color: #ffffff;
@@ -272,6 +267,12 @@ body {
   animation: fadeIn 0.3s forwards;
 }
 
+.error{
+  color: red;
+  font-style: italic;
+  display: none;
+}
+
 /* Animation de fondu */
 @keyframes fadeIn {
   from {
@@ -283,3 +284,5 @@ body {
     transform: translateY(0);
   }
 }
+
+.requis {color: red;}

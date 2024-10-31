@@ -8,6 +8,7 @@ export async function devDatabase(server) {
   const db = server.database.tables;
 
   // Création des données pour les utilisateurs
+  /*
   const users = db.get("users");
   for (const user of users.getAll()) {
     await user.delete();
@@ -48,4 +49,10 @@ export async function devDatabase(server) {
     endDate: new Date(Date.now() + 30 * 60 * 1000),
     agendaId: agenda.agendaId
   });
+  */
+  //Supprimer les anciens guests :
+  const guests = db.get("guests");
+  for (const guest of guests.getAll()) {
+    guest.delete();
+  }
 }

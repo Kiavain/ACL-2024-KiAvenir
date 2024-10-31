@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="/css/shareAgendaWindow.css">
+<div id="shareAgendaModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="shareAgenda-close-btn">&times;</span>
+        <h2>Partager un agenda</h2>
+
+        <label for="email-share">Mail de l'utilisateur à qui partager l'agenda :</label>
+        <input type="email" id="email-share" name="email-share" required>
+        <p id="mail-error" class="error">Erreur e-mail.</p>
+
+        <label for="access-shared-users">Utlisateurs avec accès :</label>
+        <ul id="access-shared-users">
+            <li>Vous : Propriétaire</li>
+            <!-- Les invités seront ajoutés ici dynamiquement par le JavaScript -->
+        </ul>
+
+        <label for="role-share-agenda">Rôle à attribuer :</label>
+        <select id="role-share-agenda" name="role-share-agenda" required>
+            <option value="Lecteur" selected>Lecteur</option>
+            <option value="Editeur">Editeur</option>
+        </select>
+        <p id="role-error" class="error">Erreur Rôle.</p>
+
+        <p id="other-error" class="error">Autre erreur.</p>
+
+        <button id="shareAgendaConfirm" class="submit-btn">Partager</button>
+
+    </div>
+</div>
+<script type="module" src="/js/agenda/agendaShare.js"></script>

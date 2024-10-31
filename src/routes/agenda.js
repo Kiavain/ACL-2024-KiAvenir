@@ -36,8 +36,10 @@ export default class AgendaRouteur extends Routeur {
 
       const agenda = await this.server.database.tables.get("agendas").get(req.params.agendaId);
       const agendas = this.server.database.tables.get("agendas");
+      const guests = this.server.database.tables.get("guests");
+      const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
       if (agenda) {
-        res.render("agenda", { agenda, agendas });
+        res.render("agenda", { agenda, agendas, guests, guestsShared });
       } else {
         res.status(404).json({ success: false, message: "Agenda non trouvé" });
       }
@@ -45,5 +47,24 @@ export default class AgendaRouteur extends Routeur {
 
     this.router.put("/api/agenda/create", this.controller.createAgenda);
     this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
+    this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);
+    this.router.put("/api/agenda/updateGuest", this.controller.updateGuest);
+    this.router.delete("/api/agenda/removeGuest", this.controller.removeGuest);
+
+    this.router.get("/getGuests", (req, res) => {
+      const agendaId = parseInt(req.query.agendaId);
+
+      // Filtrer les invités pour cet agenda (en utilisant ta base de données)
+      const guests = this.server.database.tables.get("guests").filter((guest) => guest.agendaId === agendaId);
+
+      // Retourner les invités filtrés en JSON
+      res.json(
+        guests.map((guest) => ({
+          id: guest.id,
+          username: guest.getGuest().username,
+          role: guest.getRole()
+        }))
+      );
+    });
   }
 }

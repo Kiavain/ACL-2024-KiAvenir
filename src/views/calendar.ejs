@@ -8,24 +8,24 @@
 <!-- Modale pour afficher les informations de l'événement -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close close-btn">&times;</span>
         <h2>Modifier l'événement</h2>
         <label for="eventTitle">Titre :</label>
-        <input type="text" id="eventTitle" class="input-field" />
+        <input type="text" id="eventTitle" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <label for="eventDetails">Détails :</label>
-        <textarea id="eventDetails" class="input-field"></textarea>
+        <textarea id="eventDetails" class="input-field" <% if(cantEdit) {%> disabled <%}%>></textarea>
 
         <label for="startEventTime">Date de début :</label>
-        <input type="datetime-local" id="startEventTime" class="input-field" />
+        <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <label for="endEventTime">Date de fin :</label>
-        <input type="datetime-local" id="endEventTime" class="input-field" />
+        <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
         <label id="error-update-event" class="form-label text-danger"></label>
 
         <!-- Boutons pour enregistrer ou annuler -->
-        <button id="updateEvent">Enregistrer les modifications</button>
-        <button id="deleteEvent">Supprimer l'événement</button>
+        <button id="updateEvent" <% if(cantEdit) {%> hidden <%}%>>Enregistrer les modifications</button>
+        <button id="deleteEvent" <% if(cantEdit) {%> hidden <%}%>>Supprimer l'événement</button>
     </div>
 </div>
 
