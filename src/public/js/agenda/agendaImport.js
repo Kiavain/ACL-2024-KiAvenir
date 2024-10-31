@@ -25,4 +25,31 @@ function importAgenda() {
 
 function submitImportAgenda() {
   console.log("Confirmation");
+  const importError = document.getElementById("file-error");
+  const file = document.getElementById("file-import");
+  if (!file.value || file.value === "") {
+    importError.textContent = "Veuillez sélectionner un fichier à importer.";
+    importError.style.display = "block";
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  fetch("/api/agenda/importAgenda", {
+    method: "PUT",
+    body: formData
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        importError.style.display = "none";
+        addFlashMessages(data.flashMessages);
+        modal.style.display = "none";
+      } else {
+        importError.textContent = data.message || "Erreur lors de l'importation.";
+        importError.style.display = "block";
+      }
+    })
+    .catch((error) => console.error("Erreur:", error));
 }

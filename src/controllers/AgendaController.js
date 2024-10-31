@@ -18,6 +18,7 @@ export class AgendaController extends Controller {
     this.updateAgenda = this.updateAgenda.bind(this);
     this.shareAgenda = this.shareAgenda.bind(this);
     this.exportAgenda = this.exportAgenda.bind(this);
+    this.importAgenda = this.importAgenda.bind(this);
     this.updateGuest = this.updateGuest.bind(this);
     this.removeGuest = this.removeGuest.bind(this);
     this.getGuests = this.getGuests.bind(this);
@@ -351,5 +352,24 @@ export class AgendaController extends Controller {
       return res.err(400, "Format inconnu.");
     }
     res.success(`L'agenda ${agenda.name} a été exporté avec succès au format ${format}.`);
+  }
+
+  /**
+   * Importer un agenda
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  importAgenda(req, res) {
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+    const { file } = req.body;
+    if (file === null || file === "") {
+      return res.err(400, "Vous devez importer un fichier valide.");
+    }
+    console.log(file);
+    res.success("L'agenda a été importé avec succès.");
   }
 }
