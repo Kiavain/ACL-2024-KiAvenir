@@ -90,6 +90,17 @@ export default class Agenda extends EntityStructure {
   }
 
   /**
+   * Vérifie si l'utilisateur peut éditer l'agenda
+   * @param userId {int} L'identifiant de l'utilisateur
+   * @returns {boolean} Vrai si l'utilisateur peut éditer l'agenda
+   */
+  verifyCanEdit(userId) {
+    const isOwner = this.ownerId === userId;
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur");
+
+    return isOwner || isGuest;
+  }
+  /**
    * Vérifie l'accès à l'agenda
    * @param userId {int} L'identifiant de l'utilisateur
    * @returns {boolean} Vrai si l'accès est vérifié

@@ -113,7 +113,7 @@ export class AgendaController extends Controller {
     const agenda = this.agendas.get(req.params.agendaId);
     if (!agenda) {
       return res.err(404, "Agenda non trouvé.");
-    } else if (agenda.ownerId !== localUser.id) {
+    } else if (agenda.verifyCanEdit(localUser.id)) {
       return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
     } else if (!name || name.trim() === "") {
       return res.err(400, "Le nom de l'agenda est requis.");
