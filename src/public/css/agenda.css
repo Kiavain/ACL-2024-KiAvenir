@@ -22,7 +22,6 @@ body {
 .header-left, .header-middle, .header-right {
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .header-title {
@@ -180,7 +179,12 @@ body {
   padding: 10px;
   position: relative;
 }
-
+.search-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 50px;
+  position: relative;
+}
 .agenda-list {
   list-style: none;
   padding: 0;
