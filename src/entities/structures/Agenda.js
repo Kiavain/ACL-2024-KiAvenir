@@ -113,7 +113,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Event[]} Les événements
    */
   getEvents() {
-    return this.events.getAll((x) => x.agendaId === this.agendaId);
+    return this.events.filter((x) => x.agendaId === this.agendaId);
   }
 
   /**
@@ -121,6 +121,6 @@ export default class Agenda extends EntityStructure {
    * @returns {Guest[]} Les invités
    */
   getGuests() {
-    return this.guests.getAll((x) => x.agendaId === this.agendaId);
+    return this.guests.filter((x) => x.agendaId === this.agendaId);
   }
 }
