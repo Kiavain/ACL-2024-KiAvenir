@@ -37,6 +37,7 @@
     "express-session": "^1.18.1",
     "fs-jetpack": "^5.1.0",
     "ical-generator": "^8.0.1",
+    "ical.js": "^2.1.0",
     "ics": "^3.8.1",
     "jsonwebtoken": "^9.0.2",
     "kiavenir": "file:",

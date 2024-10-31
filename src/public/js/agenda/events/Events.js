@@ -89,6 +89,9 @@ document.addEventListener("DOMContentLoaded", () => {
         setElementValue("event-date", "");
         setElementValue("event-date-end", "");
         setElementValue("event-description", "");
+        errName.style.display = "none";
+        errorElement.style.display = "none";
+        errAgenda.style.display = "none";
 
         initCalendar(agenda);
         addFlashMessages([data.message]);

@@ -3,6 +3,7 @@ import path from "path";
 import * as os from "node:os";
 import * as fs from "node:fs";
 import ical from "ical-generator";
+import * as ICAL from "ical.js";
 
 /**
  * Contrôleur pour les actions liées aux agendas
@@ -113,7 +114,7 @@ export class AgendaController extends Controller {
     const agenda = this.agendas.get(req.params.agendaId);
     if (!agenda) {
       return res.err(404, "Agenda non trouvé.");
-    } else if (agenda.verifyCanEdit(localUser.id)) {
+    } else if (!agenda.verifyCanEdit(localUser.id)) {
       return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
     } else if (!name || name.trim() === "") {
       return res.err(400, "Le nom de l'agenda est requis.");
@@ -318,7 +319,6 @@ export class AgendaController extends Controller {
           description: event.description
         }))
       });
-      console.log(data);
       const filename = `agenda_${agendaId}.json`;
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
@@ -372,24 +372,17 @@ export class AgendaController extends Controller {
     }
     // On récupère l'extension du fichier
     const fileExtension = path.extname(file.originalname).toLowerCase();
-    console.log("Extension du fichier :" + fileExtension);
 
     //Traite le fichier
     const fileContent = fs.readFileSync(file.path, "utf8");
     if (fileExtension === ".json") {
       //On traite l'import d'un agenda sous format json
       const data = JSON.parse(fileContent);
-      console.log("Contenu du fichier JSON :" + fileContent);
-      console.log("Data du fichier JSON : " + data);
       const { name, color, events, description } = data;
       // On vérifie les champs de l'agenda
       if (!name || !color || !Array.isArray(events)) {
         return res.err(401, "Données de fichier JSON invalides.");
       }
-      console.log(name);
-      console.log(description);
-      console.log(color);
-      console.log(events);
       const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
       if (alreadyExist) {
         return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
@@ -398,20 +391,50 @@ export class AgendaController extends Controller {
       for (const event of events) {
         const { name: eventName, startDate: startDate, endDate: endDate, description: eventDescription } = event;
         // On vérifie les champs de chaque événement
-        if (!eventName || !startDate || !endDate || !eventDescription) {
-          return res.err(401, "Données de fichier JSON invalides.");
+        if (eventName && startDate && endDate && eventDescription) {
+          await this.events.create({
+            name: eventName,
+            agendaId: agenda.agendaId,
+            startDate: startDate,
+            endDate: endDate,
+            description: eventDescription
+          });
         }
-        await this.events.create({
-          name: eventName,
-          agendaId: agenda.agendaId,
-          startDate: startDate,
-          endDate: endDate,
-          description: eventDescription
-        });
       }
     } else if (fileExtension === ".ics") {
       //On traite l'import d'un agenda sous format ics
-      console.log("Contenu du fichier ICS :\n" + fileContent);
+      const parsedCalendar = ICAL.default.parse(fileContent);
+      const comp = new ICAL.default.Component(parsedCalendar);
+      const vevents = comp.getAllSubcomponents("vevent");
+      const name = comp.getFirstPropertyValue("x-wr-calname");
+      const color = "#0000FF";
+      const summary = comp.getFirstPropertyValue("x-wr-caldesc");
+      // On vérifie les champs de l'agenda
+      if (!name || !Array.isArray(vevents)) {
+        return res.err(401, "Données de fichier JSON invalides.");
+      }
+      const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
+      if (alreadyExist) {
+        return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
+      }
+      const agenda = await this.agendas.create({ name, ownerId: localUser.id, color });
+
+      for (const vevent of vevents) {
+        const eventName = vevent.getFirstPropertyValue("summary");
+        const startDate = new Date(vevent.getFirstPropertyValue("dtstart").toString());
+        const endDate = new Date(vevent.getFirstPropertyValue("dtend").toString());
+        const eventDescription = vevent.getFirstPropertyValue("description") || "";
+
+        if (eventName && startDate && endDate) {
+          await this.events.create({
+            name: eventName,
+            agendaId: agenda.agendaId,
+            startDate: startDate,
+            endDate: endDate,
+            description: eventDescription
+          });
+        }
+      }
     } else {
       return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
     }
