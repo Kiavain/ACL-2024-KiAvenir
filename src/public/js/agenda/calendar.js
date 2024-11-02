@@ -31,13 +31,25 @@ export const initCalendar = (agenda) => {
     events: `/api/events/${agenda.agendaId}`,
     eventClick: (info) => {
       openModal(info.event);
+    },
+    //quand les events sont prêts on écoute la barre de recherche
+    eventsSet: (events) => {
+      document.getElementById("searchInput").addEventListener("input", function () {
+        const filter = document.getElementById("searchInput").value.toUpperCase();
+        events.forEach((event) => {
+          const title = event.title.toUpperCase();
+          if (title.includes(filter)) {
+            event.setProp("display", "auto");
+          } else {
+            event.setProp("display", "none");
+          }
+        });
+      });
     }
   });
-
   calendar.render();
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
-
 // Fonction pour ouvrir la modale
 export const openModal = (eventData) => {
   const modal = document.getElementById("eventModal");
