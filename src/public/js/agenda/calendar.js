@@ -31,23 +31,10 @@ export const initCalendar = (agenda) => {
     events: `/api/events/${agenda.agendaId}`,
     eventClick: (info) => {
       openModal(info.event);
-    },
-    //quand les events sont prêts on écoute la barre de recherche
-    eventsSet: (events) => {
-      document.getElementById("searchInput").addEventListener("input", function () {
-        const filter = document.getElementById("searchInput").value.toUpperCase();
-        events.forEach((event) => {
-          const title = event.title.toUpperCase();
-          if (title.includes(filter)) {
-            event.setProp("display", "auto");
-          } else {
-            event.setProp("display", "none");
-          }
-        });
-      });
     }
   });
   calendar.render();
+  listenFilter(calendar);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
 // Fonction pour ouvrir la modale
@@ -70,7 +57,20 @@ export const openModal = (eventData) => {
 
   modal.style.display = "block";
 };
-
+//Fonction pour écouter la barre de filtrage des évenements
+const listenFilter = (calendar) => {
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const filter = document.getElementById("searchInput").value.toUpperCase();
+    calendar.getEvents().forEach((event) => {
+      const title = event.title.toUpperCase();
+      if (title.includes(filter)) {
+        event.setProp("display", "auto");
+      } else {
+        event.setProp("display", "none");
+      }
+    });
+  });
+};
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
