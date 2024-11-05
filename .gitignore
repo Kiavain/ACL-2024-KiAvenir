@@ -4,6 +4,9 @@
 # VSCode
 .vscode
 
+# Uploads
+uploads
+
 # Database
 data/*.sqlite
 

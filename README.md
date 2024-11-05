@@ -9,6 +9,12 @@ KiAvenir est une application web qui permet de gérer un agenda et de prévoir d
 npm install && npm start 
 ```
 
+## Test
+
+```bash
+npm install && npm test
+```
+
 ## Fonctionnalités
 - Créer un compte
 - Se connecter / Se déconnecter

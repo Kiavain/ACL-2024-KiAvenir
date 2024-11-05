@@ -1,20 +1,28 @@
+import { addFlashMessages } from "../utils.js";
+
 const shareAgendaButton = document.getElementById("shareAgenda");
 const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
 const shareAgendaCloseButton = document.getElementById("shareAgenda-close-btn");
 const modal = document.getElementById("shareAgendaModal");
 
-shareAgendaCloseButton.onclick = function () {
-  modal.style.display = "none";
-};
+// Vérifie si le document est chargé
+document.addEventListener("DOMContentLoaded", () => {
+  shareAgendaCloseButton.onclick = () => (modal.style.display = "none");
+  shareAgendaButton.onclick = () => shareAgenda();
+  shareAgendaConfirmButton.onclick = () => submitShareAgenda();
 
-shareAgendaButton.addEventListener("click", () => {
-  shareAgenda();
+  // Fermer la modale si on clique ailleurs (et enlève l'écouteur)
+  window.addEventListener("click", function handleClickOutside(event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+      window.removeEventListener("click", handleClickOutside);
+    }
+  });
 });
 
-shareAgendaConfirmButton.addEventListener("click", () => {
-  submitShareAgenda();
-});
-
+/**
+ * Affiche la modale de partage d'agenda
+ */
 function shareAgenda() {
   const sharedAgendaId = document.getElementById("shareOrExport").value;
 
@@ -116,8 +124,10 @@ function submitShareAgenda() {
           mailError.textContent = data.message;
           mailError.style.display = "block";
         } else if (isRoleError) {
+          roleError.textContent = data.message;
           roleError.style.display = "block";
         } else if (isOtherError) {
+          otherError.textContent = data.message;
           otherError.style.display = "block";
         }
         console.log("Erreur partage d'agenda : " + data.message);
@@ -211,6 +221,9 @@ function applyRoleDropdownListeners() {
         body: JSON.stringify(updatedData)
       })
         .then((response) => response.json())
+        .then((data) => {
+          addFlashMessages(data.flashMessages);
+        })
         .catch((error) => console.error("Erreur:", error));
     });
   });

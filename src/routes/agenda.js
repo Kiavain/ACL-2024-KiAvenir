@@ -1,70 +1,68 @@
 import Routeur from "../structures/Routeur.js";
-import { AgendaController } from "../controllers/agendaController.js";
+import { AgendaController } from "../controllers/AgendaController.js";
+import multer from "multer";
 
 /**
  * Les routes liées à la page de l'agenda
  */
 // noinspection JSUnusedGlobalSymbols // Utilisé par le serveur
 export default class AgendaRouteur extends Routeur {
+  /**
+   * Construit le routeur
+   * @param server {KiAvenir} L'instance du serveur
+   * @constructor
+   * @override
+   */
   constructor(server) {
     super(server, new AgendaController(server));
   }
 
   /**
    * Construit la route
+   * @override
    */
   build() {
-    // Redirection vers l'agenda par défaut : le premier de la liste
-    this.router.get("/agenda", (req, res) => {
+    const upload = multer({ dest: "uploads/" });
+    this.router
+      // Rendu des pages
+      .get("/agenda", this.controller.renderAgenda)
+      .get("/agenda/:agendaIds", async (req, res) => {
       if (!res.locals.user) {
         req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
         return res.redirect("/login");
       }
 
-      // Récupérer le premier agenda de la liste pour l'utilisateur courant
-      const agenda = this.server.database.tables
+      // Récupère les IDs des agendas depuis l'URL et les transforme en tableau
+      const agendaIds = req.params.agendaIds.split(",").map((id) => parseInt(id.trim()));
+
+      // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
+      const agendas_to_consult = this.server.database.tables
         .get("agendas")
-        .filter((agenda) => agenda.ownerId === res.locals.user.id);
-      res.redirect("/agenda/" + agenda[0].agendaId);
-    });
+        .filter((agenda) => agendaIds.includes(agenda.agendaId) && agenda.ownerId === res.locals.user.id);
 
-    this.router.get("/agenda/:agendaId", async (req, res) => {
-      if (!res.locals.user) {
-        req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
-        return res.redirect("/login");
-      }
-
-      const agenda = await this.server.database.tables.get("agendas").get(req.params.agendaId);
       const agendas = this.server.database.tables.get("agendas");
       const guests = this.server.database.tables.get("guests");
       const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
-      if (agenda) {
-        res.render("agenda", { agenda, agendas, guests, guestsShared });
+
+      if (agendas_to_consult.length > 0) {
+        const agenda = agendas_to_consult[0];
+        res.render("agenda", { agenda, agendas_to_consult, agendas, guests, guestsShared });
       } else {
-        res.status(404).json({ success: false, message: "Agenda non trouvé" });
+        res.redirect("/agenda");
       }
-    });
+    })
 
-    this.router.put("/api/agenda/create", this.controller.createAgenda);
-    this.router.put("/api/agenda/:agendaId/update", this.controller.updateAgenda);
-    this.router.put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda);
-    this.router.put("/api/agenda/updateGuest", this.controller.updateGuest);
-    this.router.delete("/api/agenda/removeGuest", this.controller.removeGuest);
+      // Gesion des agendas
+      .put("/api/agenda/create", this.controller.createAgenda)
+      .put("/api/agenda/:agendaId/update", this.controller.updateAgenda)
+      .put("/api/agenda/:agendaId/exportAgenda", this.controller.exportAgenda)
+      .put("/api/agenda/importAgenda", upload.single("file"), this.controller.importAgenda)
+      .delete("/api/agenda/:agendaId/delete", this.controller.deleteAgenda)
 
-    this.router.get("/getGuests", (req, res) => {
-      const agendaId = parseInt(req.query.agendaId);
-
-      // Filtrer les invités pour cet agenda (en utilisant ta base de données)
-      const guests = this.server.database.tables.get("guests").filter((guest) => guest.agendaId === agendaId);
-
-      // Retourner les invités filtrés en JSON
-      res.json(
-        guests.map((guest) => ({
-          id: guest.id,
-          username: guest.getGuest().username,
-          role: guest.getRole()
-        }))
-      );
-    });
+      // Gestion des invités
+      .get("/getGuests", this.controller.getGuests)
+      .put("/api/agenda/:agendaId/shareAgenda", this.controller.shareAgenda)
+      .put("/api/agenda/updateGuest", this.controller.updateGuest)
+      .delete("/api/agenda/removeGuest", this.controller.removeGuest);
   }
 }
