@@ -58,32 +58,40 @@
         <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
 </div>
 
-<div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
-        Supprimer mon compte
-    </button>
-</div>
 
-<div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-danger">
-                Cette action est définitive !
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <form action="/account/delete" method="post">
-                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                </form>
-            </div>
+        <div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
+                Supprimer mon compte
+            </button>
         </div>
-    </div>
-    <% } %>
-</div>
+
+
+        <style>
+            .modal-backdrop {
+                z-index: 2 !important;
+            }
+        </style>
+
+        <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content" style="top: 20vh !important;">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-danger">
+                        Cette action est définitive !
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form action="/account/delete" method="post">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+             </div>
+         </div>
+       <% } %>
 
 
 <% if (locals.user) { %>

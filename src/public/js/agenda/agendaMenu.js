@@ -23,9 +23,10 @@ document.addEventListener("click", function (event) {
 const agendaItems = document.getElementById("agenda-list").children;
 for (let i = 0; i < agendaItems.length; i++) {
   const agendaItem = agendaItems[i];
-  const agendaItemValue = agendaItem.querySelector("button").value;
+  const agendaShareButton = agendaItem.querySelector("button");
+  const agendaItemValue = agendaShareButton.value;
   const agendaItemName = agendaItem.querySelector("a").dataset.agendaName;
-  agendaItem.addEventListener("click", () => {
+  agendaShareButton.addEventListener("click", () => {
     toggleMenuShareOrExport(agendaItemValue, agendaItemName);
   });
 }
