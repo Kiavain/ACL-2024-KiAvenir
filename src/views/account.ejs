@@ -64,9 +64,15 @@
             </button>
         </div>
 
+        <style>
+            .modal-backdrop {
+                z-index: 2 !important;
+            }
+        </style>
+
         <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
+                <div class="modal-content" style="top: 20vh !important;">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

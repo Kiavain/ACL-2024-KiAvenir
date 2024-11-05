@@ -54,7 +54,7 @@
                                 <span class="material-symbols-outlined">menu</span>
                             </button>
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
-                            <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
+                            <div id="dropdown-menu" class="dropdown-menu" style="display: none; width:20vw; left:-5vw;">
                                 <h3 class="agenda-title">Mes agendas</h3>
                                 <ul class="agenda-list" id="agenda-list">
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id).
@@ -70,7 +70,7 @@
                                         </li>
                                     <% }) %>
                                 </ul>
-                                <h3 class="agenda-title">Agendas partagées</h3>
+                                <h3 class="agenda-title">Agendas partagés</h3>
                                 <ul class="agenda-list" id="agenda-list">
                                     <% guestsShared.forEach(guest => {
                                         const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
