@@ -1,7 +1,20 @@
 // Initialiser la langue de moment.js
 import { addFlashMessage } from "./events/Events.js";
-
 moment.locale("fr");
+
+function getEventsUrl(agenda) {
+  const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+    .map((checkbox) => checkbox.value)
+    .join(",");
+
+  const search = document.getElementById("searchInput").value;
+  const input = search && search.trim() !== "" ? `?search=${search}` : "";
+  if (!selectedAgendaIds) {
+    return `/api/events/${agenda.agendaId}${input}`;
+  }
+
+  return `/api/events/${selectedAgendaIds}${input}`;
+}
 
 // Fonction pour créer et initialiser le calendrier
 export const initCalendar = (agenda) => {
@@ -27,16 +40,31 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    eventColor: agenda.color,
-    events: `/api/events/${agenda.agendaId}`,
+    events: getEventsUrl(agenda),
+    eventDataTransform: (eventData) => {
+      return {
+        ...eventData,
+        color: eventData.color
+      };
+    },
     eventClick: (info) => {
       openModal(info.event);
     }
   });
+
+  // Recharge les événements chaque fois qu'une case est cochée/décochée
+  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      calendar.setOption("events", getEventsUrl(agenda));
+      calendar.refetchEvents(); // Recharge les événements
+    });
+  });
+
   calendar.render();
-  listenFilter(calendar);
+  listenFilter(calendar, agenda);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
+
 // Fonction pour ouvrir la modale
 export const openModal = (eventData) => {
   const modal = document.getElementById("eventModal");
@@ -58,17 +86,10 @@ export const openModal = (eventData) => {
   modal.style.display = "block";
 };
 //Fonction pour écouter la barre de filtrage des évenements
-const listenFilter = (calendar) => {
+const listenFilter = (calendar, agenda) => {
   document.getElementById("searchInput").addEventListener("input", function () {
-    const filter = document.getElementById("searchInput").value.toUpperCase();
-    calendar.getEvents().forEach((event) => {
-      const title = event.title.toUpperCase();
-      if (title.includes(filter)) {
-        event.setProp("display", "auto");
-      } else {
-        event.setProp("display", "none");
-      }
-    });
+    calendar.setOption("events", getEventsUrl(agenda));
+    calendar.refetchEvents();
   });
 };
 // Fonction pour fermer la modale
