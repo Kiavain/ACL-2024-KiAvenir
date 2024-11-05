@@ -99,10 +99,14 @@ export default class Database {
    * @return {Promise<void>} La promesse
    */
   async sync() {
-    await this.connector?.sync();
+    try {
+      await this.connector?.sync();
 
-    for (const table of this.tables.values()) {
-      await table.load();
+      for (const table of this.tables.values()) {
+        await table.load();
+      }
+    } catch {
+      // Ignore
     }
   }
 }
