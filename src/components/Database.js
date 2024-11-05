@@ -103,7 +103,7 @@ export default class Database {
       await this.connector?.sync();
 
       for (const table of this.tables.values()) {
-        await table.load();
+        await table.refreshCache();
       }
     } catch {
       // Ignore

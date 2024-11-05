@@ -89,7 +89,27 @@ export default class Entity {
         );
       }
     } catch (e) {
-      console.error(e);
+      console.error("Synchronisation : ", e);
+    }
+  }
+
+  /**
+   * Actualise le cache sans recharger la table entière
+   */
+  async refreshCache() {
+    try {
+      // Récupère toutes les lignes de la table sans synchroniser
+      const rows = await this.table.findAll();
+
+      for (const row of rows) {
+        const data = row.dataValues;
+        const key = this.identifierColumns.map((c) => data[c]).join(":");
+
+        // Met à jour le cache avec les nouvelles données
+        this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
+      }
+    } catch (e) {
+      console.error("Erreur lors de la mise à jour du cache : ", e);
     }
   }
 

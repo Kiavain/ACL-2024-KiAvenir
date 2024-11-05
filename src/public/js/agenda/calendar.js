@@ -1,12 +1,20 @@
 // Initialiser la langue de moment.js
+
 import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
 
-function getEventsUrl() {
+function getEventsUrl(agenda) {
   const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
     .map((checkbox) => checkbox.value)
     .join(",");
-  return `/api/events/${selectedAgendaIds}`;
+
+  const search = document.getElementById("searchInput").value;
+  const input = search && search.trim() !== "" ? `?search=${search}` : "";
+  if (!selectedAgendaIds) {
+    return `/api/events/${agenda.agendaId}${input}`;
+  }
+
+  return `/api/events/${selectedAgendaIds}${input}`;
 }
 
 // Fonction pour créer et initialiser le calendrier
@@ -33,7 +41,7 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    events: getEventsUrl(),
+    events: getEventsUrl(agenda),
     eventDataTransform: (eventData) => {
       return {
         ...eventData,
@@ -48,11 +56,13 @@ export const initCalendar = (agenda) => {
   // Recharge les événements chaque fois qu'une case est cochée/décochée
   document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
+      calendar.setOption("events", getEventsUrl(agenda));
       calendar.refetchEvents(); // Recharge les événements
     });
   });
 
   calendar.render();
+  listenFilter(calendar, agenda);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
 
@@ -66,17 +76,23 @@ export const openModal = (eventData) => {
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
   document.getElementById("startEventTime").value = moment(eventData.start)
-    .add(2, "hour")
+    .add(1, "hour")
     .toISOString()
     .substring(0, 16);
-  document.getElementById("endEventTime").value = moment(eventData.end).add(2, "hour").toISOString().substring(0, 16);
+  document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
   modal.style.display = "block";
 };
-
+//Fonction pour écouter la barre de filtrage des évenements
+const listenFilter = (calendar, agenda) => {
+  document.getElementById("searchInput").addEventListener("input", function () {
+    calendar.setOption("events", getEventsUrl(agenda));
+    calendar.refetchEvents();
+  });
+};
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");

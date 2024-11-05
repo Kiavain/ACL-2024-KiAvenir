@@ -37,7 +37,6 @@ if (currentPath.includes("/agenda")) {
                 <% } %>
             </div>
         <% } %>
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
@@ -52,11 +51,15 @@ if (currentPath.includes("/agenda")) {
                 <% if (locals.user) { %>
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
+                        <div class = "search-bar" id="searchBar">
+                            <input type="text" id="searchInput" placeholder="Rechercher un événement">
+                        </div>
                         <div id="menuAgendas" class="buttons-nav">
                             <script type="module" src="/js/agenda/agendaMenu.js"></script>
                             <button class="icon-button" id="menu-button">
                                 <span class="material-symbols-outlined">menu</span>
                             </button>
+
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
                             <div id="dropdown-menu" class="dropdown-menu" style="display: none; width:200px; left:-5vw;">
                                 <h3 class="agenda-title">Mes agendas</h3>
