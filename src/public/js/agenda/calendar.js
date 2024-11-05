@@ -1,6 +1,6 @@
 // Initialiser la langue de moment.js
 
-import { addFlashMessages } from "./events/Events.js";
+import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
 
 function getEventsUrl(agenda) {
