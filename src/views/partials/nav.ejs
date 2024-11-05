@@ -64,7 +64,6 @@ if (currentPath.includes("/agenda")) {
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id).
                                     forEach(agenda => { %>
                                         <li class="agenda-list"  style="<%= currentPath === '/agenda/' + (agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;;' : '' %>">
-                                            <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
                                             <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>">
                                                 <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
                                                 <span id="agenda-name-<%= agenda.agendaId %>"><%= agenda.name %></span>
