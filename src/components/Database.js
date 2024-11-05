@@ -48,7 +48,7 @@ export default class Database {
     // Connecte la base de données
     this.connector = new Sequelize({
       dialect: "sqlite",
-      storage: "data/db.sqlite",
+      storage: process.env.NODE_ENV === "test" ? "data/testdb.sqlite" : "data/db.sqlite",
       logging: false,
       define: {
         charset: "utf8",
