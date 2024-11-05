@@ -25,3 +25,61 @@ body {
         display: none;
     }
 }
+
+.navbar {
+  align-items: center;
+  padding-top: 0.2rem;
+  padding-bottom: 0.2rem;
+}
+
+.navbar-brand, .navbar-nav, .navbar-toggler, #menuAgendas, #shareOrExport, #agendaEventWindow {
+  align-items: center;
+}
+
+.navbar-nav .nav-item .nav-link {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.navbar-nav .dropdown-toggle img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+}
+
+.navbar-nav .dropdown-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.header-title, .icon-button {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+.icon-button .material-symbols-outlined {
+  font-size: 1.2rem;
+}
+
+.navbar-nav, .navbar-collapse, #menuAgendas {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.popUpWindow {
+  display: none;
+  position: absolute;
+  top:60px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+  flex-direction: column;
+}
