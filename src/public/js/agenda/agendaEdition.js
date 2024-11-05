@@ -68,6 +68,20 @@ editAgendaForm.onsubmit = async function (e) {
       document.querySelector(".header-title").textContent = newAgendaName;
       editAgendaModal.style.display = "none";
 
+
+    // Met à jour le nom de l'agenda dans la liste déroulante des agendas
+    const agendaItems = document.querySelectorAll("#agenda-list .agenda-item");
+    // Parcourt chaque élément de la liste pour trouver celui avec l'ID correspondant
+    agendaItems.forEach((item) => {
+      const checkbox = item.querySelector(".agenda-checkbox");
+      const agendaLink = item.querySelector("a");
+      // Si l'ID de la checkbox correspond à celui de l'agenda, on met à jour le nom
+      if (checkbox && checkbox.value === agenda.agendaId) {
+        agendaLink.textContent = agenda.name;
+        agendaLink.style.color = agenda.color;
+      }
+    });
+    
       // Met à jour le nom de l'agenda dans la liste déroulante des agendas pour créer un événement
       const selectEvents = document.getElementById("event-agenda");
       const agendaOptions = selectEvents.options;
