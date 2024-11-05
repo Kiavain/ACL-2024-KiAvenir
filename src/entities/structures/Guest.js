@@ -89,10 +89,10 @@ export default class Guest extends EntityStructure {
   }
 
   /**
-   * Récupère le rôle du guest
-   * @returns {string} Le rôle
+   * Récupère le propriétaire de l'agenda lié au partage
+   * @returns {User} L'utilisateur
    */
-  getRole() {
-    return this.role;
+  getOwner() {
+    return this.getAgenda().getOwner();
   }
 }

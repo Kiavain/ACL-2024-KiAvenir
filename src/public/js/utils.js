@@ -37,3 +37,23 @@ export async function checkPassword(
     accountForm.password.value = rawValue;
   }
 }
+
+/**
+ * Ajoute un message flash
+ * @param messages {string[]} Les messages à afficher
+ */
+export function addFlashMessages(messages) {
+  const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
+  for (const message of messages) {
+    const flashMessage = document.createElement("div");
+    flashMessage.className = "alert-notif";
+    flashMessage.innerText = message;
+
+    flashContainer.appendChild(flashMessage);
+
+    // Affiche avec un timer, comme dans le script existant
+    setTimeout(() => {
+      flashMessage.remove();
+    }, 3000); // 3 secondes
+  }
+}

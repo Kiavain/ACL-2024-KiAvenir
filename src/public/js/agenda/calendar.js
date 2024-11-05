@@ -1,6 +1,5 @@
 // Initialiser la langue de moment.js
-import { addFlashMessage } from "./events/Events.js";
-
+import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
 
 // Fonction pour créer et initialiser le calendrier
@@ -102,7 +101,7 @@ export const saveEvent = (calendar) => {
       if (data.success) {
         calendar.refetchEvents();
         closeModal();
-        addFlashMessage("Événement mis à jour avec succès");
+        addFlashMessages(["Événement mis à jour avec succès"]);
       } else {
         alert("Échec de la mise à jour de l'événement.");
       }

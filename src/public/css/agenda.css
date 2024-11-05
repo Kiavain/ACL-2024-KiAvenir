@@ -225,20 +225,6 @@ body {
   position: relative; /* Relative pour que le pop-up soit positionné en fonction de ce bouton */
 }
 
-/* Styles pour la fenêtre pop-up */
-.popUpWindow {
-  position: absolute;
-  top:60px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  z-index: 1000;
-  display: none; /* Cacher par défaut */
-  flex-direction: column;
-}
-
 #agendaEventWindow button {
   background-color: #007bff;
   color: white;
