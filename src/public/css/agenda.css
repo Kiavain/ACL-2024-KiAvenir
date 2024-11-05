@@ -177,6 +177,7 @@ body {
   display: flex;
   justify-content: space-between;
   margin-right: 50px;
+  width: 190px;
   position: relative;
 }
 .agenda-list {

@@ -108,6 +108,9 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
+      // Récupère le champ de recherche
+      const search = req.query.search;
+
       // Récupère le start et le end
       const start = req.query.start;
       const end = req.query.end;
@@ -131,7 +134,8 @@ export default class EventRouteur extends Routeur {
         .filter((e) => {
           return (
             agendaId === e.agendaId &&
-            (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end))
+            (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
+            (!search || e.name.toLowerCase().includes(search.toLowerCase()))
           );
         })
         .map((e) => {
