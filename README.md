@@ -20,9 +20,13 @@ npm install && npm test
 - Se connecter / Se déconnecter
 - Modifier son profil
 - Ajouter un événement / agenda
-- Sélectionner un agenda
-- Voir les événements d'un agenda
+- Sélectionner plusieurs agendas simultanément
+- Voir les événements des agendas sélectionnés
 - Modifier/Supprimer un événement
+- Modifier/Supprimer un agenda
+- Filtrer les rendez-vous par nom avec une barre de recherche
+- Exporter et importer des agendas au format souhaité (JSON ou iCal)
+- Partager un agenda entre utilisateurs avec une gestion de permission
 
 ## Projets et backlog associé
 - [Fonctionnalités](https://github.com/orgs/Kiavain/projects/2/views/1?filterQuery=fonc)
