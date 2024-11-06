@@ -1,4 +1,4 @@
-import { checkPassword } from "../utils.js";
+import { checkEmail, checkPassword } from "../utils.js";
 const accountForm = document.forms["accountEdition"];
 accountForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -11,6 +11,33 @@ accountForm.addEventListener("submit", async (e) => {
  * @returns {Promise<void>}
  */
 async function validateAccountCreation(e) {
+  // Récupère le formulaire
+  const accountForm = document.forms["accountEdition"];
+
+  // Récupère le champ de l'adresse mail
+  const emailInput = accountForm.email;
+
+  emailInput.addEventListener("input", () => {
+    emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
+  });
+
+  const emailIsEmpty = (emailInput.value === "");
+  var emailIsCorrect = !emailIsEmpty;
+
+  if (emailIsEmpty) {
+    console.log("Email is empty !");
+    e.preventDefault();
+    return;
+  }
+  
+  // Vérifie le format de l'adresse mail (regex)
+  emailIsCorrect = await checkEmail(emailInput);
+
+  if (!emailIsCorrect) {
+    e.preventDefault();
+    return;
+  }
+
   const passwordMessage = document.getElementById("passwordMessage");
   const passwordRepeated = document.getElementById("passwordRepeated");
   const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");

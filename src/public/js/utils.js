@@ -10,6 +10,26 @@ export async function hashSHA256(input) {
   return hashArray.map((item) => item.toString(16).padStart(2, "0")).join("");
 }
 
+
+export async function checkEmail(
+  emailInput
+) {
+  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+  if (!emailRegex.test(emailInput.value)) {
+    // console.log("Le regex ne passe pas !");
+    emailInput.setCustomValidity("Veuillez entrer une adresse email valide.");
+    emailInput.reportValidity(); // Affiche le message d'erreur
+    return false;
+  }
+
+  // console.log("Le regex passe !!");
+  emailInput.setCustomValidity(""); // Efface le message si l'email est valide
+  return true;
+}
+
+
+
 /**
  * Vérifie le mot de passe et soumet le formulaire
  * @param password {string} Le mot de passe
