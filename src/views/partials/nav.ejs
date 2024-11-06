@@ -1,5 +1,18 @@
-<% /* global locals,currentPath,agendas */ %>
+<% /* global locals,currentPath,agendas,cantEdit, err */ %>
+<%
+if (currentPath.includes("/agenda")) {
 
+    cantEdit = true;
+    if (agenda.ownerId === locals.user.id) {
+        cantEdit = false;
+    } else {
+        let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
+        if (matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
+            cantEdit = false;
+        }
+    }
+}
+%>
 <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="/">
@@ -14,11 +27,16 @@
         <!-- Conteneur centré pour le nom de l'agenda -->
         <% if (currentPath.includes("/agenda")) { %>
             <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
+                <button class="icon-button" id="deleteAgenda">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+
                 <span class="header-title"><%= agenda.name %></span>
-                <span class="material-symbols-outlined edit-icon" id="editAgenda" title="Modifier l'agenda">edit</span>
+                <% if (agenda.ownerId === locals.user.id) {%>
+                    <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
+                <% } %>
             </div>
         <% } %>
-
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
@@ -33,36 +51,69 @@
                 <% if (locals.user) { %>
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
+                        <div class = "search-bar" id="searchBar">
+                            <input type="text" id="searchInput" placeholder="Rechercher un événement">
+                        </div>
                         <div id="menuAgendas" class="buttons-nav">
                             <script type="module" src="/js/agenda/agendaMenu.js"></script>
                             <button class="icon-button" id="menu-button">
                                 <span class="material-symbols-outlined">menu</span>
                             </button>
+
                             <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
-                            <div id="dropdown-menu" class="dropdown-menu" style="display: none;">
+                            <div id="dropdown-menu" class="dropdown-menu" style="display: none; width:200px; left:-5vw;">
                                 <h3 class="agenda-title">Mes agendas</h3>
-                                <ul class="agenda-list">
-                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id).
-                                    forEach(agenda => { %>
-                                        <li class="agenda-item"  style="<%= currentPath === '/agenda/' + (agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;;' : '' %>">
-                                            <a href="/agenda/<%= agenda.agendaId %>">
-                                                <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">event_note</span>
-                                                <%= agenda.name %>
+                                <ul class="agenda-list" id="agenda-list">
+
+                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id).forEach(agenda => { %>
+                                        <li class="agenda-item" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                            <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                                            <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                                                <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                                             </a>
+                                            <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                                            </button>
                                         </li>
                                     <% }) %>
                                 </ul>
+
+
+                                <!-- S'il y a au moins un partage qui le concerne -->
+                                <% if (guestsShared.length > 0) { %>
+                                    <h3 class="agenda-title">Agendas partagées</h3>
+                                    <ul class="agenda-list" id="share-agenda-list">
+                                        <% guestsShared.forEach(guest => {
+                                            const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
+                                        if (agenda) { %>
+                                            <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                                <a href="/agenda/<%= agenda.agendaId %>">
+                                                    <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
+                                                    <%= agenda.name %>
+                                                </a>
+                                            </li>
+                                        <% }
+                                        }) %>
+                                    </ul>
+                                <% }%>
                             </div>
                         </div>
+                        <div id="shareOrExport" class="popUpWindow">
+                            <span id="agendaName" style="text-align: center;">Agenda name</span>
+                            <button id="shareAgenda">Partager l'agenda</button>
+                            <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
+                        </div>
                         <script type="module" src="/js/agenda/events/Events.js"></script>
+                        <script type="module" src="/js/agenda/agendaImport.js"></script>
                         <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
                             add
                         </span>
                         </button>
-                        <div id="agendaEventWindow">
+                        <div id="agendaEventWindow" class="popUpWindow">
                             <button id="createAgenda">Nouvel agenda</button>
                             <button id="createEvent">Nouvel événement</button>
+                            <button id="importAgenda">Importer un agenda</button>
                         </div>
                     <% } %>
                     <li class="nav-item dropdown">
@@ -84,38 +135,14 @@
                         </ul>
                     </li>
                     <% if(currentPath.includes("/agenda")) { %>
-                        <div id="modal" class="modal">
-                            <div class="modal-content">
-                                <span class="close-btn" id="close-btn">&times;</span>
-                                <h2>Ajouter un événement</h2>
-                                <form>
-                                    <label for="event-name">Nom de l'événement:</label>
-                                    <input type="text" id="event-name" name="event-name" required>
-
-                                    <label for="event-date">Date de début:</label>
-                                    <input type="datetime-local" id="event-date" name="event-date" required>
-
-                                    <label for="event-date-end">Date de fin:</label>
-                                    <input type="datetime-local" id="event-date-end" name="event-date" required>
-
-                                    <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
-
-                                    <label for="event-agenda">Agenda:</label>
-                                    <select id="event-agenda" name="event-agenda" required>
-                                        <option value="" selected disabled>---Veuillez choisir un agenda---</option>
-                                        <% agendas.filter(agenda => agenda.ownerId === locals.user.id)
-                                        .forEach(agenda => { %>
-                                            <option value="<%= agenda.agendaId %>"><%= agenda.name %></option>
-                                        <% }) %>
-                                    </select>
-
-                                    <label for="event-description">Description:</label>
-                                    <textarea  id="event-description" name="event-description" rows = "3"></textarea>
-
-                                    <button id="saveEvent" class="submit-btn">Enregistrer</button>
-                                </form>
-                            </div>
-                        </div>
+                        <!-- Fenêtre modale ajout événement -->
+                        <%- include('modals/newEvent') %>
+                        <!-- Fenêtre modale partager un agenda -->
+                        <%- include('modals/shareAgenda') %>
+                        <!-- Fenêtre modale exporter un agenda -->
+                        <%- include('modals/exportAgenda') %>
+                        <!-- Fenêtre modale importer un agenda -->
+                        <%- include('modals/importAgenda') %>
                     <% } %>
                 <% } else { %>
                     <li class="nav-item">

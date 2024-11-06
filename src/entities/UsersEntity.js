@@ -23,7 +23,8 @@ export default class UsersEntity extends Entity {
           autoIncrement: true
         },
         username: {
-          type: DataTypes.STRING(32)
+          type: DataTypes.STRING(32),
+          unique: true
         },
         email: {
           type: DataTypes.STRING(32),

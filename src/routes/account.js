@@ -1,17 +1,24 @@
 import Routeur from "../structures/Routeur.js";
-import { AccountController } from "../controllers/accountController.js";
+import { AccountController } from "../controllers/AccountController.js";
 
 /**
  * Les routes liées à l'authentification
  */
 // noinspection JSUnusedGlobalSymbols // Utilisé par le serveur
 export default class AccountRouteur extends Routeur {
+  /**
+   * Construit le routeur
+   * @param server {KiAvenir} L'instance du serveur
+   * @constructor
+   * @override
+   */
   constructor(server) {
     super(server, new AccountController(server));
   }
 
   /**
    * Implémentation de la construction des routes
+   * @override
    */
   build() {
     this.router

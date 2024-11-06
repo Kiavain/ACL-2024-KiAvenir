@@ -1,9 +1,11 @@
 import { initCalendar } from "../calendar.js";
+import { addFlashMessages } from "../../utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Utilitaires pour sélectionner les éléments
   const getElement = (id) => document.getElementById(id);
   const getInputValue = (id) => getElement(id).value;
+  const setElementValue = (id, value) => (getElement(id).value = value);
 
   const popup = document.getElementById("agendaEventWindow");
   const createAgendaOrEvent = getElement("createAgendaOrEvent");
@@ -30,6 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target === modal) {
       modal.style.display = "none";
     }
+    if (
+      !createAgendaOrEvent.contains(event.target) &&
+      !popup.contains(event.target) &&
+      popup.classList.contains("show")
+    ) {
+      popup.classList.toggle("show");
+    }
   });
 
   createButton.onclick = (e) => {
@@ -39,60 +48,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const dateFin = getInputValue("event-date-end");
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
-    let verifs = false;
+    const errAgenda = getElement("agenda-error");
+    const errName = getElement("name-error");
     e.preventDefault();
 
-    if (dateFin < dateDebut) {
-      errorElement.style.display = "block";
-    } else {
-      errorElement.style.display = "none";
-      verifs = true;
+    errName.style.display = agendaValue ? "none" : "block";
+    errorElement.style.display = name <= dateFin ? "none" : "block";
+    errAgenda.style.display = agendaValue ? "none" : "block";
+
+    // Vérifie la validité des dates
+    if (!name || !dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
+      return;
     }
-    if (verifs === true && name && dateDebut && description && dateFin && agendaValue) {
-      const data = {
-        name: name,
-        agendaId: agendaValue,
-        description: description,
-        startDate: dateDebut,
-        endDate: dateFin
-      };
 
-      modal.style.display = "none";
-      popup.classList.toggle("show");
+    const data = {
+      name: name,
+      agendaId: agendaValue,
+      description: description,
+      startDate: dateDebut,
+      endDate: dateFin
+    };
 
-      fetch("/api/events/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+    modal.style.display = "none";
+    popup.classList.toggle("show");
+
+    fetch("/api/events/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Erreur ${response.status}: ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          initCalendar(agenda);
-          addFlashMessage(data.message);
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la requête:", error);
-        });
-    }
+      .then((data) => {
+        // Réinitialise le formulaire
+        setElementValue("event-name", "");
+        setElementValue("event-date", "");
+        setElementValue("event-date-end", "");
+        setElementValue("event-description", "");
+        errName.style.display = "none";
+        errorElement.style.display = "none";
+        errAgenda.style.display = "none";
+
+        initCalendar(agenda);
+        addFlashMessages([data.message]);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la requête:", error);
+      });
   };
 });
-
-export function addFlashMessage(message) {
-  const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
-
-  const flashMessage = document.createElement("div");
-  flashMessage.className = "alert-notif";
-  flashMessage.innerText = message;
-
-  flashContainer.appendChild(flashMessage);
-
-  // Affiche avec un timer, comme dans le script existant
-  setTimeout(() => {
-    flashMessage.remove();
-  }, 3000); // 3 secondes
-}

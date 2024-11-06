@@ -48,7 +48,7 @@ export default class Database {
     // Connecte la base de données
     this.connector = new Sequelize({
       dialect: "sqlite",
-      storage: "data/db.sqlite",
+      storage: process.env.NODE_ENV === "test" ? "data/testdb.sqlite" : "data/db.sqlite",
       logging: false,
       define: {
         charset: "utf8",
@@ -99,10 +99,14 @@ export default class Database {
    * @return {Promise<void>} La promesse
    */
   async sync() {
-    await this.connector?.sync();
+    try {
+      await this.connector?.sync();
 
-    for (const table of this.tables.values()) {
-      await table.load();
+      for (const table of this.tables.values()) {
+        await table.refreshCache();
+      }
+    } catch {
+      // Ignore
     }
   }
 }

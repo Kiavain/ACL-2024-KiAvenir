@@ -37,6 +37,11 @@ export default class Agenda extends EntityStructure {
      * @type {string}
      */
     this.color = data.color;
+    /**
+     * La description de l'agenda
+     * @type {string}
+     */
+    this.description = data.description;
   }
 
   /**
@@ -56,6 +61,14 @@ export default class Agenda extends EntityStructure {
   }
 
   /**
+   * Récupère les invités
+   * @returns {Object} Les invités
+   */
+  get guests() {
+    return this.entity.server.database.tables.get("guests");
+  }
+
+  /**
    * Met à jour les données de l'agenda
    * @param data {Object} Les données à mettre à jour
    * @returns {Promise<Agenda>} Une promesse de l'agenda
@@ -69,9 +82,35 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<void>} Une promesse
    */
   async delete() {
+    const eventDeletionPromises = this.getEvents().map((event) => event.delete());
+    const guestDeletionPromises = this.getGuests().map((guest) => guest.delete());
+
+    await Promise.all([...eventDeletionPromises, ...guestDeletionPromises]);
     return this.entity.delete((x) => x.agendaId === this.agendaId);
   }
 
+  /**
+   * Vérifie si l'utilisateur peut éditer l'agenda
+   * @param userId {int} L'identifiant de l'utilisateur
+   * @returns {boolean} Vrai si l'utilisateur peut éditer l'agenda
+   */
+  verifyCanEdit(userId) {
+    const isOwner = this.ownerId === userId;
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur");
+
+    return isOwner || isGuest;
+  }
+  /**
+   * Vérifie l'accès à l'agenda
+   * @param userId {int} L'identifiant de l'utilisateur
+   * @returns {boolean} Vrai si l'accès est vérifié
+   */
+  verifyAgendaAccess(userId) {
+    const isOwner = this.ownerId === userId;
+    const isGuest = this.getGuests().some((x) => x.guestId === userId);
+
+    return isOwner || isGuest;
+  }
   /**
    * Récupère le propriétaire de l'agenda
    * @returns {User} L'utilisateur
@@ -85,6 +124,14 @@ export default class Agenda extends EntityStructure {
    * @returns {Event[]} Les événements
    */
   getEvents() {
-    return this.events.getAll((x) => x.agendaId === this.agendaId);
+    return this.events.filter((x) => x.agendaId === this.agendaId);
+  }
+
+  /**
+   * Récupère les invités de l'agenda
+   * @returns {Guest[]} Les invités
+   */
+  getGuests() {
+    return this.guests.filter((x) => x.agendaId === this.agendaId);
   }
 }

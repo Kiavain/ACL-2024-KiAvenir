@@ -102,49 +102,62 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.get("/api/events/:agendaId", async (req, res) => {
-      // Vérifie si l'utilisateur est connecté
+    this.router.get("/api/events/:agendaIds", async (req, res) => {
       if (!res.locals.user) {
         return res.json([]);
       }
 
-      // Récupère le start et le end
+      const search = req.query.search;
       const start = req.query.start;
       const end = req.query.end;
 
-      const agendaId = parseInt(req.params.agendaId);
-      const agenda = this.server.database.tables.get("agendas").get(agendaId);
-      if (!agenda) {
-        return res.json([]);
-      }
-
-      // Vérifie si le start et le end sont définis
+      // Vérifie que start et end sont définis
       if (!start || !end) {
         return res.json([]);
       }
 
+      const agendaIds = req.params.agendaIds.split(",").map((id) => parseInt(id.trim()));
+
+      // Synchronisation avec la base de données
       await this.server.database.sync();
 
-      // Récupère les événements entre le start et le end
-      const events = agenda
-        .getEvents()
-        .filter((e) => {
-          return (
-            agendaId === e.agendaId &&
-            (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end))
-          );
-        })
-        .map((e) => {
-          return {
+      let allEvents = [];
+
+      // Parcours chaque agendaId et récupère les événements correspondants
+      for (const agendaId of agendaIds) {
+        const agenda = this.server.database.tables.get("agendas").get(agendaId);
+
+        // Continue si l'agenda n'existe pas
+        if (!agenda) {
+          continue;
+        }
+
+        // Récupère les événements pour cet agenda spécifique
+        const events = agenda
+          .getEvents()
+          .filter((e) => {
+            return (
+              agendaId === e.agendaId &&
+              (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
+              (!search || e.name.toLowerCase().includes(search.toLowerCase()))
+            );
+          })
+          .map((e) => ({
             eventId: e.eventId,
             description: e.description,
             title: e.name,
             start: moment(e.startDate).format(),
-            end: moment(e.endDate).format()
-          };
-        });
+            end: moment(e.endDate).format(),
+            agendaId: agendaId,
+            color: agenda.color
+          }));
 
-      res.json(events);
+        // Ajoute les événements de cet agenda au tableau global
+        allEvents = allEvents.concat(events);
+      }
+
+      // Envoie tous les événements associés aux agendas spécifiés
+      res.json(allEvents);
     });
   }
 }

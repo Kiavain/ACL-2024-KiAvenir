@@ -10,7 +10,7 @@ class Routeur {
   /**
    * Construit le routeur
    * @param server {KiAvenir} L'instance du serveur
-   * @param controller {Controller | AccountController} Le contrôleur associé
+   * @param controller {AgendaController | AccountController} Le contrôleur associé
    * @constructor
    */
   constructor(server, controller) {

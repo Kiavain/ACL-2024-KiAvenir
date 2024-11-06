@@ -19,16 +19,16 @@
         <span class="close-btn" id="closeViewAgendaCreation">&times;</span>
         <h2>Créer un Agenda</h2>
         <form>
-            <label for="agenda-name">Nom:</label>
+            <label for="agenda-name">Nom :</label>
             <input type="text" id="agenda-name" name="agenda-name" required>
 
-            <label for="agenda-description">Description:</label>
+            <label for="agenda-description">Description :</label>
             <textarea  id="agenda-description" name="agenda-description" rows="3"></textarea>
 
-            <label for="agenda-color">Couleur:</label>
+            <label for="agenda-color">Couleur :</label>
             <input type="color" id="agenda-color" value="#2196f3"/>
 
-            <p id="agenda-creation-error" style="color: red; display: none;">Le nom est requis.</p>
+            <p id="agenda-creation-error" style="color: red; display: none;">Le nom est requis ou bien, il est déjà pris.</p>
 
             <button id="saveAgenda" class="submit-btn">Créer l'agenda</button>
         </form>
@@ -49,6 +49,17 @@
 </div>
 
 
+<!-- Pop Up - Suppression de l'agenda -->
+<div id="deleteAgendaModal" class="modal" >
+    <div class="modal-content">
+        <span class="close-btn" id="closeDeleteAgenda">&times;</span>
+        <h2>Supprimer l'agenda:</h2>
+        <p>Êtes-vous sûr de vouloir supprimer cet agenda ?</p>
+        <button id="confirmDeleteAgenda" class="btn btn-danger">Supprimer</button>
+        <label id="deleteMessage" class="form-label text-danger"></label>
+    </div>
+</div>
+
 <script type="module" src="/js/agenda/agendaCreation.js"></script>
 <script>
   const agenda = {
@@ -58,6 +69,7 @@
   };
 </script>
 <script type="module" src="/js/agenda/agendaEdition.js"></script>
+<script src="/js/agenda/agendasSelection.js"></script>
 <link rel="stylesheet" href="/css/agenda.css">
 
 <%- include('calendar') %>

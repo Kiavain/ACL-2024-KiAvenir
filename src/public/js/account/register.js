@@ -1,4 +1,4 @@
-import { checkPassword } from "../utils.js";
+import { checkEmail, checkPassword } from "../utils.js";
 
 // Active l'enregistrement d'un compte lors du chargement du document
 document.addEventListener("DOMContentLoaded", () => register());
@@ -21,6 +21,33 @@ function register() {
  * @returns {Promise<void>}
  */
 async function validateAccountCreation(e) {
+  // Récupère le formulaire
+  const accountForm = document.forms["accountCreation"];
+
+  // Récupère le champ de l'adresse mail
+  const emailInput = accountForm.email;
+
+  emailInput.addEventListener("input", () => {
+    emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
+  });
+
+  const emailIsEmpty = (emailInput.value === "");
+  var emailIsCorrect = !emailIsEmpty;
+
+  if (emailIsEmpty) {
+    console.log("Email is empty !");
+    e.preventDefault();
+    return;
+  }
+  
+  // Vérifie le format de l'adresse mail (regex)
+  emailIsCorrect = await checkEmail(emailInput);
+
+  if (!emailIsCorrect) {
+    e.preventDefault();
+    return;
+  }
+  
   // Récupère les labels des messages d'erreur
   const passwordMessage = document.getElementById("passwordMessage");
   const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
@@ -28,16 +55,18 @@ async function validateAccountCreation(e) {
   passwordRepeatedMessage.textContent = "";
 
   // Récupère les champs de mot de passe
-  const accountForm = document.forms["accountCreation"];
   const passwordRepeated = document.getElementById("passwordRepeated");
   const password = accountForm.password.value;
   const passwordConfirmation = passwordRepeated.value;
 
   // Applique les vérifications de mot de passe
   await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
+  
 
   // Empêche la soumission du formulaire si un champ est incorrect
   if (!accountForm.checkValidity()) {
     e.preventDefault();
   }
+
+  console.log("fin de la fonction");
 }

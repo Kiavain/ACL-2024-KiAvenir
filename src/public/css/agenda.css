@@ -22,7 +22,6 @@ body {
 .header-left, .header-middle, .header-right {
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .header-title {
@@ -76,12 +75,6 @@ body {
   padding: 5px;
   justify-content: space-between;
   border-bottom: 1px solid #bbb;
-    background-color: #d0d7df;
-    display: flex;
-    align-items: center;
-    padding: 5px;
-    justify-content: space-between;
-    border-bottom: 1px solid #bbb;
 }
 
 .nav-buttons {
@@ -180,7 +173,19 @@ body {
   padding: 10px;
   position: relative;
 }
-
+.search-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 50px;
+  width: 200px;
+  position: relative;
+}
+#searchInput {
+  width: 100%;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
 .agenda-list {
   list-style: none;
   padding: 0;
@@ -192,6 +197,7 @@ body {
   border-bottom: 1px solid #ddd;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   transition: background-color 0.3s ease;
 }
 
@@ -230,20 +236,6 @@ body {
   position: relative; /* Relative pour que le pop-up soit positionné en fonction de ce bouton */
 }
 
-/* Styles pour la fenêtre pop-up */
-#agendaEventWindow {
-  position: absolute;
-  top:60px;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  z-index: 1000;
-  display: none; /* Cacher par défaut */
-  flex-direction: column;
-}
-
 #agendaEventWindow button {
   background-color: #007bff;
   color: white;
@@ -268,6 +260,12 @@ body {
   animation: fadeIn 0.3s forwards;
 }
 
+.error{
+  color: red;
+  font-style: italic;
+  display: none;
+}
+
 /* Animation de fondu */
 @keyframes fadeIn {
   from {
@@ -279,3 +277,5 @@ body {
     transform: translateY(0);
   }
 }
+
+.requis {color: red;}

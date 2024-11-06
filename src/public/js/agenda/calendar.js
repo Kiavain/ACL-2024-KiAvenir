@@ -1,7 +1,21 @@
 // Initialiser la langue de moment.js
-import { addFlashMessage } from "./events/Events.js";
 
+import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
+
+function getEventsUrl(agenda) {
+  const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+    .map((checkbox) => checkbox.value)
+    .join(",");
+
+  const search = document.getElementById("searchInput").value;
+  const input = search && search.trim() !== "" ? `?search=${search}` : "";
+  if (!selectedAgendaIds) {
+    return `/api/events/${agenda.agendaId}${input}`;
+  }
+
+  return `/api/events/${selectedAgendaIds}${input}`;
+}
 
 // Fonction pour créer et initialiser le calendrier
 export const initCalendar = (agenda) => {
@@ -14,6 +28,7 @@ export const initCalendar = (agenda) => {
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
+    noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: {
       left: "prev,next today",
@@ -27,14 +42,34 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    eventColor: agenda.color,
-    events: `/api/events/${agenda.agendaId}`,
+    events: getEventsUrl(agenda),
+    eventDataTransform: (eventData) => {
+      return {
+        ...eventData,
+        color: eventData.color
+      };
+    },
     eventClick: (info) => {
       openModal(info.event);
+    },
+    eventDidMount: function (info) {
+      if (info.view.type === "listWeek") {
+        info.el.style.backgroundColor = info.event.backgroundColor;
+        info.el.classList.remove("fc-list-event");
+      }
     }
   });
 
+  // Recharge les événements chaque fois qu'une case est cochée/décochée
+  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      calendar.setOption("events", getEventsUrl(agenda));
+      calendar.refetchEvents(); // Recharge les événements
+    });
+  });
+
   calendar.render();
+  listenFilter(calendar, agenda);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
 
@@ -48,17 +83,23 @@ export const openModal = (eventData) => {
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
   document.getElementById("startEventTime").value = moment(eventData.start)
-    .add(2, "hour")
+    .add(1, "hour")
     .toISOString()
     .substring(0, 16);
-  document.getElementById("endEventTime").value = moment(eventData.end).add(2, "hour").toISOString().substring(0, 16);
+  document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
   modal.style.display = "block";
 };
-
+//Fonction pour écouter la barre de filtrage des évenements
+const listenFilter = (calendar, agenda) => {
+  document.getElementById("searchInput").addEventListener("input", function () {
+    calendar.setOption("events", getEventsUrl(agenda));
+    calendar.refetchEvents();
+  });
+};
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
@@ -102,7 +143,7 @@ export const saveEvent = (calendar) => {
       if (data.success) {
         calendar.refetchEvents();
         closeModal();
-        addFlashMessage("Événement mis à jour avec succès");
+        addFlashMessages(["Événement mis à jour avec succès"]);
       } else {
         alert("Échec de la mise à jour de l'événement.");
       }

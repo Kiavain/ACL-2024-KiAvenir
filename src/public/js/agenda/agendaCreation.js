@@ -1,3 +1,5 @@
+import { addFlashMessages } from "../utils.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const createAgenda = document.getElementById("createAgenda");
   const viewCreateAgenda = document.getElementById("newAgenda");
@@ -42,12 +44,14 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((response) => response.json())
       .then((data) => {
+        addFlashMessages(data.flashMessages);
         if (data.success) {
           agendaCreationError.style.display = "none";
           viewCreateAgenda.style.display = "none";
           window.location.href = "/agenda/" + data.agendaId;
         } else {
           agendaCreationError.style.display = "block";
+          console.log(data.message);
         }
       })
       .catch((error) => console.error("Erreur:", error));

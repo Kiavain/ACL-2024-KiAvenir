@@ -74,18 +74,42 @@ export default class Entity {
    * @return {Promise<void>}
    */
   async load() {
-    await this.table.sync({ alter: true }); // Synchronise la table avec les fichiers de structure
+    try {
+      await this.table.sync({ alter: true }); // Synchronise la table avec les fichiers de structure
 
-    // Récupère toutes les lignes de la table
-    const rows = await this.table.findAll();
-    for (const row of rows) {
-      const data = row.dataValues;
-      const key = this.identifierColumns.map((c) => data[c]).join(":");
+      // Récupère toutes les lignes de la table
+      const rows = await this.table.findAll();
+      for (const row of rows) {
+        const data = row.dataValues;
+        const key = this.identifierColumns.map((c) => data[c]).join(":");
 
-      this.cache.set(
-        `${this.tableName}:${key}`, // Stocke la ligne dans le cache avec les clés primaires
-        new this.entityStructure(this, data) // Crée une nouvelle structure d'entité avec les données
-      );
+        this.cache.set(
+          `${this.tableName}:${key}`, // Stocke la ligne dans le cache avec les clés primaires
+          new this.entityStructure(this, data) // Crée une nouvelle structure d'entité avec les données
+        );
+      }
+    } catch (e) {
+      console.error("Synchronisation : ", e);
+    }
+  }
+
+  /**
+   * Actualise le cache sans recharger la table entière
+   */
+  async refreshCache() {
+    try {
+      // Récupère toutes les lignes de la table sans synchroniser
+      const rows = await this.table.findAll();
+
+      for (const row of rows) {
+        const data = row.dataValues;
+        const key = this.identifierColumns.map((c) => data[c]).join(":");
+
+        // Met à jour le cache avec les nouvelles données
+        this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
+      }
+    } catch (e) {
+      console.error("Erreur lors de la mise à jour du cache : ", e);
     }
   }
 
@@ -192,12 +216,18 @@ export default class Entity {
    * @returns {Promise<EntityStructure>} La ligne
    */
   async create(data) {
-    const created = await this.table.create(data);
-    const key = this.identifierColumns.map((c) => created.dataValues[c]).join(":");
+    let structure = null;
 
-    const structure = new this.entityStructure(this, created.dataValues);
+    try {
+      const created = await this.table.create(data);
+      const key = this.identifierColumns.map((c) => created.dataValues[c]).join(":");
 
-    await this.cache.set(`${this.tableName}:${key}`, structure);
+      structure = new this.entityStructure(this, created.dataValues);
+
+      await this.cache.set(`${this.tableName}:${key}`, structure);
+    } catch (err) {
+      console.error(err);
+    }
     return structure;
   }
 
@@ -205,32 +235,38 @@ export default class Entity {
    * Met à jour une ligne
    * @param fn {Function} La condition
    * @param data {Object} Les données
-   * @returns {Promise<EntityStructure>} Les lignes
+   * @returns {Promise<EntityStructure|*>} Les lignes
    */
   async update(fn, data) {
-    const all = this.filter(fn);
-    const where = [];
+    let updatedRows = [];
 
-    for (const row of all.map((v) => v.data).filter(fn)) {
-      const w = {};
+    try {
+      const all = this.filter(fn);
+      const where = [];
 
-      for (const column of this.identifierColumns) {
-        w[column] = {
-          [Op.eq]: row[column]
-        };
+      for (const row of all.map((v) => v.data).filter(fn)) {
+        const w = {};
+
+        for (const column of this.identifierColumns) {
+          w[column] = {
+            [Op.eq]: row[column]
+          };
+        }
+
+        where.push(w);
       }
 
-      where.push(w);
-    }
+      await this.table.update(data, { where: { [Op.or]: where } });
+      updatedRows = await this.table.findAll({ where: { [Op.or]: where } });
 
-    await this.table.update(data, { where: { [Op.or]: where } });
-    const updatedRows = await this.table.findAll({ where: { [Op.or]: where } });
+      for (const row of updatedRows) {
+        const data = row.dataValues;
+        const key = this.identifierColumns.map((c) => data[c]).join(":");
 
-    for (const row of updatedRows) {
-      const data = row.dataValues;
-      const key = this.identifierColumns.map((c) => data[c]).join(":");
-
-      await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
+        await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
+      }
+    } catch (err) {
+      console.error(err);
     }
 
     return updatedRows.map((u) => new this.entityStructure(this, u.dataValues));
@@ -242,26 +278,30 @@ export default class Entity {
    * @returns {Promise<void>} La ligne
    */
   async delete(fn) {
-    const all = this.filter(fn);
-    const where = [];
+    try {
+      const all = this.filter(fn);
+      const where = [];
 
-    for (const row of all) {
-      const w = {};
+      for (const row of all) {
+        const w = {};
 
-      for (const column of this.identifierColumns) {
-        w[column] = {
-          [Op.eq]: row[column]
-        };
+        for (const column of this.identifierColumns) {
+          w[column] = {
+            [Op.eq]: row[column]
+          };
+        }
+
+        // Suppression de la ligne dans le cache
+        const key = this.identifierColumns.map((c) => row.data[c]).join(":");
+        this.cache.delete(`${this.tableName}:${key}`);
+
+        where.push(w);
       }
 
-      // Suppression de la ligne dans le cache
-      const key = this.identifierColumns.map((c) => row.data[c]).join(":");
-      this.cache.delete(`${this.tableName}:${key}`);
-
-      where.push(w);
+      // Suppression de la ligne dans la base de données
+      await this.table.destroy({ where: { [Op.or]: where } });
+    } catch (err) {
+      console.error(err);
     }
-
-    // Suppression de la ligne dans la base de données
-    await this.table.destroy({ where: { [Op.or]: where } });
   }
 }

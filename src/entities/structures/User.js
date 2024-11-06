@@ -47,6 +47,22 @@ export default class User extends EntityStructures {
   }
 
   /**
+   * Récupère les agendas
+   * @returns {Object} Les agendas
+   */
+  get agendas() {
+    return this.entity.server.database.tables.get("agendas");
+  }
+
+  /**
+   * Récupère toutes les invitations dans lesquelles l'utilisateur est présent
+   * @returns {Object} Les invitations
+   */
+  get guests() {
+    return this.entity.server.database.tables.get("guests");
+  }
+
+  /**
    * Met à jour l'utilisateur
    * @param data {Object} Les données à mettre à jour
    * @returns {Promise<User>} L'utilisateur
@@ -60,7 +76,27 @@ export default class User extends EntityStructures {
    * @returns {Promise<void>} L'utilisateur
    */
   async delete() {
+    const agendaDelationPromises = this.getAgendas().map((agenda) => agenda.delete());
+    const guestDeletionPromises = this.getGuests().map((guest) => guest.delete());
+
+    await Promise.all([...agendaDelationPromises, ...guestDeletionPromises]);
     return this.entity.delete((x) => x.id === this.id);
+  }
+
+  /**
+   * Récupère les agendas de l'utilisateur
+   * @returns {Agenda[]} L'aganda
+   */
+  getAgendas() {
+    return this.agendas.filter((x) => x.ownerId === this.id);
+  }
+
+  /**
+   * Récupère les invités de l'utilisateur
+   * @returns {Guest[]} Les invités
+   */
+  getGuests() {
+    return this.guests.filter((x) => x.guestId === this.id);
   }
 
   /**
