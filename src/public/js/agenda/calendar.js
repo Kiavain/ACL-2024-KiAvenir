@@ -28,6 +28,7 @@ export const initCalendar = (agenda) => {
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
+    noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: {
       left: "prev,next today",
@@ -50,6 +51,12 @@ export const initCalendar = (agenda) => {
     },
     eventClick: (info) => {
       openModal(info.event);
+    },
+    eventDidMount: function (info) {
+      if (info.view.type === "listWeek") {
+        info.el.style.backgroundColor = info.event.backgroundColor;
+        info.el.classList.remove("fc-list-event");
+      }
     }
   });
 

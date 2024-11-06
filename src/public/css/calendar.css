@@ -118,6 +118,10 @@ h2 {
   text-align: center;
 }
 
-.fc-event:hover {
-  background-color: #0056b3;
+.fc-list-event:hover {
+  color: #000;
+}
+
+.fc-list-event .fc-list-event-dot {
+  display: none;
 }
