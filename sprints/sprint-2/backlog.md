@@ -7,6 +7,7 @@
 - [ ] Réalisation d'une revue de code pour les fonctionnalités des sprints précédents.
 - [ ] Empêcher la création d'un événement qui se termine en même temps qu'il commence.
 - [ ] Réflechir aux détails d'un agenda pour s'assurer que tout soit utile.
+- [ ] Minuit à 23:59, comportement incorrect -> All day (refetch manquant)
 
 # Fonctionnalités incomplètes de la seconde itération
 - [ ] Implémentation de rendez-vous récurrents :
@@ -16,4 +17,9 @@
   - [ ] Suppression des rendez-vous récurrents.
 
 # Nouvelles fonctionnalités à implémenter
-- Aucune nouvelle fonctionnalité à implémenter pour le moment.
+- [ ] Aucune nouvelle fonctionnalité à implémenter pour le moment.
+- [ ] Créer un événement directement en cliquant sur le calendrier.
+- [ ] Modifier un agenda (la couleur).
+- [ ] Créer des événements "All day".
+- [ ] Importer les vacances
+- [ ] Fuseau horaire basé sur le navigateur
