@@ -1,6 +1,6 @@
 {
   "name": "kiavenir",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
