@@ -10,7 +10,10 @@
             <p id="name-error" style="color: red; display: none;">Le nom de l'événement est obligatoire.</p>
 
             <label for="event-date">Date de début : <span class="requis">*</span></label>
-            <input type="datetime-local" id="event-date" name="event-date" required>
+            <input type="datetime-local" id="event-date" name="event-date" min="<?php echo date('Y-m-d\TH:i'); ?>" required>
+
+            <label for="event-all-day">All day:</label>
+            <input type="checkbox" id="event-all-day" name="event-all-day">
 
             <label for="event-date-end">Date de fin : <span class="requis">*</span></label>
             <input type="datetime-local" id="event-date-end" name="event-date" required>
