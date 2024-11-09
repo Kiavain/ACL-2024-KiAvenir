@@ -82,12 +82,17 @@ export const openModal = (eventData) => {
 
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
-  document.getElementById("startEventTime").value = moment(eventData.start)
-    .add(1, "hour")
-    .toISOString()
-    .substring(0, 16);
-  document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
-
+  console.log(eventData.allDay);
+  if (!eventData.allDay) {
+    document.getElementById("startEventTime").value = moment(eventData.start)
+      .add(1, "hour")
+      .toISOString()
+      .substring(0, 16);
+    document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
+  } else {
+    document.getElementById("startEventTime").value = moment(eventData.start).toISOString();
+    document.getElementById("endEventTime").value = moment(eventData.end).toISOString();
+  }
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 

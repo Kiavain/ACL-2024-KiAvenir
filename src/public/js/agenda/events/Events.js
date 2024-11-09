@@ -88,7 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
       agendaId: agendaValue,
       description: description,
       startDate: dateDebut,
-      endDate: dateFin
+      endDate: dateFin,
+      allDay: allDay.checked
     };
 
     modal.style.display = "none";

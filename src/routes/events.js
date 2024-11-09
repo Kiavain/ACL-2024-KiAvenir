@@ -149,7 +149,8 @@ export default class EventRouteur extends Routeur {
             start: moment(e.startDate).format(),
             end: moment(e.endDate).format(),
             agendaId: agendaId,
-            color: agenda.color
+            color: agenda.color,
+            allDay: e.allDay
           }));
 
         // Ajoute les événements de cet agenda au tableau global

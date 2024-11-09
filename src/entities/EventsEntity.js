@@ -32,6 +32,9 @@ export default class EventsEntity extends Entity {
       },
       endDate: {
         type: DataTypes.DATE
+      },
+      allDay: {
+        type: DataTypes.BOOLEAN
       }
     });
   }

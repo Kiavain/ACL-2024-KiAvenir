@@ -49,6 +49,12 @@ export default class Event extends EntityStructures {
      * @type {Date}
      */
     this.endDate = new Date(data.endDate);
+
+    /**
+     * Booléen pour savoir si l'événement est sur toute la journée
+     * @type {Boolean}
+     */
+    this.allDay = data.allDay;
   }
 
   /**
@@ -103,7 +109,8 @@ export default class Event extends EntityStructures {
       name: this.name,
       description: this.description,
       startDate: this.startDate,
-      endDate: this.endDate
+      endDate: this.endDate,
+      allDay: this.allDay
     };
   }
 }
