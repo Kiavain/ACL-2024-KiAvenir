@@ -316,7 +316,8 @@ export class AgendaController extends Controller {
           name: event.name,
           startDate: event.startDate,
           endDate: event.endDate,
-          description: event.description
+          description: event.description,
+          allDay: event.allDay
         }))
       });
       const filename = `agenda_${agendaId}.json`;
@@ -330,12 +331,24 @@ export class AgendaController extends Controller {
       // Crée un calendrier ICAL avec les événements
       const calendar = ical({ name: agenda.name, description: agenda.description });
       agenda.getEvents().map((event) => {
-        calendar.createEvent({
-          start: event.startDate,
-          end: event.endDate,
+        const eventConfig = {
           summary: event.name,
           description: event.description
-        });
+        };
+
+        if (event.allDay) {
+          // Pour un événement "All day", on utilise uniquement les dates sans heures
+          eventConfig.start = new Date(event.startDate).toISOString().split("T")[0]; // Format YYYY-MM-DD
+          eventConfig.end = new Date(event.endDate).toISOString().split("T")[0]; // Format YYYY-MM-DD
+          eventConfig.floating = true; // Indique qu'il n'y a pas d'heure spécifique
+          eventConfig.allDay = true; // Spécifie explicitement que c'est un événement de journée entière
+        } else {
+          // Pour un événement normal, utiliser les dates avec heures
+          eventConfig.start = event.startDate;
+          eventConfig.end = event.endDate;
+        }
+
+        calendar.createEvent(eventConfig);
       });
 
       // Convertit le calendrier en chaîne ICAL
@@ -389,7 +402,13 @@ export class AgendaController extends Controller {
       }
       const agenda = await this.agendas.create({ name, description, ownerId: localUser.id, color });
       for (const event of events) {
-        const { name: eventName, startDate: startDate, endDate: endDate, description: eventDescription } = event;
+        const {
+          name: eventName,
+          startDate: startDate,
+          endDate: endDate,
+          description: eventDescription,
+          allDay: allDay
+        } = event;
         // On vérifie les champs de chaque événement
         if (eventName && startDate && endDate && eventDescription) {
           await this.events.create({
@@ -397,7 +416,8 @@ export class AgendaController extends Controller {
             agendaId: agenda.agendaId,
             startDate: startDate,
             endDate: endDate,
-            description: eventDescription
+            description: eventDescription,
+            allDay: allDay
           });
         }
       }
@@ -421,9 +441,16 @@ export class AgendaController extends Controller {
 
       for (const vevent of vevents) {
         const eventName = vevent.getFirstPropertyValue("summary");
-        const startDate = new Date(vevent.getFirstPropertyValue("dtstart").toString());
-        const endDate = new Date(vevent.getFirstPropertyValue("dtend").toString());
+        const dtstartProp = vevent.getFirstProperty("dtstart");
+        const dtendProp = vevent.getFirstProperty("dtend");
+        const startDate = new Date(dtstartProp.getFirstValue().toString());
+        const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
         const eventDescription = vevent.getFirstPropertyValue("description") || "";
+
+        const dtstartValue = dtstartProp.getFirstValue();
+        const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
+
+        console.log(`Event: ${eventName}, isAllDay: ${isAllDay}, startDate: ${startDate}, endDate: ${endDate}`);
 
         if (eventName && startDate && endDate) {
           await this.events.create({
@@ -431,7 +458,8 @@ export class AgendaController extends Controller {
             agendaId: agenda.agendaId,
             startDate: startDate,
             endDate: endDate,
-            description: eventDescription
+            description: eventDescription,
+            allDay: isAllDay // Ajouter l'attribut allDay
           });
         }
       }
