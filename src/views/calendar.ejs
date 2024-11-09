@@ -19,6 +19,9 @@
         <label for="startEventTime">Date de début :</label>
         <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
+        <label for="eventAllDay">All day :</label>
+        <input type="checkbox" id="eventAllDay" name="eventAllDay"  <% if(cantEdit) {%> disabled <%}%> />
+
         <label for="endEventTime">Date de fin :</label>
         <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
         <label id="error-update-event" class="form-label text-danger"></label>

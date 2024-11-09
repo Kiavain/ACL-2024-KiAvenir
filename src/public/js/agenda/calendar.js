@@ -46,7 +46,8 @@ export const initCalendar = (agenda) => {
     eventDataTransform: (eventData) => {
       return {
         ...eventData,
-        color: eventData.color
+        color: eventData.color,
+        allDay: eventData.allDay
       };
     },
     eventClick: (info) => {
@@ -79,19 +80,37 @@ export const openModal = (eventData) => {
   if (!modal) {
     return;
   }
-
+  const allDay = document.getElementById("eventAllDay");
+  const startDate = document.getElementById("startEventTime");
+  const endDate = document.getElementById("endEventTime");
+  allDay.addEventListener("click", () => {
+    if (allDay.checked) {
+      startDate.type = "date";
+      endDate.type = "date";
+    } else {
+      startDate.type = "datetime-local";
+      endDate.type = "datetime-local";
+    }
+  });
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
-  console.log(eventData.allDay);
   if (!eventData.allDay) {
-    document.getElementById("startEventTime").value = moment(eventData.start)
-      .add(1, "hour")
-      .toISOString()
-      .substring(0, 16);
-    document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
+    allDay.checked = false;
+    startDate.type = "datetime-local";
+    endDate.type = "datetime-local";
+    startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
   } else {
-    document.getElementById("startEventTime").value = moment(eventData.start).toISOString();
-    document.getElementById("endEventTime").value = moment(eventData.end).toISOString();
+    allDay.checked = true;
+    startDate.type = "date";
+    endDate.type = "date";
+    const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
+    if (eventData.end === null) {
+      endDate.value = startDateValue;
+    } else {
+      endDate.value = moment(eventData.end).format("YYYY-MM-DD");
+    }
+    startDate.value = startDateValue;
   }
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
