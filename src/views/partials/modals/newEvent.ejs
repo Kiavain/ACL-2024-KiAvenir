@@ -12,8 +12,10 @@
             <label for="event-date">Date de début : <span class="requis">*</span></label>
             <input type="datetime-local" id="event-date" name="event-date" required>
 
-            <label for="event-all-day">All day:</label>
-            <input type="checkbox" id="event-all-day" name="event-all-day">
+            <div style="display: flex; align-items: center;">
+                <label for="event-all-day">Toute la journée : </label>
+                <input type="checkbox" id="event-all-day" name="event-all-day" style="margin-top: 12px; margin-left: 5px;">
+            </div>
 
             <label for="event-date-end">Date de fin : <span class="requis">*</span></label>
             <input type="datetime-local" id="event-date-end" name="event-date" required>
