@@ -320,7 +320,7 @@ export class AgendaController extends Controller {
           allDay: event.allDay
         }))
       });
-      const filename = `agenda_${agendaId}.json`;
+      const filename = `agenda_${agenda.name}.json`;
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
       fs.writeFileSync(downloadsPath, data, "utf8");
@@ -353,7 +353,7 @@ export class AgendaController extends Controller {
 
       // Convertit le calendrier en chaîne ICAL
       const icsContent = calendar.toString();
-      const filename = `agenda_${agendaId}.ics`;
+      const filename = `agenda_${agenda.name}.ics`;
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
       // Enregistre la chaîne ICS dans un fichier
