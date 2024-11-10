@@ -450,8 +450,6 @@ export class AgendaController extends Controller {
         const dtstartValue = dtstartProp.getFirstValue();
         const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
 
-        console.log(`Event: ${eventName}, isAllDay: ${isAllDay}, startDate: ${startDate}, endDate: ${endDate}`);
-
         if (eventName && startDate && endDate) {
           await this.events.create({
             name: eventName,
