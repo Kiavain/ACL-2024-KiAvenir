@@ -112,11 +112,10 @@ export const openModal = (eventData) => {
   } else {
     allDay.click();
     const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
-    if (eventData.end === null) {
-      endDate.value = startDateValue;
-    } else {
-      endDate.value = moment(eventData.end).format("YYYY-MM-DD");
-    }
+    let endDateValue = new Date(moment(eventData.end).format("YYYY-MM-DD"));
+    // Soustraire un jour à la date de fin
+    endDateValue.setUTCDate(endDateValue.getUTCDate() - 1);
+    endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
   const saveButton = document.getElementById("updateEvent");
