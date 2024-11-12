@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (selectedAgendaIds) {
     const agendaIds = JSON.parse(selectedAgendaIds);
     const firstAgenda = window.location.pathname.split("/")[2].split(",")[0];
-    console.log(firstAgenda);
 
     document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
       if (agendaIds.includes(checkbox.value) || firstAgenda === checkbox.value) {
