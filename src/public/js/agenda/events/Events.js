@@ -1,4 +1,4 @@
-import { initCalendar } from "../calendar.js";
+import { refreshCalendar } from "../calendar.js";
 import { addFlashMessages } from "../../utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         errorElement.style.display = "none";
         errAgenda.style.display = "none";
 
-        initCalendar(agenda);
+        refreshCalendar();
         addFlashMessages([data.message]);
       })
       .catch((error) => {

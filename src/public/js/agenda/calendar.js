@@ -3,22 +3,25 @@
 import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
 
-function getEventsUrl(agenda) {
+export function refreshCalendar() {
+  getCalendarInstance().setOption("events", getEventsUrl());
+  getCalendarInstance().refetchEvents();
+}
+
+export function getEventsUrl() {
   const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
     .map((checkbox) => checkbox.value)
     .join(",");
 
   const search = document.getElementById("searchInput").value;
   const input = search && search.trim() !== "" ? `?search=${search}` : "";
-  if (!selectedAgendaIds) {
-    return `/api/events/${agenda.agendaId}${input}`;
-  }
-
   return `/api/events/${selectedAgendaIds}${input}`;
 }
 
+let calendarInstance = null;
+
 // Fonction pour créer et initialiser le calendrier
-export const initCalendar = (agenda) => {
+export const initCalendar = () => {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) {
     console.error("Element #calendar non trouvé");
@@ -42,7 +45,7 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    events: getEventsUrl(agenda),
+    events: getEventsUrl(),
     eventDataTransform: (eventData) => {
       return {
         ...eventData,
@@ -61,17 +64,27 @@ export const initCalendar = (agenda) => {
     }
   });
 
+  calendarInstance = calendar;
+
   // Recharge les événements chaque fois qu'une case est cochée/décochée
   document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
-      calendar.setOption("events", getEventsUrl(agenda));
+      calendar.setOption("events", getEventsUrl());
       calendar.refetchEvents(); // Recharge les événements
     });
   });
 
   calendar.render();
-  listenFilter(calendar, agenda);
+  listenFilter(calendar);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
+};
+
+// Fonction pour obtenir l'instance du calendrier
+export const getCalendarInstance = () => {
+  if (!calendarInstance) {
+    console.warn("Le calendrier n'est pas encore initialisé.");
+  }
+  return calendarInstance;
 };
 
 // Fonction pour ouvrir la modale
@@ -118,9 +131,9 @@ export const openModal = (eventData) => {
   modal.style.display = "block";
 };
 //Fonction pour écouter la barre de filtrage des évenements
-const listenFilter = (calendar, agenda) => {
+const listenFilter = (calendar) => {
   document.getElementById("searchInput").addEventListener("input", function () {
-    calendar.setOption("events", getEventsUrl(agenda));
+    calendar.setOption("events", getEventsUrl());
     calendar.refetchEvents();
   });
 };
