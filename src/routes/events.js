@@ -45,7 +45,8 @@ export default class EventRouteur extends Routeur {
         name: req.body.title,
         description: req.body.description,
         startDate: req.body.start,
-        endDate: req.body.end
+        endDate: req.body.end,
+        allDay: req.body.allDay
       };
 
       if (event) {

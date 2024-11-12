@@ -148,11 +148,16 @@ export const saveEvent = (calendar) => {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
     start: document.getElementById("startEventTime").value,
-    end: document.getElementById("endEventTime").value
+    end: document.getElementById("endEventTime").value,
+    allDay: document.getElementById("eventAllDay").checked
   };
-
+  console.log(updatedData);
+  console.log(new Date(updatedData.start) < new Date(updatedData.end) && updatedData.allDay);
   // Vérifie si la date de fin est supérieure à la date de début
-  if (new Date(updatedData.start) >= new Date(updatedData.end)) {
+  if (
+    (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||
+    (new Date(updatedData.start) > new Date(updatedData.end) && updatedData.allDay)
+  ) {
     errorMessages.innerText = "La date de fin doit être supérieure à la date de début.";
     return;
   }
