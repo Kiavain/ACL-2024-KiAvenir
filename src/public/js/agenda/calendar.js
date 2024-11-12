@@ -151,8 +151,14 @@ export const saveEvent = (calendar) => {
     end: document.getElementById("endEventTime").value,
     allDay: document.getElementById("eventAllDay").checked
   };
-  console.log(updatedData);
-  console.log(new Date(updatedData.start) < new Date(updatedData.end) && updatedData.allDay);
+  if (!updatedData.title.trim()) {
+    errorMessages.innerText = "Le champ titre est obligatoire.";
+    return;
+  }
+  if (!updatedData.start || !updatedData.end) {
+    errorMessages.innerText = "Les champs dates sont obligatoires.";
+    return;
+  }
   // Vérifie si la date de fin est supérieure à la date de début
   if (
     (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||

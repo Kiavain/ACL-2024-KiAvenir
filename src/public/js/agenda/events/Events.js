@@ -78,8 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
     errorElement.style.display = name <= dateFin ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
 
+    if (!name.trim()) {
+      errName.style.display = "block";
+      return;
+    }
     // Vérifie la validité des dates
-    if (!name || !dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
+    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
       return;
     }
 
