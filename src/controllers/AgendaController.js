@@ -437,7 +437,7 @@ export class AgendaController extends Controller {
       if (alreadyExist) {
         return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
       }
-      const agenda = await this.agendas.create({ name, ownerId: localUser.id, color });
+      const agenda = await this.agendas.create({ name, description: summary, ownerId: localUser.id, color });
 
       for (const vevent of vevents) {
         const eventName = vevent.getFirstPropertyValue("summary");
