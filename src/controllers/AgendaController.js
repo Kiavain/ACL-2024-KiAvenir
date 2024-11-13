@@ -457,7 +457,7 @@ export class AgendaController extends Controller {
             startDate: startDate,
             endDate: endDate,
             description: eventDescription,
-            allDay: isAllDay // Ajouter l'attribut allDay
+            allDay: isAllDay
           });
         }
       }
