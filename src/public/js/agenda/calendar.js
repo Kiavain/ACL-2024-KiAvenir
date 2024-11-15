@@ -64,12 +64,17 @@ export const initCalendar = (agenda) => {
       const startDate = document.getElementById("event-date");
       const endDate = document.getElementById("event-date-end");
       const allDay = document.getElementById("event-all-day");
+      startDate.type = info.allDay ? "date" : "datetime-local";
+      endDate.type = startDate.type;
       startDate.value = info.dateStr;
       endDate.value = info.dateStr;
-      if (!allDay.checked) {
-        startDate.value = info.dateStr + "T07:00";
-        endDate.value += info.dateStr + "T08:00";
+      allDay.checked = info.allDay;
+
+      if (!info.allDay) {
+        startDate.value = info.dateStr.replace("+01:00", "");
+        endDate.value = moment(startDate.value).add(2, "hour").toISOString().substring(0, 16);
       }
+
       modal.style.display = "block";
     }
   });
