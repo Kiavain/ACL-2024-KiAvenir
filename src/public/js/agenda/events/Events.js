@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     // Vérifie la validité des dates
-    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
+    if (!dateDebut || !dateFin || !agendaValue || dateDebut >= dateFin) {
       return;
     }
 
