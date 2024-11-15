@@ -58,6 +58,19 @@ export const initCalendar = (agenda) => {
         info.el.style.backgroundColor = info.event.backgroundColor;
         info.el.classList.remove("fc-list-event");
       }
+    },
+    dateClick: function (info) {
+      const modal = document.getElementById("modal");
+      const startDate = document.getElementById("event-date");
+      const endDate = document.getElementById("event-date-end");
+      const allDay = document.getElementById("event-all-day");
+      startDate.value = info.dateStr;
+      endDate.value = info.dateStr;
+      if (!allDay.checked) {
+        startDate.value = info.dateStr + "T07:00";
+        endDate.value += info.dateStr + "T08:00";
+      }
+      modal.style.display = "block";
     }
   });
 
