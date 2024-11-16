@@ -1,0 +1,17 @@
+.category{
+  border-bottom: 1px solid #8e3838;
+  margin-bottom: 30px;
+}
+.last-category{
+  margin-bottom: 30px;
+}
+
+.category-ul{
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+}
+
+.span-category{
+  padding-left: 15px;
+}
