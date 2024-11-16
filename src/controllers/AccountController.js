@@ -74,8 +74,6 @@ export class AccountController extends Controller {
     const filePath = path.resolve(__dirname, "../../data/basic.ics");
     const fileContent = fs.readFileSync(filePath, "utf8");
 
-    // Traite le contenu du fichier
-    console.log(fileContent);
     //Traite le fichier
     const parsedCalendar = ICAL.default.parse(fileContent);
     const comp = new ICAL.default.Component(parsedCalendar);
@@ -87,7 +85,7 @@ export class AccountController extends Controller {
     if (alreadyExist) {
       return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
     }
-    const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color });
+    const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
 
     for (const vevent of vevents) {
       const eventName = vevent.getFirstPropertyValue("summary");

@@ -65,7 +65,7 @@ if (currentPath.includes("/agenda")) {
                                 <h3 class="agenda-title">Mes agendas</h3>
                                 <ul class="agenda-list" id="agenda-list">
 
-                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id).forEach(agenda => { %>
+                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
                                         <li class="agenda-item" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                                             <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
                                             <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
@@ -81,7 +81,7 @@ if (currentPath.includes("/agenda")) {
 
                                 <!-- S'il y a au moins un partage qui le concerne -->
                                 <% if (guestsShared.length > 0) { %>
-                                    <h3 class="agenda-title">Agendas partagées</h3>
+                                    <h3 class="agenda-title">Agendas partagés</h3>
                                     <ul class="agenda-list" id="share-agenda-list">
                                         <% guestsShared.forEach(guest => {
                                             const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
@@ -96,6 +96,28 @@ if (currentPath.includes("/agenda")) {
                                         }) %>
                                     </ul>
                                 <% }%>
+
+                                <!-- Autres agendas -->
+                                <div style="display: inline-flex;">
+                                <h3 class="agenda-title">Autres agendas</h3>
+                                <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+                                </button>
+                                </div>
+                                <ul class="agenda-list" id="agenda-list">
+
+                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true).forEach(agenda => { %>
+                                        <li class="agenda-item" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                            <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                                            <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                                                <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
+                                            </a>
+                                            <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                                                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                                            </button>
+                                        </li>
+                                    <% }) %>
+                                </ul>
                             </div>
                         </div>
                         <div id="shareOrExport" class="popUpWindow">
