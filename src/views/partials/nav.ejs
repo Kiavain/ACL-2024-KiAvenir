@@ -86,10 +86,10 @@ if (currentPath.includes("/agenda")) {
                                         <% guestsShared.forEach(guest => {
                                             const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
                                         if (agenda) { %>
-                                            <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
-                                                <a href="/agenda/<%= agenda.agendaId %>">
-                                                    <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
-                                                    <%= agenda.name %>
+                                            <li class="agenda-item" style="justify-content: unset; <%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                                <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                                                <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                                                    <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                                                 </a>
                                             </li>
                                         <% }
@@ -100,21 +100,17 @@ if (currentPath.includes("/agenda")) {
                                 <!-- Autres agendas -->
                                 <div style="display: inline-flex;">
                                 <h3 class="agenda-title">Autres agendas</h3>
-                                <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                                <button id="otherAgenda" class="icon-button" style="padding: 5px">
                                     <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
                                 </button>
                                 </div>
                                 <ul class="agenda-list" id="agenda-list">
-
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true).forEach(agenda => { %>
-                                        <li class="agenda-item" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                        <li class="agenda-item" style= "justify-content: unset;<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                                             <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
                                             <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
                                                 <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                                             </a>
-                                            <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
-                                                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
-                                            </button>
                                         </li>
                                     <% }) %>
                                 </ul>
@@ -165,6 +161,8 @@ if (currentPath.includes("/agenda")) {
                         <%- include('modals/exportAgenda') %>
                         <!-- Fenêtre modale importer un agenda -->
                         <%- include('modals/importAgenda') %>
+                        <!-- Fenêtre modale autres agendas -->
+                        <%- include('modals/otherAgenda') %>
                     <% } %>
                 <% } else { %>
                     <li class="nav-item">
