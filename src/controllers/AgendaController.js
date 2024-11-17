@@ -28,6 +28,7 @@ export class AgendaController extends Controller {
     this.renderAgendaId = this.renderAgendaId.bind(this);
     this.deleteAgenda = this.deleteAgenda.bind(this);
     this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
+    this.deleteHolidayAgenda = this.deleteHolidayAgenda.bind(this);
   }
 
   /**
@@ -533,5 +534,37 @@ export class AgendaController extends Controller {
       }
     }
     return res.success("Agenda " + name + " ajouté avec succès !");
+  }
+  /**
+   * Supprime un agenda de vacances
+   * @param req La requête
+   * @param res La réponse
+   */
+  deleteHolidayAgenda(req, res) {
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+    const { name } = req.body;
+    if (!name) {
+      return res.err(401, "Nom invalide.");
+    }
+
+    const agenda = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
+    if (!agenda) {
+      return res.err(404, "Agenda non trouvé.");
+    } else if (agenda.ownerId !== localUser.id) {
+      return res.err(403, "Vous n'êtes pas autorisé à supprimer cet agenda.");
+    }
+
+    const agendas = this.agendas.filter((agenda) => agenda.ownerId === localUser.id);
+    if (agendas.length === 1) {
+      return res.err(400, "Vous ne pouvez pas supprimer votre dernier agenda.");
+    }
+
+    agenda
+      .delete()
+      .then(() => res.success(`L'agenda ${agenda.name} a été supprimé avec succès.`))
+      .catch((error) => res.err(500, error));
   }
 }

@@ -1,4 +1,4 @@
-import {addFlashMessages} from "../utils.js";
+import { addFlashMessages } from "../utils.js";
 
 const otherAgendaButton = document.getElementById("otherAgenda");
 const otherAgendaCloseButton = document.getElementById("otherAgenda-close-btn");
@@ -12,11 +12,12 @@ const zoneCorse = document.getElementById("zoneCorse");
 document.addEventListener("DOMContentLoaded", () => {
   otherAgendaButton.onclick = () => openModal();
   otherAgendaCloseButton.onclick = () => (modal.style.display = "none");
-  basic.onclick = () => importHoliday(basic.getAttribute("data-link"), basic.checked);
-  zoneA.onclick = () => importHoliday(zoneA.getAttribute("data-link"), zoneA.checked);
-  zoneB.onclick = () => importHoliday(zoneB.getAttribute("data-link"), zoneB.checked);
-  zoneC.onclick = () => importHoliday(zoneC.getAttribute("data-link"), zoneC.checked);
-  zoneCorse.onclick = () => importHoliday(zoneCorse.getAttribute("data-link"), zoneCorse.checked);
+  basic.onclick = () => importHoliday(basic.getAttribute("data-link"), basic.getAttribute("data-name"), basic.checked);
+  zoneA.onclick = () => importHoliday(zoneA.getAttribute("data-link"), zoneA.getAttribute("data-name"), zoneA.checked);
+  zoneB.onclick = () => importHoliday(zoneB.getAttribute("data-link"), zoneB.getAttribute("data-name"), zoneB.checked);
+  zoneC.onclick = () => importHoliday(zoneC.getAttribute("data-link"), zoneC.getAttribute("data-name"), zoneC.checked);
+  zoneCorse.onclick = () =>
+    importHoliday(zoneCorse.getAttribute("data-link"), zoneCorse.getAttribute("data-name"), zoneCorse.checked);
 
   // Fermer la modale si on clique ailleurs (et enlève l'écouteur)
   window.addEventListener("click", function handleClickOutside(event) {
@@ -32,12 +33,12 @@ function openModal() {
   document.getElementById("dropdown-menu").style.display = "none";
 }
 
-function importHoliday(lien, selected) {
+function importHoliday(lien, name, selected) {
   const data = {
     lien: lien
   };
   if (!selected) {
-    removeHoliday(lien);
+    removeHoliday(name);
     return;
   }
   console.log("add");
@@ -56,6 +57,22 @@ function importHoliday(lien, selected) {
     })
     .catch((error) => console.error("Erreur:", error));
 }
-function removeHoliday(data) {
-  console.log("remove");
+function removeHoliday(name) {
+  const data = {
+    name: name
+  };
+  fetch("/api/agenda/deleteHolidayAgenda", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+    .then((response) => {
+      return response.json();
+    })
+    .then((data) => {
+      if (data.success) {
+        addFlashMessages(data.flashMessages);
+      }
+    })
+    .catch((error) => console.error("Erreur:", error));
 }
