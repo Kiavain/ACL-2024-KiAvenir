@@ -12,11 +12,11 @@ const zoneCorse = document.getElementById("zoneCorse");
 document.addEventListener("DOMContentLoaded", () => {
   otherAgendaButton.onclick = () => openModal();
   otherAgendaCloseButton.onclick = () => (modal.style.display = "none");
-  basic.onclick = () => importHolliday(basic.getAttribute("data-link"), basic.checked);
-  zoneA.onclick = () => importHolliday(zoneA.getAttribute("data-link"), zoneA.checked);
-  zoneB.onclick = () => importHolliday(zoneB.getAttribute("data-link"), zoneB.checked);
-  zoneC.onclick = () => importHolliday(zoneC.getAttribute("data-link"), zoneC.checked);
-  zoneCorse.onclick = () => importHolliday(zoneCorse.getAttribute("data-link"), zoneCorse.checked);
+  basic.onclick = () => importHoliday(basic.getAttribute("data-link"), basic.checked);
+  zoneA.onclick = () => importHoliday(zoneA.getAttribute("data-link"), zoneA.checked);
+  zoneB.onclick = () => importHoliday(zoneB.getAttribute("data-link"), zoneB.checked);
+  zoneC.onclick = () => importHoliday(zoneC.getAttribute("data-link"), zoneC.checked);
+  zoneCorse.onclick = () => importHoliday(zoneCorse.getAttribute("data-link"), zoneCorse.checked);
 
   // Fermer la modale si on clique ailleurs (et enlève l'écouteur)
   window.addEventListener("click", function handleClickOutside(event) {
@@ -32,43 +32,30 @@ function openModal() {
   document.getElementById("dropdown-menu").style.display = "none";
 }
 
-function importHolliday(lien,selected) {
+function importHoliday(lien, selected) {
   const data = {
     lien: lien
   };
   if (!selected) {
-    removeHolliday(lien);
+    removeHoliday(lien);
     return;
   }
   console.log("add");
-  /*
-  fetch(`/api/agenda/${exportAgendaId}/exportAgenda`, {
+  fetch("/api/agenda/importHolidayAgenda", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   })
     .then((response) => {
-      //Vérifie la réponse d'erreur
-      if (response.status === 400) {
-        isExportError = true;
-      }
       return response.json();
     })
     .then((data) => {
       if (data.success) {
-        exportError.style.display = "none";
         addFlashMessages(data.flashMessages);
-        modal.style.display = "none";
-      } else {
-        if (isExportError) {
-          exportError.textContent = data.message;
-          exportError.style.display = "block";
-        }
       }
     })
     .catch((error) => console.error("Erreur:", error));
-   */
 }
-function removeHolliday(data) {
+function removeHoliday(data) {
   console.log("remove");
 }

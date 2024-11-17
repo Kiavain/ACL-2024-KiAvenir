@@ -27,6 +27,7 @@ export class AgendaController extends Controller {
     this.renderAgenda = this.renderAgenda.bind(this);
     this.renderAgendaId = this.renderAgendaId.bind(this);
     this.deleteAgenda = this.deleteAgenda.bind(this);
+    this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
   }
 
   /**
@@ -501,7 +502,13 @@ export class AgendaController extends Controller {
     if (alreadyExist) {
       return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
     }
-    const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
+    const agenda = await this.agendas.create({
+      name,
+      description: summary,
+      ownerId: localUser.id,
+      color,
+      special: true
+    });
 
     for (const vevent of vevents) {
       const eventName = vevent.getFirstPropertyValue("summary");
@@ -525,5 +532,6 @@ export class AgendaController extends Controller {
         });
       }
     }
+    return res.success("Agenda " + name + " ajouté avec succès !");
   }
 }
