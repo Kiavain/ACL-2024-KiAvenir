@@ -61,6 +61,7 @@ label {
 
 textarea,
 input[type="datetime-local"],
+input[type="date"],
 select {
   width: 100%;
   padding: 8px;

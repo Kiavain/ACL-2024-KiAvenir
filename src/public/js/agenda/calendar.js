@@ -46,7 +46,8 @@ export const initCalendar = (agenda) => {
     eventDataTransform: (eventData) => {
       return {
         ...eventData,
-        color: eventData.color
+        color: eventData.color,
+        allDay: eventData.allDay
       };
     },
     eventClick: (info) => {
@@ -57,6 +58,24 @@ export const initCalendar = (agenda) => {
         info.el.style.backgroundColor = info.event.backgroundColor;
         info.el.classList.remove("fc-list-event");
       }
+    },
+    dateClick: function (info) {
+      const modal = document.getElementById("modal");
+      const startDate = document.getElementById("event-date");
+      const endDate = document.getElementById("event-date-end");
+      const allDay = document.getElementById("event-all-day");
+      startDate.type = info.allDay ? "date" : "datetime-local";
+      endDate.type = startDate.type;
+      startDate.value = info.dateStr;
+      endDate.value = info.dateStr;
+      allDay.checked = info.allDay;
+
+      if (!info.allDay) {
+        startDate.value = info.dateStr.replace("+01:00", "");
+        endDate.value = moment(startDate.value).add(2, "hour").toISOString().substring(0, 16);
+      }
+
+      modal.style.display = "block";
     }
   });
 
@@ -79,15 +98,44 @@ export const openModal = (eventData) => {
   if (!modal) {
     return;
   }
-
+  const allDay = document.getElementById("eventAllDay");
+  const startDate = document.getElementById("startEventTime");
+  const endDate = document.getElementById("endEventTime");
+  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+  const nowWithoutHours = new Date().toISOString().split("T")[0];
+  allDay.addEventListener("click", () => {
+    if (allDay.checked) {
+      startDate.type = "date";
+      endDate.type = "date";
+      startDate.min = nowWithoutHours;
+      endDate.min = nowWithoutHours;
+    } else {
+      startDate.type = "datetime-local";
+      endDate.type = "datetime-local";
+      startDate.min = now;
+      endDate.min = now;
+    }
+  });
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
-  document.getElementById("startEventTime").value = moment(eventData.start)
-    .add(1, "hour")
-    .toISOString()
-    .substring(0, 16);
-  document.getElementById("endEventTime").value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
-
+  allDay.checked = false;
+  if (!eventData.allDay) {
+    allDay.checked = false;
+    startDate.type = "datetime-local";
+    endDate.type = "datetime-local";
+    startDate.min = now;
+    endDate.min = now;
+    startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
+  } else {
+    allDay.click();
+    const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
+    let endDateValue = new Date(moment(eventData.end).format("YYYY-MM-DD"));
+    // Soustraire un jour à la date de fin
+    endDateValue.setUTCDate(endDateValue.getUTCDate() - 1);
+    endDate.value = endDateValue.toISOString().split("T")[0];
+    startDate.value = startDateValue;
+  }
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
@@ -124,11 +172,22 @@ export const saveEvent = (calendar) => {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
     start: document.getElementById("startEventTime").value,
-    end: document.getElementById("endEventTime").value
+    end: document.getElementById("endEventTime").value,
+    allDay: document.getElementById("eventAllDay").checked
   };
-
+  if (!updatedData.title.trim()) {
+    errorMessages.innerText = "Le champ titre est obligatoire.";
+    return;
+  }
+  if (!updatedData.start || !updatedData.end) {
+    errorMessages.innerText = "Les champs dates sont obligatoires.";
+    return;
+  }
   // Vérifie si la date de fin est supérieure à la date de début
-  if (new Date(updatedData.start) >= new Date(updatedData.end)) {
+  if (
+    (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||
+    (new Date(updatedData.start) > new Date(updatedData.end) && updatedData.allDay)
+  ) {
     errorMessages.innerText = "La date de fin doit être supérieure à la date de début.";
     return;
   }

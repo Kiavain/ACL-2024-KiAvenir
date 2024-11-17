@@ -17,7 +17,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const modal = document.getElementById("modal");
   const closeModalBtn = document.getElementById("close-btn");
   const createButton = document.getElementById("saveEvent");
+  const allDay = getElement("event-all-day");
+  //Empêche de mettre une date < à ajd
+  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+  const nowWithoutHours = new Date().toISOString().split("T")[0];
+  //Change le format de la date en all day, sans heures
+  allDay.addEventListener("click", () => {
+    const startDate = getElement("event-date");
+    const endDate = getElement("event-date-end");
+    if (allDay.checked) {
+      const newStartDate = startDate.value.split("T")[0];
+      startDate.type = "date";
+      endDate.type = "date";
 
+      startDate.min = nowWithoutHours;
+      endDate.min = nowWithoutHours;
+      startDate.value = newStartDate;
+      endDate.value = startDate.value;
+    } else {
+      const newStartDate = startDate.value + "T07:00";
+      const newEndDate = startDate.value + "T08:00";
+      startDate.type = "datetime-local";
+      endDate.type = "datetime-local";
+      startDate.min = now;
+      endDate.min = now;
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
+    }
+  });
   createEvent.onclick = () => {
     modal.style.display = "block";
   };
@@ -50,14 +77,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorElement = getElement("date-error");
     const errAgenda = getElement("agenda-error");
     const errName = getElement("name-error");
+    const allDay = getElement("event-all-day");
     e.preventDefault();
 
     errName.style.display = agendaValue ? "none" : "block";
     errorElement.style.display = name <= dateFin ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
 
+    if (!name.trim()) {
+      errName.style.display = "block";
+      return;
+    }
     // Vérifie la validité des dates
-    if (!name || !dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
+    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;
     }
 
@@ -66,7 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
       agendaId: agendaValue,
       description: description,
       startDate: dateDebut,
-      endDate: dateFin
+      endDate: dateFin,
+      allDay: allDay.checked
     };
 
     modal.style.display = "none";
