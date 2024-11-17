@@ -63,15 +63,14 @@ export class AccountController extends Controller {
     });
   }
   /**
-   * Importer un agenda
-   * @param req
-   * @param res
-   * @returns {Promise<*>}
+   * Importer l'agenda des jours fériés de base
+   * @param userId {number} L'identifiant de l'utilisateur
+   * @returns {Promise<void>} Crée l'agenda de vacances par défaut
    */
   async holidayAgenda(userId) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const filePath = path.resolve(__dirname, "../../data/basic.ics");
+    const filePath = path.resolve(__dirname, "../../data/hollidays/Basic.ics");
     const fileContent = fs.readFileSync(filePath, "utf8");
 
     //Traite le fichier
@@ -81,10 +80,6 @@ export class AccountController extends Controller {
     const name = comp.getFirstPropertyValue("x-wr-calname");
     const color = "#0000FF";
     const summary = comp.getFirstPropertyValue("x-wr-caldesc");
-    const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === userId);
-    if (alreadyExist) {
-      return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
-    }
     const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
 
     for (const vevent of vevents) {

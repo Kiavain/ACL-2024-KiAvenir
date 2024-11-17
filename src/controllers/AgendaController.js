@@ -4,6 +4,7 @@ import * as os from "node:os";
 import * as fs from "node:fs";
 import ical from "ical-generator";
 import * as ICAL from "ical.js";
+import { fileURLToPath } from "url";
 
 /**
  * Contrôleur pour les actions liées aux agendas
@@ -465,5 +466,64 @@ export class AgendaController extends Controller {
       return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
     }
     res.success("L'agenda a été importé avec succès.");
+  }
+  /**
+   * Importer un agenda de vacances
+   * @param req
+   * @param res
+   * @returns {Promise<*>}
+   */
+  async importHolidayAgenda(req, res) {
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+    const { lien } = req.body;
+    if (!lien) {
+      return res.err(401, "Lien invalide.");
+    }
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath = path.resolve(__dirname, lien);
+    if (!filePath) {
+      return res.err(401, "Lien invalide, agenda inconnu.");
+    }
+    const fileContent = fs.readFileSync(filePath, "utf8");
+
+    //Traite le fichier
+    const parsedCalendar = ICAL.default.parse(fileContent);
+    const comp = new ICAL.default.Component(parsedCalendar);
+    const vevents = comp.getAllSubcomponents("vevent");
+    const name = comp.getFirstPropertyValue("x-wr-calname");
+    const color = "#0000FF";
+    const summary = comp.getFirstPropertyValue("x-wr-caldesc");
+    const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
+    if (alreadyExist) {
+      return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
+    }
+    const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
+
+    for (const vevent of vevents) {
+      const eventName = vevent.getFirstPropertyValue("summary");
+      const dtstartProp = vevent.getFirstProperty("dtstart");
+      const dtendProp = vevent.getFirstProperty("dtend");
+      const startDate = new Date(dtstartProp.getFirstValue().toString());
+      const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
+      const eventDescription = vevent.getFirstPropertyValue("description") || "";
+
+      const dtstartValue = dtstartProp.getFirstValue();
+      const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
+
+      if (eventName && startDate && endDate) {
+        await this.events.create({
+          name: eventName,
+          agendaId: agenda.agendaId,
+          startDate: startDate,
+          endDate: endDate,
+          description: eventDescription,
+          allDay: isAllDay
+        });
+      }
+    }
   }
 }

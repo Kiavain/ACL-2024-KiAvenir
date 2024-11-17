@@ -2,23 +2,23 @@
 <div id="otherAgendaModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" id="otherAgenda-close-btn">&times;</span>
-        <h2>Autres agendas</h2>
+        <h2>Importer d'autres agendas</h2>
 
 
         <div class="category">
             <h4>Jours fériés locaux</h4>
             <ul class="category-ul">
-                <li><input type="checkbox" id="joursFeriesLocauxCheckBox"><span class="span-category">Jours fériés et autres fêtes en France</span></li>
+                <li><input type="checkbox" checked="<% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Jours fériés et autres fêtes en France")%>" id="basic" data-link="../../data/hollidays/Basic.ics"><span class="span-category">Jours fériés et autres fêtes en France</span></li>
             </ul>
         </div>
 
         <div class="last-category">
             <h4>Vacances scolaires</h4>
             <ul class="category-ul">
-                <li><input type="checkbox" id="joursFeriesLocauxCheckBox"><span class="span-category">Zone A</span></li>
-                <li><input type="checkbox" id="joursFeriesLocauxCheckBox"><span class="span-category">Zone B</span></li>
-                <li><input type="checkbox" id="joursFeriesLocauxCheckBox"><span class="span-category">Zone C</span></li>
-                <li><input type="checkbox" id="joursFeriesLocauxCheckBox"><span class="span-category">Zone Corse</span></li>
+                <li><input type="checkbox" id="zoneA" data-link="../../data/hollidays/Zone-A.ics"><span class="span-category">Zone A</span></li>
+                <li><input type="checkbox" id="zoneB" data-link="../../data/hollidays/Zone-B.ics"><span class="span-category">Zone B</span></li>
+                <li><input type="checkbox" id="zoneC" data-link="../../data/hollidays/Zone-C.ics"><span class="span-category">Zone C</span></li>
+                <li><input type="checkbox" id="zoneCorse" data-link="../../data/hollidays/Corse.ics"><span class="span-category">Corse</span></li>
             </ul>
         </div>
 
