@@ -8,7 +8,7 @@
         <div class="category">
             <h4>Jours fériés locaux</h4>
             <ul class="category-ul">
-                <li><input type="checkbox"        <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Jours fériés et autres fêtes en France")) { %> checked <% } %> id="basic" data-link="../../data/holidays/Basic.ics" data-name="Jours fériés et autres fêtes en France"><span class="span-category">Jours fériés et autres fêtes en France</span></li>
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Jours fériés et autres fêtes en France")) { %> checked <% } %> id="basic" data-link="../../data/holidays/Basic.ics" data-name="Jours fériés et autres fêtes en France"><span class="span-category">Jours fériés et autres fêtes en France</span></li>
             </ul>
         </div>
 
@@ -21,6 +21,8 @@
                 <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Calendrier scolaire - Corse")) { %> checked <% } %> id="zoneCorse" data-link="../../data/holidays/Corse.ics" data-name="Calendrier scolaire - Corse"><span class="span-category">Corse</span></li>
             </ul>
         </div>
+        <div id="loader" class="loader" style="display: none;"></div>
+
 
 
     </div>

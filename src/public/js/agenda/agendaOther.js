@@ -12,12 +12,11 @@ const zoneCorse = document.getElementById("zoneCorse");
 document.addEventListener("DOMContentLoaded", () => {
   otherAgendaButton.onclick = () => openModal();
   otherAgendaCloseButton.onclick = () => (modal.style.display = "none");
-  basic.onclick = () => importHoliday(basic.getAttribute("data-link"), basic.getAttribute("data-name"), basic.checked);
-  zoneA.onclick = () => importHoliday(zoneA.getAttribute("data-link"), zoneA.getAttribute("data-name"), zoneA.checked);
-  zoneB.onclick = () => importHoliday(zoneB.getAttribute("data-link"), zoneB.getAttribute("data-name"), zoneB.checked);
-  zoneC.onclick = () => importHoliday(zoneC.getAttribute("data-link"), zoneC.getAttribute("data-name"), zoneC.checked);
-  zoneCorse.onclick = () =>
-    importHoliday(zoneCorse.getAttribute("data-link"), zoneCorse.getAttribute("data-name"), zoneCorse.checked);
+  basic.onclick = () => importHoliday(basic);
+  zoneA.onclick = () => importHoliday(zoneA);
+  zoneB.onclick = () => importHoliday(zoneB);
+  zoneC.onclick = () => importHoliday(zoneC);
+  zoneCorse.onclick = () => importHoliday(zoneCorse);
 
   // Fermer la modale si on clique ailleurs (et enlève l'écouteur)
   window.addEventListener("click", function handleClickOutside(event) {
@@ -33,15 +32,23 @@ function openModal() {
   document.getElementById("dropdown-menu").style.display = "none";
 }
 
-function importHoliday(lien, name, selected) {
+function importHoliday(elem) {
   const data = {
-    lien: lien
+    lien: elem.getAttribute("data-link")
   };
-  if (!selected) {
-    removeHoliday(name);
+  if (!elem.checked) {
+    removeHoliday(elem, elem.getAttribute("data-name"));
     return;
   }
-  console.log("add");
+  const loader = document.getElementById("loader");
+  loader.style.display = "block"; // Affiche le loader
+  elem.disabled = true;
+
+  // Cache le loader après 2 secondes
+  setTimeout(() => {
+    loader.style.display = "none";
+    elem.disabled = false;
+  }, 2000);
   fetch("/api/agenda/importHolidayAgenda", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -57,10 +64,19 @@ function importHoliday(lien, name, selected) {
     })
     .catch((error) => console.error("Erreur:", error));
 }
-function removeHoliday(name) {
+function removeHoliday(elem, name) {
   const data = {
     name: name
   };
+  const loader = document.getElementById("loader");
+  loader.style.display = "block"; // Affiche le loader
+  elem.disabled = true;
+
+  // Cache le loader après 2 secondes
+  setTimeout(() => {
+    loader.style.display = "none";
+    elem.disabled = false;
+  }, 2000);
   fetch("/api/agenda/deleteHolidayAgenda", {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
