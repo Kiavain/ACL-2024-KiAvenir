@@ -9,9 +9,16 @@ export function refreshCalendar() {
 }
 
 export function getEventsUrl() {
-  const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+  let selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
     .map((checkbox) => checkbox.value)
     .join(",");
+
+  // Vérifie aussi l'agendaId présent dans l'URL
+  const url = new URL(window.location.href);
+  const agendaId = url.pathname.split("/").pop();
+  if (agendaId && !selectedAgendaIds.includes(agendaId)) {
+    selectedAgendaIds += `,${agendaId}`;
+  }
 
   const search = document.getElementById("searchInput").value;
   const input = search && search.trim() !== "" ? `?search=${search}` : "";

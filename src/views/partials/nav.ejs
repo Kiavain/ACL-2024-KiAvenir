@@ -86,7 +86,7 @@ if (currentPath.includes("/agenda")) {
                                         <% guestsShared.forEach(guest => {
                                             const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
                                         if (agenda) { %>
-                                            <li class="agenda-list" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                            <li class="agenda-item" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                                                 <a href="/agenda/<%= agenda.agendaId %>">
                                                     <span class="material-symbols-outlined" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>">check_box</span>
                                                     <%= agenda.name %>
