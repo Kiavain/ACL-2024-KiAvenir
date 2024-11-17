@@ -19,24 +19,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const createButton = document.getElementById("saveEvent");
   const allDay = getElement("event-all-day");
   //Empêche de mettre une date < à ajd
-  const startDate = getElement("event-date");
-  const endDate = getElement("event-date-end");
   const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
   const nowWithoutHours = new Date().toISOString().split("T")[0];
-  startDate.min = now;
-  endDate.min = now;
   //Change le format de la date en all day, sans heures
   allDay.addEventListener("click", () => {
+    const startDate = getElement("event-date");
+    const endDate = getElement("event-date-end");
     if (allDay.checked) {
+      const newStartDate = startDate.value.split("T")[0];
       startDate.type = "date";
       endDate.type = "date";
+
       startDate.min = nowWithoutHours;
       endDate.min = nowWithoutHours;
+      startDate.value = newStartDate;
+      endDate.value = startDate.value;
     } else {
+      const newStartDate = startDate.value + "T07:00";
+      const newEndDate = startDate.value + "T08:00";
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
       startDate.min = now;
       endDate.min = now;
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
     }
   });
   createEvent.onclick = () => {
@@ -83,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     // Vérifie la validité des dates
-    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin) {
+    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;
     }
 
