@@ -182,7 +182,7 @@ export default class EventRouteur extends Routeur {
           // Pour chaque jour, regarder les evenements recurrents
           // Si la date du jour est superieure a la date de l'evenement
           //  Calculer si l'evenement doit etre afficher ce jour
-          //    - si quotidient: true
+          //    - si quotidien: true
           //    - si hebdo: calculer la date modulo 7, si ca tombe juste, afficher l'event
           //    - si mensuel: true si le jour en question est le meme jour que l'evt
           //    - si annuel: true si le jour et le mois en question est le meme que l'evt (exception: si l'evt est un 29 fevrier et pas de 29/02 cette annee: mettre le 1er mars)
@@ -190,33 +190,99 @@ export default class EventRouteur extends Routeur {
           //   Sauf si c'est un 'all-day' ?
 
 
-          const startCalendar = new Date(start);
-          let currentDate = new Date(start);
-          const endCalendar = new Date(end);
+        const startCalendar = new Date(start);
+        let currentDate = new Date(start);
+        const endCalendar = new Date(end);
 
-          // S'assurer que startCalendar est avant endCalendar
-          if (startCalendar > endCalendar) {
-              console.log("La date de début du calendrier est après la date de fin");
-              return;
-          }
+        // S'assurer que startCalendar est avant endCalendar
+        if (startCalendar > endCalendar) {
+            console.log("La date de début du calendrier est après la date de fin");
+            return;
+        }
 
-          // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
-          while (currentDate < endCalendar) {
-              // Afficher le jour en question
-              const dateComplete = currentDate.toLocaleString().split('T')[0];
-              // console.log(dateComplete); // Affiche le jour au format DD/MM/YYYY
-              const dateSeparee = dateComplete.split('/');
+        // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
+        while (currentDate < endCalendar) {
+            // Afficher le jour en question
+            const dateToString = currentDate.toLocaleString().split('T')[0].split('/');
+            
+            const jour = parseInt(dateToString[0]);
+            const mois = parseInt(dateToString[1]);
+            const annee = parseInt(dateToString[2].split(' ')[0]);
+        
+            console.log("\ndate:", jour, mois, annee);
+
+            // On parcourt les évènements récurrents pour savoir si on doit en afficher un
+            for (const evt of recurringEvents) {
+              let displayEvent = false;
+              const eventStart = new Date(evt.start);
+              const eventEnd = new Date(evt.end);
+              const dureeEvent = eventEnd - eventStart; // On calcule la duree de l'évènement
+            
+              const eventStartDate = eventStart.getDate();
+              const eventStartMonth = eventStart.getMonth() + 1;
+              const eventStartYear = eventStart.getFullYear();
+
+              // On vérifie si l'évènement doit être affiché
+              // if tombe un bon jour, alors displayEvent = true;
+              if (currentDate > eventStart) {
+                // Si la date du jour en question est ultérieure à la date originale de l'évènement
+                switch (evt.recurrence) {
+                  case 1: // Tous les jours
+                    // displayEvent = true;
+                    break;
+                  case 2: // Toutes les semaines
+                    displayEvent = true;
+                    break;
+                  case 3: // Tous les mois
+                    // displayEvent = true;
+                    break;
+                  case 4: // Tous les ans
+                    // displayEvent = true;
+                    break;
+                  default:
+                    break;
+                }
+              }
               
-              const jour = dateSeparee[0];
-              const mois = dateSeparee[1];
-              const annee = dateSeparee[2].split(' ')[0];
-              // console.log(jour, mois, annee);
 
 
 
-              // Passer au jour suivant
-              currentDate.setDate(currentDate.getDate() + 1);
-          }
+              // On vérifie qu'on soit pas à la date même de l'évènement avant (pour éviter de l'afficher 2 fois)
+              if (eventStartDate == jour && eventStartMonth == mois && eventStartYear == annee) {
+                // console.log("on est le meme jour !");
+                displayEvent = false;
+              }
+              // else {
+              //   console.log("event:", eventStartDate, eventStartMonth, eventStartYear);
+              // }
+
+              if (displayEvent) {
+                // On clone l'évènement
+                let adjustedEvent = { ...evt };
+
+
+                // let adjustedEventStart = eventStart.toLocaleString();
+                let adjustedEventStart = new Date(eventStart);
+                adjustedEventStart.setDate(jour);
+                adjustedEventStart.setMonth(mois-1);
+                adjustedEventStart.setYear(annee);
+
+                // Calculons la date de fin
+                let adjustedEventEnd = new Date(adjustedEventStart);
+                adjustedEventEnd.setTime(adjustedEventStart.getTime() + dureeEvent); // On définit la date de fin de l'évènement
+
+
+                adjustedEvent.start = adjustedEventStart.toISOString();
+                adjustedEvent.end = adjustedEventEnd.toISOString();
+
+                console.log(evt, adjustedEvent);
+                adjustedRecurringEvents.push(adjustedEvent);
+              }
+            }
+
+            // Passer au jour suivant
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
 
 
 
