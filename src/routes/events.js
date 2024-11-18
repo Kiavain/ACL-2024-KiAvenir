@@ -169,9 +169,8 @@ export default class EventRouteur extends Routeur {
             recurrence: e.recurrence
           }));
 
-
         // On récupère les évènements récurrents
-        const recurringEvents = events.filter(event => event.recurrence != 0);
+        const recurringEvents = events.filter((event) => event.recurrence !== 0);
         let adjustedRecurringEvents = [];
 
         // Algorithme
@@ -191,94 +190,94 @@ export default class EventRouteur extends Routeur {
         let currentDate = new Date(start);
         const endCalendar = new Date(end);
 
-
         // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         while (currentDate < endCalendar) {
-            // Afficher le jour en question
-            const dateToString = currentDate.toLocaleString().split('T')[0].split('/');
-            
-            const jour = parseInt(dateToString[0]);
-            const mois = parseInt(dateToString[1]);
-            const annee = parseInt(dateToString[2].split(' ')[0]);
-        
-            // console.log("\ndate:", jour, mois, annee);
+          // Afficher le jour en question
+          const dateToString = currentDate.toLocaleString().split("T")[0].split("/");
 
-            // On parcourt les évènements récurrents pour savoir si on doit en afficher un
-            for (const evt of recurringEvents) {
-              let displayEvent = false;
-              const eventStart = new Date(evt.start);
-              const eventEnd = new Date(evt.end);
-              const dureeEvent = eventEnd - eventStart; // On calcule la duree de l'évènement
-            
-              const eventStartDate = eventStart.getDate();
-              const eventStartMonth = eventStart.getMonth() + 1;
-              const eventStartYear = eventStart.getFullYear();
+          const jour = parseInt(dateToString[0]);
+          const mois = parseInt(dateToString[1]);
+          const annee = parseInt(dateToString[2].split(" ")[0]);
 
-              // On vérifie si l'évènement doit être affiché
-              // if tombe un bon jour, alors displayEvent = true;
-              if (currentDate > eventStart) {
-                // Si la date du jour en question est ultérieure à la date originale de l'évènement
-                switch (evt.recurrence) {
-                  case 1: // Tous les jours
+          // console.log("\ndate:", jour, mois, annee);
+
+          // On parcourt les évènements récurrents pour savoir si on doit en afficher un
+          for (const evt of recurringEvents) {
+            let displayEvent = false;
+            const eventStart = new Date(evt.start);
+            const eventEnd = new Date(evt.end);
+            const dureeEvent = eventEnd - eventStart; // On calcule la duree de l'évènement
+
+            const eventStartDate = eventStart.getDate();
+            const eventStartMonth = eventStart.getMonth() + 1;
+            const eventStartYear = eventStart.getFullYear();
+
+            // On vérifie si l'évènement doit être affiché
+            // if tombe un bon jour, alors displayEvent = true;
+            if (currentDate > eventStart) {
+              // Si la date du jour en question est ultérieure à la date originale de l'évènement
+              switch (evt.recurrence) {
+                case 1: // Tous les jours
+                  console.log("Tous les jours", evt.title);
+                  displayEvent = true;
+                  break;
+                case 2: // Toutes les semaines
+                  // On calcule si la date de début est la même modulo 7 jours
+                  // On converti les dates en "jours calendaires" (pour pallier aux changements d'heures)
+                  const eventStartMidnight = new Date(eventStart);
+                  eventStartMidnight.setHours(0, 0, 0, 0);
+
+                  const daysFromEpochEvent = Math.floor(new Date(eventStartMidnight).getTime() / (1000 * 60 * 60 * 24));
+                  const daysFromEpochCurrent = Math.floor(new Date(currentDate).getTime() / (1000 * 60 * 60 * 24));
+                  // On calcule la différence de jours
+                  const differenceInDays = Math.abs(daysFromEpochCurrent - daysFromEpochEvent);
+                  // On teste la différence modulo 7
+                  displayEvent = differenceInDays % 7 === 0;
+                  break;
+                case 3: // Tous les mois
+                  if (eventStartDate == jour) {
                     displayEvent = true;
-                    break;
-                  case 2: // Toutes les semaines
-                    // On calcule si la date de début est la même modulo 7 jours
-                    // On converti les dates en "jours calendaires" (pour pallier aux changements d'heures)
-                    const eventStartMidnight = new Date(eventStart);
-                    eventStartMidnight.setHours(0,0,0,0);
-
-                    const daysFromEpochEvent = Math.floor(new Date(eventStartMidnight).getTime() / (1000 * 60 * 60 * 24));
-                    const daysFromEpochCurrent = Math.floor(new Date(currentDate).getTime() / (1000 * 60 * 60 * 24));
-                    // On calcule la différence de jours
-                    const differenceInDays = Math.abs(daysFromEpochCurrent - daysFromEpochEvent);
-                    // On teste la différence modulo 7
-                    displayEvent = differenceInDays % 7 === 0;
-                    break;
-                  case 3: // Tous les mois
-                    if (eventStartDate == jour) {
-                      displayEvent = true;
-                    }
-                    break;
-                  case 4: // Tous les ans
-                    if (eventStartMonth == mois && eventStartDate == jour) {
-                      //todo fix: prendre en compte les 29 fevrier comme des 1er mars ?
-                      displayEvent = true;
-                    }
-                    break;
-                  default:
-                    break;
-                }
-              }
-
-              // On vérifie qu'on soit pas à la date même de l'évènement avant (pour éviter de l'afficher 2 fois)
-              if (eventStartDate == jour && eventStartMonth == mois && eventStartYear == annee) {
-                displayEvent = false;
-              }
-
-              if (displayEvent) {
-                // On clone l'évènement
-                let adjustedEvent = { ...evt };
-
-                // let adjustedEventStart = eventStart.toLocaleString();
-                let adjustedEventStart = new Date(eventStart);
-                adjustedEventStart.setDate(jour);
-                adjustedEventStart.setMonth(mois-1);
-                adjustedEventStart.setYear(annee);
-
-                // Calculons la date de fin
-                let adjustedEventEnd = new Date(adjustedEventStart);
-                adjustedEventEnd.setTime(adjustedEventStart.getTime() + dureeEvent); // On définit la date de fin de l'évènement
-
-                adjustedEvent.start = adjustedEventStart.toISOString();
-                adjustedEvent.end = adjustedEventEnd.toISOString();
-
-                adjustedRecurringEvents.push(adjustedEvent);
+                  }
+                  break;
+                case 4: // Tous les ans
+                  if (eventStartMonth == mois && eventStartDate == jour) {
+                    //todo fix: prendre en compte les 29 fevrier comme des 1er mars ?
+                    displayEvent = true;
+                  }
+                  break;
+                default:
+                  break;
               }
             }
 
-            // Passer au jour suivant
-            currentDate.setDate(currentDate.getDate() + 1);
+            // On vérifie qu'on soit pas à la date même de l'évènement avant (pour éviter de l'afficher 2 fois)
+            if (eventStartDate == jour && eventStartMonth == mois && eventStartYear == annee) {
+              displayEvent = false;
+            }
+
+            if (displayEvent) {
+              // On clone l'évènement
+              let adjustedEvent = { ...evt };
+
+              // let adjustedEventStart = eventStart.toLocaleString();
+              let adjustedEventStart = new Date(eventStart);
+              adjustedEventStart.setDate(jour);
+              adjustedEventStart.setMonth(mois - 1);
+              adjustedEventStart.setYear(annee);
+
+              // Calculons la date de fin
+              let adjustedEventEnd = new Date(adjustedEventStart);
+              adjustedEventEnd.setTime(adjustedEventStart.getTime() + dureeEvent); // On définit la date de fin de l'évènement
+
+              adjustedEvent.start = adjustedEventStart.toISOString();
+              adjustedEvent.end = adjustedEventEnd.toISOString();
+
+              adjustedRecurringEvents.push(adjustedEvent);
+            }
+          }
+
+          // Passer au jour suivant
+          currentDate.setDate(currentDate.getDate() + 1);
         }
 
         // Ajoute les événements de cet agenda au tableau global
@@ -286,6 +285,7 @@ export default class EventRouteur extends Routeur {
       }
 
       // Envoie tous les événements associés aux agendas spécifiés
+      console.log("events", allEvents);
       res.json(allEvents);
     });
   }
