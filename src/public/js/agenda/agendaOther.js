@@ -60,6 +60,42 @@ function importHoliday(elem) {
     .then((data) => {
       if (data.success) {
         addFlashMessages(data.flashMessages);
+        // Créer un nouvel élément <li>
+        const newAgenda = document.createElement("li");
+        newAgenda.classList.add("agenda-item");
+        newAgenda.style.justifyContent = "unset";
+
+        newAgenda.style.backgroundColor = "rgba(0, 123, 255, 0.2)";
+        newAgenda.style.color = "white";
+
+        // Créer l'input checkbox
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add("agenda-checkbox");
+        checkbox.value = data.newAgenda.agendaId;
+        checkbox.onclick = (event) => event.stopPropagation();
+        checkbox.style.marginRight = "10px";
+        checkbox.style.fontSize = "20px";
+        checkbox.style.color = data.newAgenda.color;
+
+        // Créer le lien
+        const link = document.createElement("a");
+        link.href = `/agenda/${data.newAgenda.agendaId}`;
+        link.dataset.agendaName = data.newAgenda.name;
+        link.onclick = (event) => event.stopPropagation();
+
+        const span = document.createElement("span");
+        span.textContent = data.newAgenda.name;
+        span.style.color = data.newAgenda.color;
+
+        link.appendChild(span);
+        newAgenda.appendChild(checkbox);
+        newAgenda.appendChild(link);
+        newAgenda.setAttribute("data-agenda-name", data.newAgenda.name);
+
+        // Ajouter le nouvel élément <li> à la liste
+        const agendaList = document.getElementById("other-agenda-list");
+        agendaList.appendChild(newAgenda);
       }
     })
     .catch((error) => console.error("Erreur:", error));
@@ -88,6 +124,10 @@ function removeHoliday(elem, name) {
     .then((data) => {
       if (data.success) {
         addFlashMessages(data.flashMessages);
+        const liElement = document.querySelector(`li[data-agenda-name="${name}"]`);
+        if (liElement) {
+          liElement.remove();
+        }
       }
     })
     .catch((error) => console.error("Erreur:", error));

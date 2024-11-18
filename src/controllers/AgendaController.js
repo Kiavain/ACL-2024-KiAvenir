@@ -533,7 +533,15 @@ export class AgendaController extends Controller {
         });
       }
     }
-    return res.success("Agenda " + name + " ajouté avec succès !");
+    return res.json({
+      success: true,
+      flashMessages: ["Agenda " + name + " ajouté avec succès !"],
+      newAgenda: {
+        agendaId: agenda.agendaId,
+        name: agenda.name,
+        color: agenda.color
+      }
+    });
   }
   /**
    * Supprime un agenda de vacances
