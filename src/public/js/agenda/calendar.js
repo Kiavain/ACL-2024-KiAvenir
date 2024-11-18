@@ -156,18 +156,20 @@ export const openModal = (eventData) => {
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById("eventRecurrence");
   let recurrence = eventData.extendedProps.recurrence;
-  let options = recurrenceSelect.children;
+  let recurrenceOptions = recurrenceSelect.children;
   
   for (let i = 0; i <= 4; i++) {
-    options[i].selected = false;
+    recurrenceOptions[i].selected = false;
   }
-  options[recurrence].selected = true;
+  recurrenceOptions[recurrence].selected = true;
+
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
   modal.style.display = "block";
 };
+
 //Fonction pour écouter la barre de filtrage des évenements
 const listenFilter = (calendar) => {
   document.getElementById("searchInput").addEventListener("input", function () {
@@ -175,6 +177,7 @@ const listenFilter = (calendar) => {
     calendar.refetchEvents();
   });
 };
+
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");

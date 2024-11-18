@@ -152,7 +152,7 @@ export default class EventRouteur extends Routeur {
           .filter((e) => {
             return (
               agendaId === e.agendaId &&
-              (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
+              // (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
               (!search || e.name.toLowerCase().includes(search.toLowerCase()))
             );
           })
@@ -168,8 +168,68 @@ export default class EventRouteur extends Routeur {
             recurrence: e.recurrence
           }));
 
+        // On récupère les évènements récurrents
+        const recurringEvents = events.filter(event => event.recurrence != 0);
+        let adjustedRecurringEvents = [];
+
+        for (const evt of recurringEvents) {
+          const startDate = new Date(evt.start);
+          const endDate = new Date(evt.end);
+          
+          // if ((moment(startDate).isBetween(start, end) || moment(endDate).isBetween(start, end))) {
+          //   adjustedRecurringEvents.push(evt);
+          // }
+
+
+          // Clone l'évènement
+          let adjustedEvent = { ...evt };
+          // adjustedEvent.eventId = 0;
+
+          console.log("On duplique l'event " + evt.eventId + " - '" + evt.title + "' (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
+          switch (evt.recurrence) {
+            case 1: // Tous les jours
+              startDate.setDate(startDate.getDate() + 1);
+              endDate.setDate(endDate.getDate() + 1);
+              break;
+            case 2: // Toutes les semaines
+              startDate.setDate(startDate.getDate() + 7);
+              endDate.setDate(endDate.getDate() + 7);
+              break;
+            case 3: // Tous les mois
+              startDate.setMonth(startDate.getMonth() + 1);
+              endDate.setMonth(endDate.getMonth() + 1);
+              break;
+            case 4: // Tous les ans
+              startDate.setFullYear(startDate.getFullYear() + 1);
+              endDate.setFullYear(endDate.getFullYear() + 1);
+              break;
+            default:
+              break;
+          }
+          adjustedEvent.start = startDate.toISOString();
+          adjustedEvent.end = endDate.toISOString();
+
+          adjustedRecurringEvents.push(adjustedEvent);
+        }
+
+        // Adjust recurring events for the current month
+        // const adjustedRecurringEvents = recurringEvents.map(event => {
+        //   const adjustedEvent = { ...event }; // Clone the event
+        //   // console.log(adjustedEvent);
+        //   const eventStartDate = new Date(event.start);
+        //   const eventEndDate = new Date(event.end);
+        //   eventStartDate.setMonth(eventStartDate.getMonth() + 1); // Move to current month
+        //   eventEndDate.setMonth(eventEndDate.getMonth() + 1); // Move to current month
+        //   adjustedEvent.start = eventStartDate.toISOString();
+        //   adjustedEvent.end = eventEndDate.toISOString();
+        //   return adjustedEvent;
+        // });
+
+
+        // console.log(adjustedRecurringEvents);
+
         // Ajoute les événements de cet agenda au tableau global
-        allEvents = allEvents.concat(events);
+        allEvents = allEvents.concat(events, adjustedRecurringEvents);
       }
 
       // Envoie tous les événements associés aux agendas spécifiés
