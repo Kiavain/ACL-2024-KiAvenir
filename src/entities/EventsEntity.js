@@ -37,7 +37,8 @@ export default class EventsEntity extends Entity {
         type: DataTypes.BOOLEAN
       },
       recurrence: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        defaultValue: 0
       }
     });
   }
