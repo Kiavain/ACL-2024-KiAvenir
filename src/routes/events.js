@@ -152,6 +152,7 @@ export default class EventRouteur extends Routeur {
           .filter((e) => {
             return (
               agendaId === e.agendaId &&
+              // je désactive pour récupérer TOUS les évènements et afficher les récurrents
               // (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
               (!search || e.name.toLowerCase().includes(search.toLowerCase()))
             );
@@ -173,13 +174,24 @@ export default class EventRouteur extends Routeur {
         let adjustedRecurringEvents = [];
 
         for (const evt of recurringEvents) {
+          const startCalendar = new Date(start);
           const startDate = new Date(evt.start);
           const endDate = new Date(evt.end);
           
-          // if ((moment(startDate).isBetween(start, end) || moment(endDate).isBetween(start, end))) {
-          //   adjustedRecurringEvents.push(evt);
-          // }
+          // Notes:
+          // start: debut du calendrier à afficher
+          // end: fin du calendrier à afficher
 
+          // Algorithme
+          // Pour chaque jour, regarder les evenements recurrents
+          // Si la date du jour est superieure a la date de l'evenement
+          //  Calculer si l'evenement doit etre afficher ce jour
+          //    - si quotidient: true
+          //    - si hebdo: calculer la date modulo 7, si ca tombe juste, afficher l'event
+          //    - si mensuel: true si le jour en question est le meme jour que l'evt
+          //    - si annuel: true si le jour et le mois en question est le meme que l'evt (exception: si l'evt est un 29 fevrier et pas de 29/02 cette annee: mettre le 1er mars)
+          //   Pour calculer la date de fin de l'event cloné, calculer la duree de l'event (date de fin - date de debut), et calculer la nouvelle date de fin à partir de la nouvelle date de début
+          
 
           // Clone l'évènement
           let adjustedEvent = { ...evt };
@@ -196,12 +208,17 @@ export default class EventRouteur extends Routeur {
               endDate.setDate(endDate.getDate() + 7);
               break;
             case 3: // Tous les mois
-              startDate.setMonth(startDate.getMonth() + 1);
-              endDate.setMonth(endDate.getMonth() + 1);
+              if (startCalendar.getMonth() > startDate.getMonth()) {
+                console.log("Mois actuel: " + startCalendar.getMonth());
+                startDate.setMonth(startCalendar.getMonth());
+                endDate.setMonth(startCalendar.getMonth());
+              }
               break;
             case 4: // Tous les ans
-              startDate.setFullYear(startDate.getFullYear() + 1);
-              endDate.setFullYear(endDate.getFullYear() + 1);
+              if (start < startDate) {
+                startDate.setFullYear(start.getFullYear());
+                endDate.setFullYear(start.getFullYear());
+              }
               break;
             default:
               break;
@@ -209,6 +226,7 @@ export default class EventRouteur extends Routeur {
           adjustedEvent.start = startDate.toISOString();
           adjustedEvent.end = endDate.toISOString();
 
+          console.log("> (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
           adjustedRecurringEvents.push(adjustedEvent);
         }
 
@@ -225,7 +243,7 @@ export default class EventRouteur extends Routeur {
         //   return adjustedEvent;
         // });
 
-
+        // console.log(start);
         // console.log(adjustedRecurringEvents);
 
         // Ajoute les événements de cet agenda au tableau global
