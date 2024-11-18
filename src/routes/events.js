@@ -199,7 +199,7 @@ export default class EventRouteur extends Routeur {
           const mois = parseInt(dateToString[1]);
           const annee = parseInt(dateToString[2].split(" ")[0]);
 
-          // console.log("\ndate:", jour, mois, annee);
+          console.log("\nJour traité: " + jour + "-" + mois + "-" + annee);
 
           // On parcourt les évènements récurrents pour savoir si on doit en afficher un
           for (const evt of recurringEvents) {
@@ -218,21 +218,26 @@ export default class EventRouteur extends Routeur {
               // Si la date du jour en question est ultérieure à la date originale de l'évènement
               switch (evt.recurrence) {
                 case 1: // Tous les jours
-                  console.log("Tous les jours", evt.title);
+                  // console.log("Tous les jours", evt.title);
                   displayEvent = true;
                   break;
                 case 2: // Toutes les semaines
                   // On calcule si la date de début est la même modulo 7 jours
-                  // On converti les dates en "jours calendaires" (pour pallier aux changements d'heures)
-                  const eventStartMidnight = new Date(eventStart);
+                  // On convertit les dates en "jours calendaires" (pour pallier aux changements d'heures)
+                  let currentDateMidnight = new Date(currentDate);
+                  let eventStartMidnight = new Date(eventStart);
+                  currentDateMidnight.setHours(0, 0, 0, 0);
                   eventStartMidnight.setHours(0, 0, 0, 0);
 
-                  const daysFromEpochEvent = Math.floor(new Date(eventStartMidnight).getTime() / (1000 * 60 * 60 * 24));
-                  const daysFromEpochCurrent = Math.floor(new Date(currentDate).getTime() / (1000 * 60 * 60 * 24));
+                  const daysFromEvent = Math.floor(new Date(eventStartMidnight).getTime() / (1000 * 60 * 60 * 24));
+                  const daysFromCurrent = Math.floor(new Date(currentDateMidnight).getTime() / (1000 * 60 * 60 * 24));
                   // On calcule la différence de jours
-                  const differenceInDays = Math.abs(daysFromEpochCurrent - daysFromEpochEvent);
+                  const differenceInDays = Math.abs(daysFromEvent - daysFromCurrent);
                   // On teste la différence modulo 7
                   displayEvent = differenceInDays % 7 === 0;
+                  if (displayEvent) {
+                    console.log(currentDateMidnight, eventStartMidnight, differenceInDays % 7, displayEvent);
+                  }
                   break;
                 case 3: // Tous les mois
                   if (eventStartDate == jour) {
@@ -261,9 +266,9 @@ export default class EventRouteur extends Routeur {
 
               // let adjustedEventStart = eventStart.toLocaleString();
               let adjustedEventStart = new Date(eventStart);
-              adjustedEventStart.setDate(jour);
-              adjustedEventStart.setMonth(mois - 1);
               adjustedEventStart.setYear(annee);
+              adjustedEventStart.setMonth(mois - 1);
+              adjustedEventStart.setDate(jour);
 
               // Calculons la date de fin
               let adjustedEventEnd = new Date(adjustedEventStart);
@@ -271,6 +276,8 @@ export default class EventRouteur extends Routeur {
 
               adjustedEvent.start = adjustedEventStart.toISOString();
               adjustedEvent.end = adjustedEventEnd.toISOString();
+
+              console.log(adjustedEventStart , adjustedEvent.start);
 
               adjustedRecurringEvents.push(adjustedEvent);
             }
@@ -285,7 +292,7 @@ export default class EventRouteur extends Routeur {
       }
 
       // Envoie tous les événements associés aux agendas spécifiés
-      console.log("events", allEvents);
+      // console.log("events", allEvents);
       res.json(allEvents);
     });
   }
