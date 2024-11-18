@@ -43,7 +43,7 @@ export const initCalendar = () => {
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek"
+      right: "dayGridMonth,timeGridWeek,timeGridDay"
     },
     buttonText: {
       today: "Aujourd'hui",
