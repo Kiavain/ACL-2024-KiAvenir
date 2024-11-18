@@ -71,14 +71,20 @@ export const initCalendar = () => {
     },
     dateClick: function (info) {
       const modal = document.getElementById("modal");
+      const name = document.getElementById("event-name");
       const startDate = document.getElementById("event-date");
       const endDate = document.getElementById("event-date-end");
       const allDay = document.getElementById("event-all-day");
+      const agenda = document.getElementById("event-agenda");
+      const description = document.getElementById("event-description");
       startDate.type = info.allDay ? "date" : "datetime-local";
       endDate.type = startDate.type;
       startDate.value = info.dateStr;
       endDate.value = info.dateStr;
       allDay.checked = info.allDay;
+      agenda.value = agenda.options[0].value;
+      name.value = "";
+      description.value = "";
 
       if (!info.allDay) {
         startDate.value = info.dateStr.replace("+01:00", "");
@@ -90,14 +96,6 @@ export const initCalendar = () => {
   });
 
   calendarInstance = calendar;
-
-  // Recharge les événements chaque fois qu'une case est cochée/décochée
-  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      calendar.setOption("events", getEventsUrl());
-      calendar.refetchEvents(); // Recharge les événements
-    });
-  });
 
   calendar.render();
   listenFilter(calendar);
