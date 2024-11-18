@@ -27,30 +27,30 @@ export default class AgendaRouteur extends Routeur {
       // Rendu des pages
       .get("/agenda", this.controller.renderAgenda)
       .get("/agenda/:agendaIds", async (req, res) => {
-      if (!res.locals.user) {
-        req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
-        return res.redirect("/login");
-      }
+        if (!res.locals.user) {
+          req.flash("Vous devez être connecté pour accéder à cette page.");
+          return res.redirect("/login");
+        }
 
-      // Récupère les IDs des agendas depuis l'URL et les transforme en tableau
-      const agendaIds = req.params.agendaIds.split(",").map((id) => parseInt(id.trim()));
+        // Récupère les IDs des agendas depuis l'URL et les transforme en tableau
+        const agendaIds = req.params.agendaIds.split(",").map((id) => parseInt(id.trim()));
 
-      // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
-      const agendas_to_consult = this.server.database.tables
-        .get("agendas")
-        .filter((agenda) => agendaIds.includes(agenda.agendaId) && agenda.ownerId === res.locals.user.id);
+        // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
+        const agendas_to_consult = this.server.database.tables
+          .get("agendas")
+          .filter((agenda) => agendaIds.includes(agenda.agendaId) && agenda.verifyAgendaAccess(res.locals.user.id));
 
-      const agendas = this.server.database.tables.get("agendas");
-      const guests = this.server.database.tables.get("guests");
-      const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
+        const agendas = this.server.database.tables.get("agendas");
+        const guests = this.server.database.tables.get("guests");
+        const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
 
-      if (agendas_to_consult.length > 0) {
-        const agenda = agendas_to_consult[0];
-        res.render("agenda", { agenda, agendas_to_consult, agendas, guests, guestsShared });
-      } else {
-        res.redirect("/agenda");
-      }
-    })
+        if (agendas_to_consult.length > 0) {
+          const agenda = agendas_to_consult[0];
+          res.render("agenda", { agenda, agendas_to_consult, agendas, guests, guestsShared });
+        } else {
+          res.redirect("/agenda");
+        }
+      })
 
       // Gesion des agendas
       .put("/api/agenda/create", this.controller.createAgenda)

@@ -10,13 +10,13 @@
     <div class="modal-content">
         <span class="close close-btn">&times;</span>
         <h2>Modifier l'événement</h2>
-        <label for="eventTitle">Titre :</label>
+        <label for="eventTitle">Titre : <span class="requis">*</span></label>
         <input type="text" id="eventTitle" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <label for="eventDetails">Détails :</label>
         <textarea id="eventDetails" class="input-field" <% if(cantEdit) {%> disabled <%}%>></textarea>
 
-        <label for="startEventTime">Date de début :</label>
+        <label for="startEventTime">Date de début : <span class="requis">*</span></label>
         <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
 
         <div style="display: flex; align-items: center;">
@@ -24,7 +24,7 @@
             <input type="checkbox" id="eventAllDay" style="margin-top: 12px; margin-left: 5px;" name="eventAllDay" <% if(cantEdit) {%> disabled <%}%> />
         </div>
 
-        <label for="endEventTime">Date de fin :</label>
+        <label for="endEventTime">Date de fin : <span class="requis">*</span></label>
         <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
         <label id="error-update-event" class="form-label text-danger"></label>
 
