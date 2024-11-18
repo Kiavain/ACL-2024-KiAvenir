@@ -209,7 +209,7 @@ export default class EventRouteur extends Routeur {
             const mois = parseInt(dateToString[1]);
             const annee = parseInt(dateToString[2].split(' ')[0]);
         
-            console.log("\ndate:", jour, mois, annee);
+            // console.log("\ndate:", jour, mois, annee);
 
             // On parcourt les évènements récurrents pour savoir si on doit en afficher un
             for (const evt of recurringEvents) {
@@ -228,16 +228,31 @@ export default class EventRouteur extends Routeur {
                 // Si la date du jour en question est ultérieure à la date originale de l'évènement
                 switch (evt.recurrence) {
                   case 1: // Tous les jours
-                    // displayEvent = true;
-                    break;
-                  case 2: // Toutes les semaines
                     displayEvent = true;
                     break;
+                  case 2: // Toutes les semaines
+                    // On calcule si la date de début est la même modulo 7 jours
+                    // On prend la date de l'évènement à minuit
+                    const eventStartMidnight = new Date(eventStart);
+                    eventStartMidnight.setHours(0);
+                    eventStartMidnight.setMinutes(0);
+                    // On calcule la différence en millisecondes
+                    const differenceInMilliseconds = Math.abs(currentDate - eventStartMidnight);
+                    // On convertit les millisecondes en jours
+                    const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 60 * 60 * 24));
+                    // On teste la différence modulo 7 jours
+                    displayEvent = (differenceInDays % 7 == 0);
+                    break;
                   case 3: // Tous les mois
-                    // displayEvent = true;
+                    if (eventStartDate == jour) {
+                      displayEvent = true;
+                    }
                     break;
                   case 4: // Tous les ans
-                    // displayEvent = true;
+                    if (eventStartMonth == mois && eventStartDate == jour) {
+                      //todo fix: prendre en compte les 29 fevrier comme un 1er mars ?
+                      displayEvent = true;
+                    }
                     break;
                   default:
                     break;
@@ -275,7 +290,7 @@ export default class EventRouteur extends Routeur {
                 adjustedEvent.start = adjustedEventStart.toISOString();
                 adjustedEvent.end = adjustedEventEnd.toISOString();
 
-                console.log(evt, adjustedEvent);
+                // console.log(evt, adjustedEvent);
                 adjustedRecurringEvents.push(adjustedEvent);
               }
             }
