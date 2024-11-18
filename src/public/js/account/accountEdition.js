@@ -21,7 +21,7 @@ async function validateAccountCreation(e) {
     emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
   });
 
-  const emailIsEmpty = (emailInput.value === "");
+  const emailIsEmpty = emailInput.value === "";
   var emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
@@ -29,7 +29,7 @@ async function validateAccountCreation(e) {
     e.preventDefault();
     return;
   }
-  
+
   // Vérifie le format de l'adresse mail (regex)
   emailIsCorrect = await checkEmail(emailInput);
 
