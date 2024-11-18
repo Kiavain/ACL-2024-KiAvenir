@@ -169,16 +169,12 @@ export default class EventRouteur extends Routeur {
             recurrence: e.recurrence
           }));
 
+
         // On récupère les évènements récurrents
         const recurringEvents = events.filter(event => event.recurrence != 0);
         let adjustedRecurringEvents = [];
 
-        for (const evt of recurringEvents) {
-          const startCalendar = new Date(start);
-          const startDate = new Date(evt.start);
-          const endDate = new Date(evt.end);
-          
-          // Notes:
+        // Notes:
           // start: debut du calendrier à afficher
           // end: fin du calendrier à afficher
 
@@ -191,44 +187,79 @@ export default class EventRouteur extends Routeur {
           //    - si mensuel: true si le jour en question est le meme jour que l'evt
           //    - si annuel: true si le jour et le mois en question est le meme que l'evt (exception: si l'evt est un 29 fevrier et pas de 29/02 cette annee: mettre le 1er mars)
           //   Pour calculer la date de fin de l'event cloné, calculer la duree de l'event (date de fin - date de debut), et calculer la nouvelle date de fin à partir de la nouvelle date de début
-          
+          //   Sauf si c'est un 'all-day' ?
 
-          // Clone l'évènement
-          let adjustedEvent = { ...evt };
-          // adjustedEvent.eventId = 0;
 
-          console.log("On duplique l'event " + evt.eventId + " - '" + evt.title + "' (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
-          switch (evt.recurrence) {
-            case 1: // Tous les jours
-              startDate.setDate(startDate.getDate() + 1);
-              endDate.setDate(endDate.getDate() + 1);
-              break;
-            case 2: // Toutes les semaines
-              startDate.setDate(startDate.getDate() + 7);
-              endDate.setDate(endDate.getDate() + 7);
-              break;
-            case 3: // Tous les mois
-              if (startCalendar.getMonth() > startDate.getMonth()) {
-                console.log("Mois actuel: " + startCalendar.getMonth());
-                startDate.setMonth(startCalendar.getMonth());
-                endDate.setMonth(startCalendar.getMonth());
-              }
-              break;
-            case 4: // Tous les ans
-              if (start < startDate) {
-                startDate.setFullYear(start.getFullYear());
-                endDate.setFullYear(start.getFullYear());
-              }
-              break;
-            default:
-              break;
+          const startCalendar = new Date(start);
+          let currentDate = new Date(start);
+          const endCalendar = new Date(end);
+
+          // S'assurer que startCalendar est avant endCalendar
+          if (startCalendar > endCalendar) {
+              console.log("La date de début du calendrier est après la date de fin");
+              return;
           }
-          adjustedEvent.start = startDate.toISOString();
-          adjustedEvent.end = endDate.toISOString();
 
-          console.log("> (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
-          adjustedRecurringEvents.push(adjustedEvent);
-        }
+          // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
+          while (currentDate < endCalendar) {
+              // Afficher le jour en question
+              const dateComplete = currentDate.toLocaleString().split('T')[0];
+              // console.log(dateComplete); // Affiche le jour au format DD/MM/YYYY
+              const dateSeparee = dateComplete.split('/');
+              
+              const jour = dateSeparee[0];
+              const mois = dateSeparee[1];
+              const annee = dateSeparee[2].split(' ')[0];
+              // console.log(jour, mois, annee);
+
+
+
+              // Passer au jour suivant
+              currentDate.setDate(currentDate.getDate() + 1);
+          }
+
+
+
+        // for (const evt of recurringEvents) {
+        //   const startDate = new Date(evt.start);
+        //   const endDate = new Date(evt.end);
+          
+        //   // Clone l'évènement
+        //   let adjustedEvent = { ...evt };
+        //   // adjustedEvent.eventId = 0;
+
+        //   console.log("On duplique l'event " + evt.eventId + " - '" + evt.title + "' (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
+        //   switch (evt.recurrence) {
+        //     case 1: // Tous les jours
+        //       startDate.setDate(startDate.getDate() + 1);
+        //       endDate.setDate(endDate.getDate() + 1);
+        //       break;
+        //     case 2: // Toutes les semaines
+        //       startDate.setDate(startDate.getDate() + 7);
+        //       endDate.setDate(endDate.getDate() + 7);
+        //       break;
+        //     case 3: // Tous les mois
+        //       if (startCalendar.getMonth() > startDate.getMonth()) {
+        //         console.log("Mois actuel: " + startCalendar.getMonth());
+        //         startDate.setMonth(startCalendar.getMonth());
+        //         endDate.setMonth(startCalendar.getMonth());
+        //       }
+        //       break;
+        //     case 4: // Tous les ans
+        //       if (start < startDate) {
+        //         startDate.setFullYear(start.getFullYear());
+        //         endDate.setFullYear(start.getFullYear());
+        //       }
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        //   adjustedEvent.start = startDate.toISOString();
+        //   adjustedEvent.end = endDate.toISOString();
+
+        //   console.log("> (date: " + evt.start + ", recurrence:" + evt.recurrence + ")");
+        //   adjustedRecurringEvents.push(adjustedEvent);
+        // }
 
         // Adjust recurring events for the current month
         // const adjustedRecurringEvents = recurringEvents.map(event => {
@@ -244,6 +275,15 @@ export default class EventRouteur extends Routeur {
         // });
 
         // console.log(start);
+        // console.log(startCalendar.toLocaleString());
+        
+
+        // Pour obtenir les jours en UTC (sans le +1h de la timezone)
+        // const day2 = startCalendar.getUTCDate(); // Jour du mois en UTC
+        // const month2 = startCalendar.getUTCMonth() + 1; // Mois en UTC (ajoute 1 car getUTCMonth() retourne un index de 0 à 11)
+        // const year2 = startCalendar.getUTCFullYear(); // Année en UTC
+        // console.log(day2, month2, year2);
+
         // console.log(adjustedRecurringEvents);
 
         // Ajoute les événements de cet agenda au tableau global
