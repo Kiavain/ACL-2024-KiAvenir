@@ -152,6 +152,17 @@ export const openModal = (eventData) => {
     endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
+  
+  // Définit la récurrence de l'event
+  let recurrenceSelect = document.getElementById("eventRecurrence");
+  let recurrence = eventData.extendedProps.recurrence;
+  let options = recurrenceSelect.children;
+  
+  for (let i = 0; i <= 4; i++) {
+    options[i].selected = false;
+  }
+  options[recurrence].selected = true;
+
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
@@ -189,7 +200,8 @@ export const saveEvent = (calendar) => {
     description: document.getElementById("eventDetails").value,
     start: document.getElementById("startEventTime").value,
     end: document.getElementById("endEventTime").value,
-    allDay: document.getElementById("eventAllDay").checked
+    allDay: document.getElementById("eventAllDay").checked,
+    recurrence: document.getElementById("eventRecurrence").value
   };
   if (!updatedData.title.trim()) {
     errorMessages.innerText = "Le champ titre est obligatoire.";

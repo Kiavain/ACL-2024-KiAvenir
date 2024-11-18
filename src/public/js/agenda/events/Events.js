@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const errAgenda = getElement("agenda-error");
     const errName = getElement("name-error");
     const allDay = getElement("event-all-day");
+    const recurrence = getElement("event-recurrence");
     e.preventDefault();
 
     errName.style.display = agendaValue ? "none" : "block";
@@ -92,6 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;
     }
+    // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
+    if (recurrence.value != 0 && recurrence.value != 1 && recurrence.value != 2 && recurrence.value != 3 && recurrence.value != 4) {
+      return;
+    }
 
     const data = {
       name: name,
@@ -99,7 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
       description: description,
       startDate: dateDebut,
       endDate: dateFin,
-      allDay: allDay.checked
+      allDay: allDay.checked,
+      recurrence: recurrence.value
     };
 
     modal.style.display = "none";

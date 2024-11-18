@@ -52,7 +52,8 @@ export default class EventRouteur extends Routeur {
         description: req.body.description,
         startDate: req.body.start,
         endDate: req.body.end,
-        allDay: req.body.allDay
+        allDay: req.body.allDay,
+        recurrence: req.body.recurrence
       };
 
       if (event) {
@@ -88,15 +89,15 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const newEvent = this.server.database.tables.get("events");
-      if (newEvent) {
+      const allEvents = this.server.database.tables.get("events");
+      if (allEvents) {
         //Permet de rajouter un jour au jour de Fin à un event all Day
         if (req.body.allDay) {
           let endDate = new Date(req.body.endDate);
           endDate.setUTCDate(endDate.getUTCDate() + 1);
           req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
         }
-        newEvent
+        allEvents
           .create(req.body)
           .then(() => {
             res.json({ success: true, message: "Événement créé avec succès" });
@@ -163,7 +164,8 @@ export default class EventRouteur extends Routeur {
             end: moment(e.endDate).format(),
             agendaId: agendaId,
             color: agenda.color,
-            allDay: e.allDay
+            allDay: e.allDay,
+            recurrence: e.recurrence
           }));
 
         // Ajoute les événements de cet agenda au tableau global

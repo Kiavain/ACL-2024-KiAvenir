@@ -35,6 +35,9 @@ export default class EventsEntity extends Entity {
       },
       allDay: {
         type: DataTypes.BOOLEAN
+      },
+      recurrence: {
+        type: DataTypes.INTEGER
       }
     });
   }
