@@ -64,10 +64,8 @@ export const initCalendar = () => {
       openModal(info.event);
     },
     eventDidMount: function (info) {
-      if (info.view.type === "listWeek") {
-        info.el.style.backgroundColor = info.event.backgroundColor;
-        info.el.classList.remove("fc-list-event");
-      }
+      info.el.style.backgroundColor = info.event.backgroundColor;
+      info.el.classList.remove("fc-list-event");
     },
     dateClick: function (info) {
       const modal = document.getElementById("modal");
