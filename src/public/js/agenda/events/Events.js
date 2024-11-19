@@ -18,9 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.getElementById("close-btn");
   const createButton = document.getElementById("saveEvent");
   const allDay = getElement("event-all-day");
-  //Empêche de mettre une date < à ajd
-  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  const nowWithoutHours = new Date().toISOString().split("T")[0];
+
   //Change le format de la date en all day, sans heures
   allDay.addEventListener("click", () => {
     const startDate = getElement("event-date");
@@ -29,9 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const newStartDate = startDate.value.split("T")[0];
       startDate.type = "date";
       endDate.type = "date";
-
-      startDate.min = nowWithoutHours;
-      endDate.min = nowWithoutHours;
       startDate.value = newStartDate;
       endDate.value = startDate.value;
     } else {
@@ -39,8 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const newEndDate = startDate.value + "T08:00";
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
-      startDate.min = now;
-      endDate.min = now;
       startDate.value = newStartDate;
       endDate.value = newEndDate;
     }

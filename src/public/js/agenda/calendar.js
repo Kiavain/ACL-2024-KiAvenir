@@ -117,19 +117,14 @@ export const openModal = (eventData) => {
   const allDay = document.getElementById("eventAllDay");
   const startDate = document.getElementById("startEventTime");
   const endDate = document.getElementById("endEventTime");
-  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  const nowWithoutHours = new Date().toISOString().split("T")[0];
+
   allDay.addEventListener("click", () => {
     if (allDay.checked) {
       startDate.type = "date";
       endDate.type = "date";
-      startDate.min = nowWithoutHours;
-      endDate.min = nowWithoutHours;
     } else {
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
-      startDate.min = now;
-      endDate.min = now;
     }
   });
   document.getElementById("eventTitle").value = eventData.title;
@@ -139,8 +134,7 @@ export const openModal = (eventData) => {
     allDay.checked = false;
     startDate.type = "datetime-local";
     endDate.type = "datetime-local";
-    startDate.min = now;
-    endDate.min = now;
+
     startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
     endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
   } else {
