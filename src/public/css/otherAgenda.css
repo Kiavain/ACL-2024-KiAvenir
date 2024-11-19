@@ -1,0 +1,32 @@
+.category{
+  border-bottom: 1px solid #8e3838;
+  margin-bottom: 30px;
+}
+.last-category{
+  margin-bottom: 30px;
+}
+
+.category-ul{
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+}
+
+.span-category{
+  padding-left: 15px;
+}
+.loader {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  transform: translate(-50%, -50%);
+  align-self: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
