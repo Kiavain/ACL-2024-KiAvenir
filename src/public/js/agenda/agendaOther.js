@@ -125,7 +125,11 @@ function removeHoliday(elem, name) {
       if (data.success) {
         addFlashMessages(data.flashMessages);
         const liElement = document.querySelector(`li[data-agenda-name="${name}"]`);
+        const divDropDown = document.getElementById("dropdown-menu");
+        const liDropDown = divDropDown.querySelector("li");
+        console.log(liDropDown);
         if (liElement) {
+          liElement.querySelector("input").click();
           liElement.remove();
         }
       }
