@@ -28,7 +28,7 @@ export default class AgendaRouteur extends Routeur {
       .get("/agenda", this.controller.renderAgenda)
       .get("/agenda/:agendaIds", async (req, res) => {
         if (!res.locals.user) {
-          req.flash("notifications", "Vous devez être connecté pour accéder à cette page.");
+          req.flash("Vous devez être connecté pour accéder à cette page.");
           return res.redirect("/login");
         }
 
@@ -38,7 +38,7 @@ export default class AgendaRouteur extends Routeur {
         // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
         const agendas_to_consult = this.server.database.tables
           .get("agendas")
-          .filter((agenda) => agendaIds.includes(agenda.agendaId) && agenda.ownerId === res.locals.user.id);
+          .filter((agenda) => agendaIds.includes(agenda.agendaId) && agenda.verifyAgendaAccess(res.locals.user.id));
 
         const agendas = this.server.database.tables.get("agendas");
         const guests = this.server.database.tables.get("guests");

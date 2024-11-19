@@ -3,22 +3,32 @@
 import { addFlashMessages } from "../utils.js";
 moment.locale("fr");
 
-function getEventsUrl(agenda) {
-  const selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+export function refreshCalendar() {
+  getCalendarInstance().setOption("events", getEventsUrl());
+  getCalendarInstance().refetchEvents();
+}
+
+export function getEventsUrl() {
+  let selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
     .map((checkbox) => checkbox.value)
     .join(",");
 
-  const search = document.getElementById("searchInput").value;
-  const input = search && search.trim() !== "" ? `?search=${search}` : "";
-  if (!selectedAgendaIds) {
-    return `/api/events/${agenda.agendaId}${input}`;
+  // Vérifie aussi l'agendaId présent dans l'URL
+  const url = new URL(window.location.href);
+  const agendaId = url.pathname.split("/").pop();
+  if (agendaId && !selectedAgendaIds.includes(agendaId)) {
+    selectedAgendaIds += `,${agendaId}`;
   }
 
+  const search = document.getElementById("searchInput").value;
+  const input = search && search.trim() !== "" ? `?search=${search}` : "";
   return `/api/events/${selectedAgendaIds}${input}`;
 }
 
+let calendarInstance = null;
+
 // Fonction pour créer et initialiser le calendrier
-export const initCalendar = (agenda) => {
+export const initCalendar = () => {
   const calendarEl = document.getElementById("calendar");
   if (!calendarEl) {
     console.error("Element #calendar non trouvé");
@@ -33,7 +43,7 @@ export const initCalendar = (agenda) => {
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek"
+      right: "dayGridMonth,timeGridWeek,timeGridDay"
     },
     buttonText: {
       today: "Aujourd'hui",
@@ -42,7 +52,7 @@ export const initCalendar = (agenda) => {
       day: "Jour",
       list: "Liste"
     },
-    events: getEventsUrl(agenda),
+    events: getEventsUrl(),
     eventDataTransform: (eventData) => {
       return {
         ...eventData,
@@ -54,24 +64,48 @@ export const initCalendar = (agenda) => {
       openModal(info.event);
     },
     eventDidMount: function (info) {
-      if (info.view.type === "listWeek") {
-        info.el.style.backgroundColor = info.event.backgroundColor;
-        info.el.classList.remove("fc-list-event");
+      info.el.style.backgroundColor = info.event.backgroundColor;
+      info.el.classList.remove("fc-list-event");
+    },
+    dateClick: function (info) {
+      const modal = document.getElementById("modal");
+      const name = document.getElementById("event-name");
+      const startDate = document.getElementById("event-date");
+      const endDate = document.getElementById("event-date-end");
+      const allDay = document.getElementById("event-all-day");
+      const agenda = document.getElementById("event-agenda");
+      const description = document.getElementById("event-description");
+      startDate.type = info.allDay ? "date" : "datetime-local";
+      endDate.type = startDate.type;
+      startDate.value = info.dateStr;
+      endDate.value = info.dateStr;
+      allDay.checked = info.allDay;
+      agenda.value = agenda.options[0].value;
+      name.value = "";
+      description.value = "";
+
+      if (!info.allDay) {
+        startDate.value = info.dateStr.replace("+01:00", "");
+        endDate.value = moment(startDate.value).add(2, "hour").toISOString().substring(0, 16);
       }
+
+      modal.style.display = "block";
     }
   });
 
-  // Recharge les événements chaque fois qu'une case est cochée/décochée
-  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
-    checkbox.addEventListener("change", () => {
-      calendar.setOption("events", getEventsUrl(agenda));
-      calendar.refetchEvents(); // Recharge les événements
-    });
-  });
+  calendarInstance = calendar;
 
   calendar.render();
-  listenFilter(calendar, agenda);
+  listenFilter(calendar);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
+};
+
+// Fonction pour obtenir l'instance du calendrier
+export const getCalendarInstance = () => {
+  if (!calendarInstance) {
+    console.warn("Le calendrier n'est pas encore initialisé.");
+  }
+  return calendarInstance;
 };
 
 // Fonction pour ouvrir la modale
@@ -83,19 +117,14 @@ export const openModal = (eventData) => {
   const allDay = document.getElementById("eventAllDay");
   const startDate = document.getElementById("startEventTime");
   const endDate = document.getElementById("endEventTime");
-  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  const nowWithoutHours = new Date().toISOString().split("T")[0];
+
   allDay.addEventListener("click", () => {
     if (allDay.checked) {
       startDate.type = "date";
       endDate.type = "date";
-      startDate.min = nowWithoutHours;
-      endDate.min = nowWithoutHours;
     } else {
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
-      startDate.min = now;
-      endDate.min = now;
     }
   });
   document.getElementById("eventTitle").value = eventData.title;
@@ -105,8 +134,7 @@ export const openModal = (eventData) => {
     allDay.checked = false;
     startDate.type = "datetime-local";
     endDate.type = "datetime-local";
-    startDate.min = now;
-    endDate.min = now;
+
     startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
     endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
   } else {
@@ -124,9 +152,9 @@ export const openModal = (eventData) => {
   modal.style.display = "block";
 };
 //Fonction pour écouter la barre de filtrage des évenements
-const listenFilter = (calendar, agenda) => {
+const listenFilter = (calendar) => {
   document.getElementById("searchInput").addEventListener("input", function () {
-    calendar.setOption("events", getEventsUrl(agenda));
+    calendar.setOption("events", getEventsUrl());
     calendar.refetchEvents();
   });
 };
