@@ -33,7 +33,7 @@ if (currentPath.includes("/agenda")) {
                     </button>
                 <% } %>
 
-                <span class="header-title"><%= agenda.name %></span>
+                <span id="agendaNameDisplay" style="font-size: 24px; font-weight: bold; color: <%= agenda.color %>; margin-right: 10px;"><%= agenda.name %></span>
                 <% if (agenda.ownerId === locals.user.id) {%>
                     <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
                 <% } %>

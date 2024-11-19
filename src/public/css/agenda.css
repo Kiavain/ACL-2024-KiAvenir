@@ -266,6 +266,13 @@ body {
   display: none;
 }
 
+.flex-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
 /* Animation de fondu */
 @keyframes fadeIn {
   from {
