@@ -146,11 +146,24 @@ export const openModal = (eventData) => {
     endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
+  
+  // Définit la récurrence de l'event
+  let recurrenceSelect = document.getElementById("eventRecurrence");
+  let recurrence = eventData.extendedProps.recurrence;
+  let recurrenceOptions = recurrenceSelect.children;
+  
+  for (let i = 0; i <= 4; i++) {
+    recurrenceOptions[i].selected = false;
+  }
+  recurrenceOptions[recurrence].selected = true;
+
+
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
   modal.style.display = "block";
 };
+
 //Fonction pour écouter la barre de filtrage des évenements
 const listenFilter = (calendar) => {
   document.getElementById("searchInput").addEventListener("input", function () {
@@ -158,6 +171,7 @@ const listenFilter = (calendar) => {
     calendar.refetchEvents();
   });
 };
+
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
@@ -183,7 +197,8 @@ export const saveEvent = (calendar) => {
     description: document.getElementById("eventDetails").value,
     start: document.getElementById("startEventTime").value,
     end: document.getElementById("endEventTime").value,
-    allDay: document.getElementById("eventAllDay").checked
+    allDay: document.getElementById("eventAllDay").checked,
+    recurrence: document.getElementById("eventRecurrence").value
   };
   if (!updatedData.title.trim()) {
     errorMessages.innerText = "Le champ titre est obligatoire.";

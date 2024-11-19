@@ -5,11 +5,11 @@
         <span class="close-btn" id="close-btn">&times;</span>
         <h2>Ajouter un événement</h2>
         <form>
-            <label for="event-name">Nom de l'événement : <span class="requis">*</span></label>
+            <label for="event-name">Nom de l'événement : <span class="requis">*</span></label>
             <input type="text" id="event-name" name="event-name" required>
             <p id="name-error" style="color: red; display: none;">Le nom de l'événement est obligatoire.</p>
 
-            <label for="event-date">Date de début : <span class="requis">*</span></label>
+            <label for="event-date">Date de début : <span class="requis">*</span></label>
             <input type="datetime-local" id="event-date" name="event-date" required>
 
             <div style="display: flex; align-items: center;">
@@ -17,7 +17,18 @@
                 <input type="checkbox" id="event-all-day" name="event-all-day" style="margin-top: 12px; margin-left: 5px;">
             </div>
 
-            <label for="event-date-end">Date de fin : <span class="requis">*</span></label>
+            <div style="display: flex; align-items: center;">
+                <label for="event-recurrence">Se répète :</label>
+                <select name="event-recurrence" id="event-recurrence" style="margin-top: 12px; margin-left: 5px; width:200px;">
+                    <option value="0" selected>Une seule fois</option>
+                    <option value="1">Tous les jours</option>
+                    <option value="2">Toutes les semaines</option>
+                    <option value="3">Tous les mois</option>
+                    <option value="4">Tous les ans</option>
+                </select>
+            </div>
+
+            <label for="event-date-end">Date de fin : <span class="requis">*</span></label>
             <input type="datetime-local" id="event-date-end" name="event-date" required>
 
             <p id="date-error" style="color: red; display: none;">La date de fin doit être supérieure à la date de début.</p>
