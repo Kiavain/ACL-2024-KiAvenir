@@ -33,7 +33,7 @@ if (currentPath.includes("/agenda")) {
                     </button>
                 <% } %>
 
-                <span class="header-title"><%= agenda.name %></span>
+                <span id="agendaNameDisplay" style="font-size: 24px; font-weight: bold; color: <%= agenda.color %>; margin-right: 10px;"><%= agenda.name %></span>
                 <% if (agenda.ownerId === locals.user.id && agenda.special === false) {%>
                     <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
                 <% } %>
@@ -68,7 +68,7 @@ if (currentPath.includes("/agenda")) {
                                 <ul class="agenda-list" id="agenda-list">
 
                                     <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
-                                        <li class="agenda-item" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                                        <li class="agenda-item" data-description="<%= agenda.description %>" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                                             <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
                                             <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
                                                 <span style="color:<%= agenda.color %>"><%= agenda.name %></span>

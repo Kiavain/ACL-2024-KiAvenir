@@ -113,7 +113,7 @@ export class AgendaController extends Controller {
       return res.err(401, "Vous devez être connecté pour accéder à cette page.");
     }
 
-    const { name } = req.body;
+    const { name, color, description } = req.body;
     const agenda = this.agendas.get(req.params.agendaId);
     if (!agenda) {
       return res.err(404, "Agenda non trouvé.");
@@ -121,9 +121,13 @@ export class AgendaController extends Controller {
       return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
     } else if (!name || name.trim() === "") {
       return res.err(400, "Le nom de l'agenda est requis.");
+    } else if (color === "#FFFFFF") {
+      return res.err(400, "La couleur de l'agenda ne peut pas être blanche.");
+    } else if (description && description.length > 255) {
+      return res.err(400, "La description de l'agenda ne peut pas dépasser 255 caractères.");
     }
 
-    await agenda.update({ name });
+    await agenda.update({ name, description, color });
     return res.success(`L'agenda ${agenda.name} a été mis à jour avec succès.`);
   }
 
