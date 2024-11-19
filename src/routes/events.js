@@ -121,16 +121,15 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
-      const search = req.query.search;
-      const start = req.query.start;
-      const end = req.query.end;
+      const { search, start, end } = req.query;
+      let { agendaIds } = req.params;
 
       // Vérifie que start et end sont définis
       if (!start || !end) {
         return res.json([]);
       }
 
-      const agendaIds = req.params.agendaIds.split(",").map((id) => parseInt(id.trim()));
+      agendaIds = agendaIds.split(",").map((id) => parseInt(id.trim()));
 
       // Synchronisation avec la base de données
       await this.server.database.sync();
@@ -140,8 +139,6 @@ export default class EventRouteur extends Routeur {
       // Parcours chaque agendaId et récupère les événements correspondants
       for (const agendaId of agendaIds) {
         const agenda = this.server.database.tables.get("agendas").get(agendaId);
-
-        // Continue si l'agenda n'existe pas
         if (!agenda) {
           continue;
         }
@@ -150,12 +147,7 @@ export default class EventRouteur extends Routeur {
         const events = agenda
           .getEvents()
           .filter((e) => {
-            return (
-              agendaId === e.agendaId &&
-              // je désactive pour récupérer TOUS les évènements et afficher les récurrents
-              // (moment(e.startDate).isBetween(start, end) || moment(e.endDate).isBetween(start, end)) &&
-              (!search || e.name.toLowerCase().includes(search.toLowerCase()))
-            );
+            return agendaId === e.agendaId && (!search || e.name.toLowerCase().includes(search.toLowerCase()));
           })
           .map((e) => ({
             eventId: e.eventId,
@@ -163,90 +155,66 @@ export default class EventRouteur extends Routeur {
             title: e.name,
             start: moment(e.startDate).format(),
             end: moment(e.endDate).format(),
-            agendaId: agendaId,
             color: agenda.color,
             allDay: e.allDay,
-            recurrence: e.recurrence
+            recurrence: e.recurrence,
+            agendaId
           }));
 
         // On récupère les évènements récurrents
         const recurringEvents = events.filter((event) => event.recurrence !== 0);
         let adjustedRecurringEvents = [];
 
-        // Algorithme
-        // Pour chaque jour, regarder les evenements recurrents
-        // Si la date du jour est superieure a la date de l'evenement:
-        //  Calculer si l'evenement doit etre afficher ce jour
-        //    - si quotidien: true
-        //    - si hebdo: calculer la date modulo 7, si ca tombe juste, true
-        //    - si mensuel: true si le jour est le meme jour que l'event
-        //    - si annuel: true si le jour et le mois sont les memes que l'event
-        //      (exception: si l'event est un 29 fevrier et qu'il n'y en a pas cette annee: mettre le 1er mars)
-        //
-        //   Pour calculer la date de fin de l'event cloné, calculer la duree de l'event (date de fin - date de debut),
-        //    et calculer la nouvelle date de fin à partir de la nouvelle date de début
-        //   Sauf si c'est un 'all-day' ?
+        // Fonction pour vérifier si une année est bissextile
+        const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
+        // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         let currentDate = new Date(start);
         const endCalendar = new Date(end);
 
-        // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         while (currentDate < endCalendar) {
-          // Afficher le jour en question
-          const dateToString = currentDate.toLocaleString().split("T")[0].split("/");
-
-          const jour = parseInt(dateToString[0]);
-          const mois = parseInt(dateToString[1]);
-          const annee = parseInt(dateToString[2].split(" ")[0]);
-
-          console.log("\nJour traité: " + jour + "-" + mois + "-" + annee);
+          // Récupération des informations de la date actuelle en UTC
+          const jour = currentDate.getUTCDate();
+          const mois = currentDate.getUTCMonth() + 1; // Les mois sont de 0 à 11
+          const annee = currentDate.getUTCFullYear();
 
           // On parcourt les évènements récurrents pour savoir si on doit en afficher un
           for (const evt of recurringEvents) {
             let displayEvent = false;
             const eventStart = new Date(evt.start);
             const eventEnd = new Date(evt.end);
-            const dureeEvent = eventEnd - eventStart; // On calcule la duree de l'évènement
+            const dureeEvent = eventEnd - eventStart; // Durée de l'événement en millisecondes
 
-            const eventStartDate = eventStart.getDate();
-            const eventStartMonth = eventStart.getMonth() + 1;
-            const eventStartYear = eventStart.getFullYear();
+            const eventStartDate = eventStart.getUTCDate();
+            const eventStartMonth = eventStart.getUTCMonth() + 1;
+            const eventStartYear = eventStart.getUTCFullYear();
 
             // On vérifie si l'évènement doit être affiché
-            // if tombe un bon jour, alors displayEvent = true;
             if (currentDate > eventStart) {
-              // Si la date du jour en question est ultérieure à la date originale de l'évènement
               switch (evt.recurrence) {
                 case 1: // Tous les jours
-                  // console.log("Tous les jours", evt.title);
                   displayEvent = true;
                   break;
                 case 2: // Toutes les semaines
-                  // On calcule si la date de début est la même modulo 7 jours
-                  // On convertit les dates en "jours calendaires" (pour pallier aux changements d'heures)
-                  let currentDateMidnight = new Date(currentDate);
-                  let eventStartMidnight = new Date(eventStart);
-                  currentDateMidnight.setHours(0, 0, 0, 0);
-                  eventStartMidnight.setHours(0, 0, 0, 0);
-
-                  const daysFromEvent = Math.floor(new Date(eventStartMidnight).getTime() / (1000 * 60 * 60 * 24));
-                  const daysFromCurrent = Math.floor(new Date(currentDateMidnight).getTime() / (1000 * 60 * 60 * 24));
-                  // On calcule la différence de jours
-                  const differenceInDays = Math.abs(daysFromEvent - daysFromCurrent);
-                  // On teste la différence modulo 7
+                  const differenceInDays = Math.floor(
+                    (currentDate.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24)
+                  );
                   displayEvent = differenceInDays % 7 === 0;
-                  if (displayEvent) {
-                    console.log(currentDateMidnight, eventStartMidnight, differenceInDays % 7, displayEvent);
-                  }
                   break;
                 case 3: // Tous les mois
-                  if (eventStartDate == jour) {
-                    displayEvent = true;
-                  }
+                  displayEvent = eventStartDate === jour;
                   break;
                 case 4: // Tous les ans
-                  if (eventStartMonth == mois && eventStartDate == jour) {
-                    //todo fix: prendre en compte les 29 fevrier comme des 1er mars ?
+                  if (eventStartMonth === mois && eventStartDate === jour) {
+                    displayEvent = true;
+                  } else if (
+                    eventStartMonth === 2 &&
+                    eventStartDate === 29 &&
+                    mois === 3 &&
+                    jour === 1 &&
+                    !isLeapYear(annee)
+                  ) {
+                    // Gestion spécifique du 29 février dans une année non bissextile
                     displayEvent = true;
                   }
                   break;
@@ -255,36 +223,28 @@ export default class EventRouteur extends Routeur {
               }
             }
 
-            // On vérifie qu'on soit pas à la date même de l'évènement avant (pour éviter de l'afficher 2 fois)
-            if (eventStartDate == jour && eventStartMonth == mois && eventStartYear == annee) {
+            // Éviter d'afficher l'événement deux fois s'il tombe sur sa date de départ
+            if (eventStartDate === jour && eventStartMonth === mois && eventStartYear === annee) {
               displayEvent = false;
             }
 
             if (displayEvent) {
-              // On clone l'évènement
-              let adjustedEvent = { ...evt };
+              // Calculons la nouvelle date de début
+              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour));
 
-              // let adjustedEventStart = eventStart.toLocaleString();
-              let adjustedEventStart = new Date(eventStart);
-              adjustedEventStart.setYear(annee);
-              adjustedEventStart.setMonth(mois - 1);
-              adjustedEventStart.setDate(jour);
-
-              // Calculons la date de fin
-              let adjustedEventEnd = new Date(adjustedEventStart);
-              adjustedEventEnd.setTime(adjustedEventStart.getTime() + dureeEvent); // On définit la date de fin de l'évènement
-
-              adjustedEvent.start = adjustedEventStart.toISOString();
-              adjustedEvent.end = adjustedEventEnd.toISOString();
-
-              console.log(adjustedEventStart , adjustedEvent.start);
+              // On clone l'évènement en ajustant la date de début et de fin
+              const adjustedEvent = {
+                ...evt,
+                start: adjustedEventStart.toISOString(),
+                end: new Date(adjustedEventStart.getTime() + dureeEvent).toISOString()
+              };
 
               adjustedRecurringEvents.push(adjustedEvent);
             }
           }
 
           // Passer au jour suivant
-          currentDate.setDate(currentDate.getDate() + 1);
+          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
         }
 
         // Ajoute les événements de cet agenda au tableau global
@@ -292,7 +252,6 @@ export default class EventRouteur extends Routeur {
       }
 
       // Envoie tous les événements associés aux agendas spécifiés
-      // console.log("events", allEvents);
       res.json(allEvents);
     });
   }
