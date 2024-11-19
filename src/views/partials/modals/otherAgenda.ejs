@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="/css/otherAgenda.css">
+<div id="otherAgendaModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" id="otherAgenda-close-btn">&times;</span>
+        <h2>Importer d'autres agendas</h2>
+
+
+        <div class="category">
+            <h4>Jours fériés locaux</h4>
+            <ul class="category-ul">
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Jours fériés et autres fêtes en France")) { %> checked <% } %> id="basic" data-link="../../data/holidays/Basic.ics" data-name="Jours fériés et autres fêtes en France"><span class="span-category">Jours fériés et autres fêtes en France</span></li>
+            </ul>
+        </div>
+
+        <div class="last-category">
+            <h4>Vacances scolaires</h4>
+            <ul class="category-ul">
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Calendrier scolaire - Zone A")) { %> checked <% } %> id="zoneA" data-link="../../data/holidays/Zone-A.ics" data-name="Calendrier scolaire - Zone A"><span class="span-category">Zone A</span></li>
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Calendrier scolaire - Zone B")) { %> checked <% } %> id="zoneB" data-link="../../data/holidays/Zone-B.ics" data-name="Calendrier scolaire - Zone B"><span class="span-category">Zone B</span></li>
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Calendrier scolaire - Zone C")) { %> checked <% } %> id="zoneC" data-link="../../data/holidays/Zone-C.ics" data-name="Calendrier scolaire - Zone C"><span class="span-category">Zone C</span></li>
+                <li><input type="checkbox" <% if (agendas.some(agenda => agenda.ownerId === locals.user.id && agenda.special === true && agenda.name === "Calendrier scolaire - Corse")) { %> checked <% } %> id="zoneCorse" data-link="../../data/holidays/Corse.ics" data-name="Calendrier scolaire - Corse"><span class="span-category">Corse</span></li>
+            </ul>
+        </div>
+        <div id="loader" class="loader" style="display: none;"></div>
+
+
+
+    </div>
+</div>
+<script type="module" src="/js/agenda/agendaOther.js"></script>
