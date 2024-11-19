@@ -187,7 +187,7 @@ export class AgendaController extends Controller {
       return res.err(403, "Vous n'êtes pas autorisé à supprimer cet agenda.");
     }
 
-    const agendas = this.agendas.filter((agenda) => agenda.ownerId === localUser.id);
+    const agendas = this.agendas.filter((agenda) => agenda.ownerId === localUser.id && !agenda.special);
     if (agendas.length === 1) {
       return res.err(400, "Vous ne pouvez pas supprimer votre dernier agenda.");
     }
