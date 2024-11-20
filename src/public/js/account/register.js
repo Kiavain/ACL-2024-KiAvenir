@@ -31,7 +31,7 @@ async function validateAccountCreation(e) {
     emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
   });
 
-  const emailIsEmpty = (emailInput.value === "");
+  const emailIsEmpty = emailInput.value === "";
   var emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
@@ -39,7 +39,7 @@ async function validateAccountCreation(e) {
     e.preventDefault();
     return;
   }
-  
+
   // Vérifie le format de l'adresse mail (regex)
   emailIsCorrect = await checkEmail(emailInput);
 
@@ -47,7 +47,7 @@ async function validateAccountCreation(e) {
     e.preventDefault();
     return;
   }
-  
+
   // Récupère les labels des messages d'erreur
   const passwordMessage = document.getElementById("passwordMessage");
   const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
@@ -61,7 +61,6 @@ async function validateAccountCreation(e) {
 
   // Applique les vérifications de mot de passe
   await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
-  
 
   // Empêche la soumission du formulaire si un champ est incorrect
   if (!accountForm.checkValidity()) {

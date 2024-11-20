@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const deleteButton = document.getElementById("deleteEvent");
 
   // Initialisation du calendrier
-  const calendar = initCalendar(agenda);
+  const calendar = initCalendar();
 
   // Si le calendrier est bien initialisé
   if (calendar) {

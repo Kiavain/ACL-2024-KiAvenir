@@ -55,6 +55,12 @@ export default class Event extends EntityStructures {
      * @type {Boolean}
      */
     this.allDay = data.allDay;
+
+    /**
+     * Entier pour déterminer la répétition d'un événement (ponctuel, quotidient, hebdomadaire, etc.)
+     * @type {int}
+     */
+    this.recurrence = data.recurrence;
   }
 
   /**
@@ -110,7 +116,8 @@ export default class Event extends EntityStructures {
       description: this.description,
       startDate: this.startDate,
       endDate: this.endDate,
-      allDay: this.allDay
+      allDay: this.allDay,
+      recurrence: this.recurrence
     };
   }
 }
