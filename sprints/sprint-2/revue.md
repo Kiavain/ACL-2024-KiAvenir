@@ -46,4 +46,7 @@ Comme pour les précédents sprints, notre plus grande difficulté est de réuss
 Ici le problème résidait dans la fonction toLocalString() concernant les dates, ces fonctions n'ont pas le même format sur les deux systèmes d'exploitation.
 Nous avons dû adapter notre code pour que cela fonctionne sur les deux systèmes.
 
-
+### Problème de planification
+Nous avions pensé à une fonctionnalité pour capturer la timezone de l'utilisateur pour adapter les événements.
+Néanmoins, nous avons dû abandonner cette idée car nous avons pris conscience que ce n'était pas souhaitable.
+Si l'utilisateur prévoit un événement à une heure précise, il veut que cet événement soit à cette heure précise, peu importe où il se trouve, il ne faut pas adapter l'heure de l'événement.
