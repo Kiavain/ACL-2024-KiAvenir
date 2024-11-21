@@ -188,8 +188,9 @@ export const saveEvent = (calendar) => {
   const updatedData = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
-    start: document.getElementById("startEventTime").value,
-    end: document.getElementById("endEventTime").value,
+    // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
+    start: document.getElementById("startEventTime").value + "+00:00",
+    end: document.getElementById("endEventTime").value + "+00:00",
     allDay: document.getElementById("eventAllDay").checked
   };
   if (!updatedData.title.trim()) {
