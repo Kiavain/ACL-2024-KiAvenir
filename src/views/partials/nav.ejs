@@ -120,7 +120,7 @@ if (currentPath.includes("/agenda")) {
                     <% } %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img id="userIcon" src="/img/user_icon/account.jpg" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
+                            <img id="userIcon" src="/img/user_icon/account.jpg" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top" data-user-id="<%= locals.user.id %>">
                             <span class="ms-2"><%= locals.user.username %></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
