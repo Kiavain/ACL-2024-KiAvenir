@@ -19,12 +19,15 @@
                 <div class="col-md-4">
                     <!-- Formulaire pour l'avatar -->
                     <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
-                    <form name="accountEdition" action="/account/edit" method="POST">
-                        <div class="row">
-                            <h3>To do</h3>
+                    <form action="/account/edit-icon" method="POST" enctype="multipart/form-data">
+                        <!-- Champ pour sélectionner un fichier -->
+                        <div class="mb-3">
+                        <label for="imageUpload" class="form-label fw-bold">Choisissez une image :</label>
+                        <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" required>
                         </div>
+                        <!-- Bouton de soumission -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary fw-bold w-75 mx-auto">Enregistrer mon avatar</button>
+                        <button type="submit" class="btn btn-primary fw-bold">Uploader l'image</button>
                         </div>
                     </form>
                 </div>
