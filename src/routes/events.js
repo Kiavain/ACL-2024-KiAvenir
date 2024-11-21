@@ -161,6 +161,8 @@ export default class EventRouteur extends Routeur {
             agendaId
           }));
 
+        console.log(events.find((e) => e.recurrence !== 0));
+
         // On récupère les évènements récurrents
         const recurringEvents = events.filter((event) => event.recurrence !== 0);
         let adjustedRecurringEvents = [];
@@ -170,6 +172,7 @@ export default class EventRouteur extends Routeur {
 
         // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         let currentDate = new Date(start);
+        currentDate.setUTCHours(23, 59, 59, 999);
         const endCalendar = new Date(end);
 
         while (currentDate < endCalendar) {
@@ -230,7 +233,7 @@ export default class EventRouteur extends Routeur {
 
             if (displayEvent) {
               // Calculons la nouvelle date de début
-              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour));
+              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours()));
 
               // On clone l'évènement en ajustant la date de début et de fin
               const adjustedEvent = {
