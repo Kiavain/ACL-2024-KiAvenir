@@ -1,6 +1,25 @@
 import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
+import { access, unlink } from 'fs/promises';
+
+
+
+// Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
+async function checkAndDeleteIcon(path) {
+  try {
+    await access(path); // Vérifie si le fichier existe
+    await unlink(path); // Supprime le fichier
+    console.log(`Le fichier ${path} a été supprimé avec succès.`);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      console.log(`Le fichier ${path} n'existe pas.`);
+    } else {
+      console.error(`Erreur : ${err.message}`);
+    }
+  }
+}
+
 
 /**
  * Contrôleur pour les comptes utilisateurs
@@ -268,6 +287,12 @@ export class AccountController extends Controller {
     try {
       // Supprime l'utilisateur et le déconnecte
       const user = this.database.get("users").get(localUser.id);
+
+      // Supprime l'avatar s'il existe
+      const filePath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
+      checkAndDeleteIcon(filePath);
+
+      // Supprime l'utilisateur
       await user.delete();
       this.logout(req, res);
     } catch (err) {
