@@ -231,7 +231,9 @@ export default class EventRouteur extends Routeur {
 
             if (displayEvent) {
               // Calculons la nouvelle date de début
-              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours()));
+              const adjustedEventStart = new Date(
+                Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours(), eventStart.getUTCMinutes())
+              );
 
               // On clone l'évènement en ajustant la date de début et de fin
               const adjustedEvent = {
