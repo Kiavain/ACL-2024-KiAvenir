@@ -208,6 +208,8 @@ export class AccountController extends Controller {
     };
   }
 
+//todo: ajouter une fonction editUserIcon
+
   /**
    * Prépare l'objet utilisateur avec les modifications
    * @param user L'utilisateur

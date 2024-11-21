@@ -14,9 +14,23 @@
             Vous pouvez <a href="/signin" class="link-underline link-underline-opacity-0">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0">vous connecter</a> pour accéder à cette page.
         </div>
     <% } else { %>
-        <div class="container d-flex justify-content-center align-items-center h-75">
-            <div class="" style="width: 600px;">
-                <div class="">
+        <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+            <div class="row w-100">
+                <div class="col-md-4">
+                    <!-- Formulaire pour l'avatar -->
+                    <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
+                    <form name="accountEdition" action="/account/edit" method="POST">
+                        <div class="row">
+                            <h3>To do</h3>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary fw-bold w-75 mx-auto">Enregistrer mon avatar</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- <div class="col-md-1 vr"></div> -->
+                <div class="col-md-8">
+                    <!-- Formulaire pour les infos du compte -->
                     <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h2>
                     <form name="accountEdition" action="/account/edit" method="POST">
                         <div class="row">
@@ -47,8 +61,8 @@
                                 <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
                             </div>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary fw-bold">Enregistrer les modifications</button>
+                        <div class="d-grid w-75 mx-auto">
+                            <button type="submit" class="btn btn-primary fw-bold">Enregistrer mes modifications</button>
                         </div>
                     </form>
                 </div>
