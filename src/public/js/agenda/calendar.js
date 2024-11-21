@@ -118,19 +118,14 @@ export const openModal = (eventData) => {
   const allDay = document.getElementById("eventAllDay");
   const startDate = document.getElementById("startEventTime");
   const endDate = document.getElementById("endEventTime");
-  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  const nowWithoutHours = new Date().toISOString().split("T")[0];
+
   allDay.addEventListener("click", () => {
     if (allDay.checked) {
       startDate.type = "date";
       endDate.type = "date";
-      startDate.min = nowWithoutHours;
-      endDate.min = nowWithoutHours;
     } else {
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
-      startDate.min = now;
-      endDate.min = now;
     }
   });
   document.getElementById("eventTitle").value = eventData.title;
@@ -140,8 +135,6 @@ export const openModal = (eventData) => {
     allDay.checked = false;
     startDate.type = "datetime-local";
     endDate.type = "datetime-local";
-    startDate.min = now;
-    endDate.min = now;
     startDate.value = moment(eventData.start).toISOString().substring(0, 16);
     endDate.value = moment(eventData.end).toISOString().substring(0, 16);
   } else {
@@ -153,11 +146,24 @@ export const openModal = (eventData) => {
     endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
+  
+  // Définit la récurrence de l'event
+  let recurrenceSelect = document.getElementById("eventRecurrence");
+  let recurrence = eventData.extendedProps.recurrence;
+  let recurrenceOptions = recurrenceSelect.children;
+  
+  for (let i = 0; i <= 4; i++) {
+    recurrenceOptions[i].selected = false;
+  }
+  recurrenceOptions[recurrence].selected = true;
+
+
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
 
   modal.style.display = "block";
 };
+
 //Fonction pour écouter la barre de filtrage des évenements
 const listenFilter = (calendar) => {
   document.getElementById("searchInput").addEventListener("input", function () {
@@ -165,6 +171,7 @@ const listenFilter = (calendar) => {
     calendar.refetchEvents();
   });
 };
+
 // Fonction pour fermer la modale
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
@@ -188,10 +195,10 @@ export const saveEvent = (calendar) => {
   const updatedData = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
-    // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
     start: document.getElementById("startEventTime").value + "+00:00",
     end: document.getElementById("endEventTime").value + "+00:00",
-    allDay: document.getElementById("eventAllDay").checked
+    allDay: document.getElementById("eventAllDay").checked,
+    recurrence: document.getElementById("eventRecurrence").value
   };
   if (!updatedData.title.trim()) {
     errorMessages.innerText = "Le champ titre est obligatoire.";
