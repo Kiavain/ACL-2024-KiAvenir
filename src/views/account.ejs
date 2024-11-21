@@ -20,14 +20,17 @@
                     <!-- Formulaire pour l'avatar -->
                     <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
                     <form action="/account/edit-icon" method="POST" enctype="multipart/form-data">
+                        <div class="text-center mb-3">
+                            <img id="userIconPreview" src="/img/default_user_icon.jpg" alt="Avatar actuel" class="img-fluid rounded-circle" width="150">
+                        </div>
                         <!-- Champ pour sélectionner un fichier -->
                         <div class="mb-3">
-                        <label for="imageUpload" class="form-label fw-bold">Choisissez une image :</label>
-                        <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" required>
+                            <label for="imageUpload" class="form-label fw-bold">Choisissez une image :</label>
+                            <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" required>
                         </div>
                         <!-- Bouton de soumission -->
                         <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold">Uploader l'image</button>
+                            <button type="submit" class="btn btn-primary fw-bold">Uploader l'image</button>
                         </div>
                     </form>
                 </div>

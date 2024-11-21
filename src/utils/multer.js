@@ -7,15 +7,14 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Dossier des uploads (chemin absolu)
-const uploadsDir = path.join(__dirname, '../..', 'uploads'); // Revenir d'un dossier avec '..'
+// Dossier des uploads
+const uploadsDir = path.join(__dirname, '../..', 'uploads');
 
 // Vérifie si le dossier 'uploads' existe, sinon le crée
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log('Dossier "uploads" créé');
 }
-
 
 // Configuration de stockage avec Multer
 const storage = multer.diskStorage({

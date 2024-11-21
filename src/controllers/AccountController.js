@@ -208,7 +208,6 @@ export class AccountController extends Controller {
     };
   }
 
-//todo: ajouter une fonction editUserIcon
   /**
    * Modifie l'avatar du compte de l'utilisateur connecté.
    * @param req La requête
@@ -225,9 +224,8 @@ export class AccountController extends Controller {
       if (!req.file) {
         return res.status(400).send('Aucune image uploadée.');
       }
-      // Infos sur le fichier uploadé
+      // Fichier uploadé
       const newIconPath = req.file.path; // Chemin du fichier enregistré
-      
       // const originalName = req.file.originalname;
       // console.log(`Image uploadée : ${originalName}, chemin : ${newIconPath}`);
 
