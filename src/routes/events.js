@@ -218,6 +218,7 @@ export default class EventRouteur extends Routeur {
                     displayEvent = true;
                   }
                   break;
+                case 5: // Custom
                 default:
                   break;
               }
