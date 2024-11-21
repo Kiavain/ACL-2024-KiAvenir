@@ -10,7 +10,7 @@ async function checkAndDeleteIcon(path) {
   try {
     await access(path); // Vérifie si le fichier existe
     await unlink(path); // Supprime le fichier
-    console.log(`Le fichier ${path} a été supprimé avec succès.`);
+    // console.log(`Le fichier ${path} a été supprimé avec succès.`);
   } catch (err) {
     if (err.code === 'ENOENT') {
       console.log(`Le fichier ${path} n'existe pas.`);
