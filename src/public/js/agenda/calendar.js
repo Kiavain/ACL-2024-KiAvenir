@@ -121,11 +121,18 @@ export const openModal = (eventData) => {
 
   allDay.addEventListener("click", () => {
     if (allDay.checked) {
+      const newStartDate = startDate.value.split("T")[0];
       startDate.type = "date";
       endDate.type = "date";
+      startDate.value = newStartDate;
+      endDate.value = startDate.value;
     } else {
+      const newStartDate = startDate.value + "T07:00";
+      const newEndDate = startDate.value + "T08:00";
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
     }
   });
   document.getElementById("eventTitle").value = eventData.title;
