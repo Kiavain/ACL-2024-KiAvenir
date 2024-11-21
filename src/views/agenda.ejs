@@ -39,10 +39,20 @@
 <div id="editAgendaModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" id="closeEditAgenda">&times;</span>
-        <h2>Modifier le nom de l'agenda:</h2>
+        <h2>Modifier l'agenda:</h2>
         <form id="editAgendaForm">
-            <label for="new-agenda-name">Nom de l'agenda:</label>
-            <input type="text" id="new-agenda-name" name="new-agenda-name" required>
+            <div class="flex-container">
+                <label for="new-agenda-name">Nom de l'agenda:</label>
+                <input type="text" id="new-agenda-name" name="new-agenda-name" value="<%= agenda.name %>" required>
+            </div>
+            <div class="flex-container">
+                <label for="new-agenda-color">Couleur de l'agenda:</label>
+                <input type="color" id="new-agenda-color" name="new-agenda-color" value="<%= agenda.color %>">
+            </div>
+            <div class="flex-container">
+                <label for="new-agenda-description">Description de l'agenda:</label>
+                <textarea id="new-agenda-description" name="new-agenda-description" rows="3"><%= agenda.description || ""%></textarea>
+            </div>
             <button type="submit" class="submit-btn">Mettre à jour</button>
         </form>
     </div>

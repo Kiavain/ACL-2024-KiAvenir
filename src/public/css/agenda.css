@@ -201,6 +201,27 @@ body {
   transition: background-color 0.3s ease;
 }
 
+.agenda-item::after {
+  content: attr(data-description);
+  position: absolute;
+  left: 50%;
+  margin-top: 50px;
+  transform: translateX(-50%);
+  background-color: #1a73e8;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+}
+
+.agenda-item:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
 .agenda-item:hover {
   background-color: rgba(0, 123, 255, 0.1);
 }
@@ -265,6 +286,13 @@ body {
   font-style: italic;
   display: none;
 }
+
+.flex-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 
 /* Animation de fondu */
 @keyframes fadeIn {

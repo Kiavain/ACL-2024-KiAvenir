@@ -18,9 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.getElementById("close-btn");
   const createButton = document.getElementById("saveEvent");
   const allDay = getElement("event-all-day");
-  //Empêche de mettre une date < à ajd
-  const now = new Date().toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-  const nowWithoutHours = new Date().toISOString().split("T")[0];
+
   //Change le format de la date en all day, sans heures
   allDay.addEventListener("click", () => {
     const startDate = getElement("event-date");
@@ -29,9 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const newStartDate = startDate.value.split("T")[0];
       startDate.type = "date";
       endDate.type = "date";
-
-      startDate.min = nowWithoutHours;
-      endDate.min = nowWithoutHours;
       startDate.value = newStartDate;
       endDate.value = startDate.value;
     } else {
@@ -39,8 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const newEndDate = startDate.value + "T08:00";
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
-      startDate.min = now;
-      endDate.min = now;
       startDate.value = newStartDate;
       endDate.value = newEndDate;
     }
@@ -67,17 +60,19 @@ document.addEventListener("DOMContentLoaded", () => {
       popup.classList.toggle("show");
     }
   });
-
   createButton.onclick = (e) => {
+    const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
     const name = getInputValue("event-name");
-    const dateDebut = getInputValue("event-date");
+    // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
+    const dateDebut = getInputValue("event-date") + stringAppend;
     const description = getInputValue("event-description") || " ";
-    const dateFin = getInputValue("event-date-end");
+    const dateFin = getInputValue("event-date-end") + stringAppend;
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
     const errAgenda = getElement("agenda-error");
     const errName = getElement("name-error");
     const allDay = getElement("event-all-day");
+    const recurrence = getElement("event-recurrence");
     e.preventDefault();
 
     errName.style.display = agendaValue ? "none" : "block";
@@ -92,6 +87,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;
     }
+    // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
+    if (
+      recurrence.value !== 0 &&
+      recurrence.value !== 1 &&
+      recurrence.value !== 2 &&
+      recurrence.value !== 3 &&
+      recurrence.value !== 4
+    ) {
+      return;
+    }
 
     const data = {
       name: name,
@@ -99,7 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
       description: description,
       startDate: dateDebut,
       endDate: dateFin,
-      allDay: allDay.checked
+      allDay: allDay.checked,
+      recurrence: recurrence.value
     };
 
     modal.style.display = "none";
