@@ -1,7 +1,7 @@
 const userIcon = document.getElementById('userIcon');
 const userId = userIcon.dataset.userId;
 const iconPath = "/img/user_icon/" + userId +".jpg";
-const defaultPath = "/img/user_icon/account.jpg";
+// const defaultPath = "/img/default_user_icon.jpg";
 
 fetch(iconPath, { method: 'HEAD' })
   .then((response) => {

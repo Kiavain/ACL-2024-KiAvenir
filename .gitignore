@@ -145,3 +145,6 @@ dist
 
 # MacOS
 .DS_Store
+
+# Icones utilisateurs
+src/public/img/user_icon
