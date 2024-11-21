@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     errName.style.display = agendaValue ? "none" : "block";
-    errorElement.style.display = name <= dateFin ? "none" : "block";
+    errorElement.style.display = dateDebut <= dateFin ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
 
     if (!name.trim()) {
