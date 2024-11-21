@@ -161,8 +161,6 @@ export default class EventRouteur extends Routeur {
             agendaId
           }));
 
-        console.log(events.find((e) => e.recurrence !== 0));
-
         // On récupère les évènements récurrents
         const recurringEvents = events.filter((event) => event.recurrence !== 0);
         let adjustedRecurringEvents = [];
