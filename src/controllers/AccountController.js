@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
 import { access, unlink } from 'fs/promises';
-
+import fs from 'fs';
 
 
 // Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
@@ -221,19 +221,32 @@ export class AccountController extends Controller {
     if (!localUser) {
       return res.status(401).redirect("/401");
     }
+    try {
+      if (!req.file) {
+        return res.status(400).send('Aucune image uploadée.');
+      }
+      // Infos sur le fichier uploadé
+      const newIconPath = req.file.path; // Chemin du fichier enregistré
+      
+      // const originalName = req.file.originalname;
+      // console.log(`Image uploadée : ${originalName}, chemin : ${newIconPath}`);
 
-    console.log(req);
-    // console.log("=====================\n========================\n==================");
-    // console.log(res);
+      //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
+      
+      // Supprime l'avatar s'il existe
+      await checkAndDeleteIcon(iconPath);
 
-    // //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
-    // const id = localUser.id;
-    // const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
-    // // Supprime l'avatar s'il existe
-    // checkAndDeleteIcon(iconPath);
-    // // Upload le nouvel avatar
+      // Upload du nouvel avatar
+      fs.copyFileSync(newIconPath, iconPath); // Copie le fichier dans le dossier des avatars et le renomme
+      checkAndDeleteIcon(newIconPath);  // Supprime le fichier original dans 'uploads/'
 
-
+      // On renvoie l'utilisateur sur la page d'accueil
+      return res.redirect("/");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erreur lors de l\'upload de l\'image.');
+    }
   }
 
   /**
