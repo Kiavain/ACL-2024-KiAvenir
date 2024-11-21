@@ -146,12 +146,12 @@ export const openModal = (eventData) => {
     endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
-  
+
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById("eventRecurrence");
   let recurrence = eventData.extendedProps.recurrence;
   let recurrenceOptions = recurrenceSelect.children;
-  
+
   for (let i = 0; i <= 4; i++) {
     recurrenceOptions[i].selected = false;
   }
@@ -191,12 +191,12 @@ export const saveEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
   const errorMessages = document.getElementById("error-update-event");
   const eventId = saveButton.dataset.eventId;
-
+  const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
   const updatedData = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
-    start: document.getElementById("startEventTime").value + "+00:00",
-    end: document.getElementById("endEventTime").value + "+00:00",
+    start: document.getElementById("startEventTime").value + stringAppend,
+    end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value
   };

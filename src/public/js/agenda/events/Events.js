@@ -60,13 +60,13 @@ document.addEventListener("DOMContentLoaded", () => {
       popup.classList.toggle("show");
     }
   });
-
   createButton.onclick = (e) => {
+    const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
     const name = getInputValue("event-name");
     // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
-    const dateDebut = getInputValue("event-date") + "+00:00";
+    const dateDebut = getInputValue("event-date") + stringAppend;
     const description = getInputValue("event-description") || " ";
-    const dateFin = getInputValue("event-date-end") + "+00:00";
+    const dateFin = getInputValue("event-date-end") + stringAppend;
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
     const errAgenda = getElement("agenda-error");
