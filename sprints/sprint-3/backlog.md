@@ -9,4 +9,4 @@
 - [ ] Faire une prévisualisation de la page d'accueil. (Responsable : Aéna)
 - [ ] Menu déroulant pour la liste des agendas. (Responsable : Rayan)
 - [ ] Drag'n drop pour les événements. (Responsable : Thomas)
-- [ ] Créer des avatars. (Nicolas)
+- [ ] Créer des avatars. (Responsable : Nicolas)
