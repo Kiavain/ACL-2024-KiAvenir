@@ -86,8 +86,8 @@ export const initCalendar = () => {
       description.value = "";
 
       if (!info.allDay) {
-        startDate.value = info.dateStr.replace("+01:00", "");
-        endDate.value = moment(startDate.value).add(2, "hour").toISOString().substring(0, 16);
+        startDate.value = moment(info.dateStr).toISOString().substring(0, 16);
+        endDate.value = moment(info.dateStr).add(1, "hour").toISOString().substring(0, 16);
       }
 
       modal.style.display = "block";
@@ -156,7 +156,6 @@ export const openModal = (eventData) => {
     recurrenceOptions[i].selected = false;
   }
   recurrenceOptions[recurrence].selected = true;
-
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;

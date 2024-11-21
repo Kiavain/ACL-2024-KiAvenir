@@ -88,7 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
-    if (recurrence.value != 0 && recurrence.value != 1 && recurrence.value != 2 && recurrence.value != 3 && recurrence.value != 4) {
+    if (
+      recurrence.value !== 0 &&
+      recurrence.value !== 1 &&
+      recurrence.value !== 2 &&
+      recurrence.value !== 3 &&
+      recurrence.value !== 4
+    ) {
       return;
     }
 
