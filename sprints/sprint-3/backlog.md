@@ -1,5 +1,6 @@
 # Corrections liées à la seconde itération
 - [ ] Interdire les accès aux sélections des agendas qu'on n'a pas accès. (Responsable : Esteban)
+- [ ] Correction des timezones en passant tout en UTC (Responsable : Aéna)
 - [ ] Être plus souple sur les événements récurrents. (Responsable : Sarah)
   - [ ] Pouvoir mettre un interval (ex : toutes les 2 semaines).
   - [ ] Un nombre de répétitions ou date de fin.
