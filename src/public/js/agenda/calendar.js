@@ -38,6 +38,7 @@ export const initCalendar = () => {
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
+    timeZone: "UTC",
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: {
@@ -141,8 +142,8 @@ export const openModal = (eventData) => {
     endDate.type = "datetime-local";
     startDate.min = now;
     endDate.min = now;
-    startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
-    endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
+    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
   } else {
     allDay.click();
     const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
