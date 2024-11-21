@@ -209,6 +209,32 @@ export class AccountController extends Controller {
   }
 
 //todo: ajouter une fonction editUserIcon
+  /**
+   * Modifie l'avatar du compte de l'utilisateur connecté.
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<void>}
+   */
+  async editUserIcon(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.status(401).redirect("/401");
+    }
+
+    console.log(req);
+    // console.log("=====================\n========================\n==================");
+    // console.log(res);
+
+    // //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
+    // const id = localUser.id;
+    // const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
+    // // Supprime l'avatar s'il existe
+    // checkAndDeleteIcon(iconPath);
+    // // Upload le nouvel avatar
+
+
+  }
 
   /**
    * Prépare l'objet utilisateur avec les modifications
@@ -291,8 +317,8 @@ export class AccountController extends Controller {
       const user = this.database.get("users").get(localUser.id);
 
       // Supprime l'avatar s'il existe
-      const filePath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
-      checkAndDeleteIcon(filePath);
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
+      checkAndDeleteIcon(iconPath);
 
       // Supprime l'utilisateur
       await user.delete();

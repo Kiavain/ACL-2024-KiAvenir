@@ -32,6 +32,7 @@ export default class AccountRouteur extends Routeur {
       .post("/account/login", this.controller.login)
       .post("/account/logout", this.controller.logout)
       .post("/account/edit", this.controller.editAccount)
-      .post("/account/delete", this.controller.deleteAccount);
+      .post("/account/delete", this.controller.deleteAccount)
+      .post("/account/edit-icon", this.controller.editUserIcon);
   }
 }
