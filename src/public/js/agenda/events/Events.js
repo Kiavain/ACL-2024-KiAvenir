@@ -60,23 +60,22 @@ document.addEventListener("DOMContentLoaded", () => {
       popup.classList.toggle("show");
     }
   });
+
   createButton.onclick = (e) => {
-    const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
     const name = getInputValue("event-name");
-    // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
-    const dateDebut = getInputValue("event-date") + stringAppend;
+    const dateDebut = getInputValue("event-date");
     const description = getInputValue("event-description") || " ";
-    const dateFin = getInputValue("event-date-end") + stringAppend;
+    const dateFin = getInputValue("event-date-end");
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
     const errAgenda = getElement("agenda-error");
     const errName = getElement("name-error");
     const allDay = getElement("event-all-day");
-    const recurrenceValue = parseInt(getInputValue("event-recurrence"));
+    const recurrence = getElement("event-recurrence");
     e.preventDefault();
 
     errName.style.display = agendaValue ? "none" : "block";
-    errorElement.style.display = dateDebut < dateFin ? "none" : "block";
+    errorElement.style.display = name <= dateFin ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
 
     if (!name.trim()) {
@@ -87,9 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;
     }
-
     // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
-    if (recurrenceValue < 0 || recurrenceValue > 4) {
+    if (recurrence.value != 0 && recurrence.value != 1 && recurrence.value != 2 && recurrence.value != 3 && recurrence.value != 4) {
       return;
     }
 
@@ -100,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       startDate: dateDebut,
       endDate: dateFin,
       allDay: allDay.checked,
-      recurrence: recurrenceValue
+      recurrence: recurrence.value
     };
 
     modal.style.display = "none";
