@@ -1,33 +1,62 @@
-const recurrenceSelect = document.getElementById("event-recurrence");
-const recurrenceCustom = document.getElementById("showRecurrenceOptions");
+document.addEventListener("DOMContentLoaded", () => {
+  // Sélection des éléments
+  const recurrenceSelect = document.getElementById("event-recurrence");
+  const showRecurrencePanel = document.getElementById("show-recurrence-options");
+  const recurrenceCustomSelect = document.getElementById("event-recurrence-custom");
+  const recurrenceCustomNumber = document.getElementById("event-recurrence-number");
 
-const recurenceSelectEdit = document.getElementById("eventRecurrence");
-const recurrenceCustomEdit = document.getElementById("showRecurrenceOptionsEdit");
+  const recurrenceSelectEdit = document.getElementById("eventRecurrence");
+  const showRecurrencePanelEdit = document.getElementById("showRecurrenceOptions");
+  const recurrenceCustomSelectEdit = document.getElementById("eventRecurrenceCustom");
+  const recurrenceCustomNumberEdit = document.getElementById("eventRecurrenceNumber");
 
-if (recurrenceSelect) {
-  recurrenceSelect.addEventListener("change", (event) => {
-    const selectedValue = event.target.value;
+  // Masquer les options personnalisées au chargement
+  if (showRecurrencePanel) {
+    showRecurrencePanel.style.display = "none";
+  }
+  if (showRecurrencePanelEdit) {
+    showRecurrencePanelEdit.style.display = "none";
+  }
 
-    if (selectedValue === "5") {
-      // Afficher les options personnalisées
-      recurrenceCustom.style.display = "flex";
+  // Fonction pour afficher ou masquer les options personnalisées
+  function toggleCustomOptions(selectElement, panelElement) {
+    if (selectElement.value === "5") {
+      panelElement.style.display = "flex";
     } else {
-      // Cacher les options personnalisées
-      recurrenceCustom.style.display = "none";
+      panelElement.style.display = "none";
     }
-  });
-}
+  }
 
-if (recurenceSelectEdit) {
-  recurenceSelectEdit.addEventListener("change", (event) => {
-    const selectedValue = event.target.value;
+  // Gérer les changements dans le menu de récurrence principal
+  if (recurrenceSelect) {
+    recurrenceSelect.addEventListener("change", () => {
+      toggleCustomOptions(recurrenceSelect, showRecurrencePanel);
+    });
+  }
 
-    if (selectedValue === "5") {
-      // Afficher les options personnalisées
-      recurrenceCustomEdit.style.display = "flex";
-    } else {
-      // Cacher les options personnalisées
-      recurrenceCustomEdit.style.display = "none";
-    }
-  });
-}
+  if (recurrenceSelectEdit) {
+    recurrenceSelectEdit.addEventListener("change", () => {
+      toggleCustomOptions(recurrenceSelectEdit, showRecurrencePanelEdit);
+    });
+  }
+
+  // Gérer les changements dans les options personnalisées
+  if (recurrenceCustomSelect) {
+    recurrenceCustomSelect.addEventListener("change", (event) => {
+      const customUnit = event.target.value; // Valeur sélectionnée (jours, semaines, etc.)
+      handleCustomRecurrenceChange(customUnit, recurrenceCustomNumber.value);
+    });
+  }
+
+  if (recurrenceCustomNumber) {
+    recurrenceCustomNumber.addEventListener("input", (event) => {
+      const customNumber = event.target.value;
+      handleCustomRecurrenceChange(recurrenceCustomSelect.value, customNumber);
+    });
+  }
+
+  // Gérer les changements dans les options personnalisées (édition)
+  function handleCustomRecurrenceChange(unit) {
+    return null;
+  }
+});
