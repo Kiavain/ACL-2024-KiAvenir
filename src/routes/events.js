@@ -139,7 +139,7 @@ export default class EventRouteur extends Routeur {
       // Parcours chaque agendaId et récupère les événements correspondants
       for (const agendaId of agendaIds) {
         const agenda = this.server.database.tables.get("agendas").get(agendaId);
-        if (!agenda /*&& !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))*/) {
+        if (!agenda || !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))) {
           continue;
         }
 
