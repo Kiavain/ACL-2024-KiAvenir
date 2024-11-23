@@ -2,12 +2,74 @@
 <div id="calendar-container">
     <div id="sliding-panel">
         <!-- Contenu de la zone coulissante -->
-        <h3>Mes Agendas</h3>
-        <ul id="agenda-list">
-            <li>Agenda 1</li>
-            <li>Agenda 2</li>
-            <li>Agenda 3</li>
+        <h3 class="agenda-title">Mes agendas</h3>
+        <ul class="agenda-list" id="agenda-list">
+            <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
+                <li class="agenda-item" data-description="<%= agenda.description %>" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                    <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                        <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
+                    </a>
+                    <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                    </button>
+                </li>
+            <% }) %>
         </ul>
+        <!-- S'il y a au moins un partage qui le concerne -->
+        <% if (guestsShared.length > 0) { %>
+            <h3 class="agenda-title">Agendas partagés</h3>
+            <ul class="agenda-list" id="share-agenda-list">
+                <% guestsShared.forEach(guest => {
+                    const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
+                if (agenda) { %>
+                    <li class="agenda-item" data-agenda-name="<%= agenda.name%>" style= "justify-content: unset;background-color: rgba(0, 123, 255, 0.2); color: white !important;">
+                        <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                        <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                            <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
+                        </a>
+                    </li>
+                <% }
+                }) %>
+            </ul>
+        <% }%>
+        <!-- Autres agendas -->
+        <div style="display: ruby;">
+            <h3 class="agenda-title" style="margin-left: 45px;">Autres agendas</h3>
+            <button id="otherAgenda" class="icon-button" style="padding: 5px">
+                <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+            </button>
+        </div>
+        <ul class="agenda-list" id="other-agenda-list">
+            <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true).forEach(agenda => { %>
+                <li class="agenda-item" data-agenda-name="<%= agenda.name%>" style= "justify-content: unset;<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
+                    <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
+                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                        <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
+                    </a>
+                </li>
+            <% }) %>
+        </ul>
+        <!-- Menu pour les options des agendas -->
+        <div id="shareOrExport" class="popUpWindow">
+            <span id="agendaName" style="text-align: center;">Agenda name</span>
+            <button id="shareAgenda">Partager l'agenda</button>
+            <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
+        </div>
     </div>
+    <!-- Fenêtre modale partager un agenda -->
+    <%- include('modals/shareAgenda') %>
+    <!-- Fenêtre modale exporter un agenda -->
+    <%- include('modals/exportAgenda') %>
+    <!-- Fenêtre modale importer un agenda -->
+    <%- include('modals/importAgenda') %>
+    <!-- Fenêtre modale autres agendas -->
+    <%- include('modals/otherAgenda') %>
+
+    <!-- FullCalendar -->
     <div id="calendar" data-agendaid="<%= agenda.agendaId %>"></div>
 </div>
+<!-- Scripts -->
+<script type="module" src="/js/agenda/agendaMenu.js"></script>
+<script type="module" src="/js/agenda/events/Events.js"></script>
+<script type="module" src="/js/agenda/agendaImport.js"></script>
