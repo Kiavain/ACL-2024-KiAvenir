@@ -30,6 +30,7 @@ let calendarInstance = null;
 // Fonction pour créer et initialiser le calendrier
 export const initCalendar = () => {
   const calendarEl = document.getElementById("calendar");
+  const slidingPanel = document.getElementById("sliding-panel");
   if (!calendarEl) {
     console.error("Element #calendar non trouvé");
     return null;
@@ -42,9 +43,25 @@ export const initCalendar = () => {
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: {
-      left: "prev,next today",
+      left: "customButton prev,next today",
       center: "title",
       right: "dayGridMonth,timeGridWeek,timeGridDay"
+    },
+    customButtons: {
+      customButton: {
+        text: "Menu",
+        click: () => {
+          // Toggle the sliding panel
+          if (slidingPanel.classList.contains("open")) {
+            slidingPanel.classList.remove("open");
+            calendarEl.style.marginLeft = "0";
+          } else {
+            slidingPanel.classList.add("open");
+            calendarEl.style.marginLeft = "300px"; // Ajustez selon la largeur de #sliding-panel
+          }
+          calendar.updateSize(); // Redimensionne le calendrier
+        }
+      }
     },
     buttonText: {
       today: "Aujourd'hui",
