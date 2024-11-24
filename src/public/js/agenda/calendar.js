@@ -114,6 +114,7 @@ export const initCalendar = () => {
   calendarInstance = calendar;
 
   calendar.render();
+  document.querySelector(".fc-customButton-button").innerHTML = "<i class=material-symbols-outlined>menu</i>";
   listenFilter(calendar);
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };

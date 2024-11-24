@@ -125,3 +125,7 @@ h2 {
 .fc-list-event .fc-list-event-dot {
   display: none;
 }
+
+.fc-customButton-button i {
+  vertical-align: middle;
+}

@@ -21,7 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 function toggleMenuShareOrExport(val, name, color, description, button) {
-  if (shareOrExport.style.display === "grid") {
+  //Si on clique sur le même agenda on ferme la pop up
+  if (shareOrExport.style.display === "grid" && shareOrExport.value === val) {
     shareOrExport.style.display = "none";
     return;
   }
