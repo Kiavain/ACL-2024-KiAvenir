@@ -21,6 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 function toggleMenuShareOrExport(val, name, color, description, button) {
+  if (shareOrExport.style.display === "grid") {
+    shareOrExport.style.display = "none";
+    return;
+  }
   shareOrExport.style.display = "grid";
   shareOrExport.value = val;
   document.getElementById("new-agenda-name").value = name;
