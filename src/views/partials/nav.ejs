@@ -25,20 +25,7 @@ if (currentPath.includes("/agenda")) {
         </button>
 
         <!-- Conteneur centré pour le nom de l'agenda -->
-        <% if (currentPath.includes("/agenda")) { %>
-            <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
-                <% if (agenda.ownerId === locals.user.id) {%>
-                    <button class="icon-button" id="deleteAgenda">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                <% } %>
 
-                <span id="agendaNameDisplay" style="font-size: 24px; font-weight: bold; color: <%= agenda.color %>; margin-right: 10px;"><%= agenda.name %></span>
-                <% if (agenda.ownerId === locals.user.id && agenda.special === false) {%>
-                    <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
-                <% } %>
-            </div>
-        <% } %>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">

@@ -37,7 +37,6 @@ function reload() {
 function openModal() {
   // Afficher la modale
   modal.style.display = "block";
-  document.getElementById("dropdown-menu").style.display = "none";
 }
 
 function importHoliday(elem) {

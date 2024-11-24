@@ -6,8 +6,10 @@ for (let i = 0; i < agendaItems.length; i++) {
   const agendaShareButton = agendaItem.querySelector("button");
   const agendaItemValue = agendaShareButton.value;
   const agendaItemName = agendaItem.querySelector("a").dataset.agendaName;
+  const agendaItemColor = agendaItem.querySelector("a").dataset.agendaColor;
+  const agendaItemDescription = agendaItem.querySelector("a").dataset.agendaDescription;
   agendaShareButton.addEventListener("click", () => {
-    toggleMenuShareOrExport(agendaItemValue, agendaItemName);
+    toggleMenuShareOrExport(agendaItemValue, agendaItemName, agendaItemColor, agendaItemDescription);
   });
 }
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,8 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-function toggleMenuShareOrExport(val, name) {
+function toggleMenuShareOrExport(val, name, color, description) {
   shareOrExport.style.display = "flex";
   shareOrExport.value = val;
+  document.getElementById("new-agenda-name").value = name;
+  document.getElementById("new-agenda-color").value = color;
+  document.getElementById("new-agenda-description").textContent = description;
   document.getElementById("agendaName").textContent = name;
 }

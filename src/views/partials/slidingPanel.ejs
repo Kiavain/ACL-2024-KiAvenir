@@ -7,11 +7,11 @@
             <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
                 <li class="agenda-item" data-description="<%= agenda.description %>" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                     <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" data-agenda-color="<%= agenda.color %>" data-agenda-description="<%= agenda.description %>" onclick="event.stopPropagation()">
                         <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                     </a>
                     <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
                     </button>
                 </li>
             <% }) %>
@@ -55,6 +55,8 @@
             <span id="agendaName" style="text-align: center;">Agenda name</span>
             <button id="shareAgenda">Partager l'agenda</button>
             <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
+            <button id="editAgenda" style="background-color: #68a12d;">Modifier l'agenda</button>
+            <button id="deleteAgenda" style="background-color: #9c0808;">Supprimer l'agenda</button>
         </div>
     </div>
     <!-- Fenêtre modale partager un agenda -->
@@ -73,3 +75,4 @@
 <script type="module" src="/js/agenda/agendaMenu.js"></script>
 <script type="module" src="/js/agenda/events/Events.js"></script>
 <script type="module" src="/js/agenda/agendaImport.js"></script>
+<script type="module" src="/js/agenda/agendaEdition.js"></script>
