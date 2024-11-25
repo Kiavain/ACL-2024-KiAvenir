@@ -19,10 +19,9 @@
             <div class="col-md-4">
                 <!-- Formulaire pour l'avatar -->
                 <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
-                <form action="/account/edit-icon" method="POST" enctype="multipart/form-data">
+                <form name="iconForm" action="/account/edit-icon" method="POST" enctype="multipart/form-data">
                     <div class="text-center">
-                        <!-- <img id="userIconPreview" src="/img/default_user_icon.jpg" alt="Avatar actuel" class="figure-img img-fluid rounded border border-dark" style="max-width: 300px; max-height: 300px;"> -->
-                        <canvas id="userIconPreview" class="figure-img img-fluid rounded border border-dark" style="max-width: 300px; max-height: 300px;"></canvas>
+                        <canvas id="userIconPreview" class="figure-img img-fluid rounded border border-dark"></canvas>
                     </div>
                     <!-- Champ pour sélectionner un fichier (on override le champ par défaut pour traduire) -->
                     <div class="mb-3 d-flex flex-column align-items-center">
@@ -35,7 +34,7 @@
                     </div>
                     <!-- Bouton de soumission -->
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-primary fw-bold">Changer mon avatar</button>
+                        <button type="submit" id="uploadIcon" class="btn btn-primary fw-bold">Changer mon avatar</button>
                     </div>
                 </form>
             </div>

@@ -6,8 +6,14 @@ const fileName = document.querySelector('.file-name');
 const userIconPreview = document.getElementById('userIconPreview');
 const ctx = userIconPreview.getContext('2d');
 
-const MAX_WIDTH = 300; // Largeur maximale
-const MAX_HEIGHT = 300; // Hauteur maximale
+const uploadButton = document.getElementById('uploadIcon');
+let resizedImageBlob = null;
+
+const MAX_WIDTH = 400; // Largeur maximale
+const MAX_HEIGHT = 400; // Hauteur maximale
+
+userIconPreview.style.maxWidth = MAX_WIDTH + "px;";
+userIconPreview.style.maxHeight = MAX_HEIGHT + "px;";
 
 userIconPreview.width = MAX_WIDTH;
 userIconPreview.height = MAX_HEIGHT;
@@ -47,6 +53,11 @@ fileInput.addEventListener('change', () => {
                 ctx.drawImage(img, 0, 0, width, height);
 
                 console.log(`Image redimensionnée à : ${width}x${height}px`);
+
+                // Convertir l'image redimensionnée en Blob
+                userIconPreview.toBlob((blob) => {
+                    resizedImageBlob = blob; // Stocker le Blob pour l'envoi
+                }, 'image/jpeg', 0.8); // Compression JPEG (80%)
             };
 
             img.src = event.target.result; // Charger l'image
@@ -59,3 +70,33 @@ fileInput.addEventListener('change', () => {
 });
 
 
+const iconForm = document.forms["iconForm"];
+iconForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!resizedImageBlob) {
+        alert('Veuillez sélectionner une image.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', resizedImageBlob, 'resized-image.jpg');
+
+    // Change la requête avec fetch API
+    fetch('/account/edit-icon', {
+        method: 'POST',
+        body: formData
+    })
+    .then((response) => {
+        if (response.ok) {
+            // console.log('Image envoyée avec succès !');
+            window.location.reload();
+        } else {
+            console.log('Erreur lors de l\'envoi de l\'image.');
+        }
+    })
+    .catch((error) => {
+        console.error('Erreur réseau :', error);
+    });
+
+});
