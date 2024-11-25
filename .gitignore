@@ -147,4 +147,5 @@ dist
 .DS_Store
 
 # Icones utilisateurs
-src/public/img/user_icon
+src/public/img/user_icon/*
+!src/public/img/user_icon/.gitkeep
