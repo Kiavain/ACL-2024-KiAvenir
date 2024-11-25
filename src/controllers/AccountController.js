@@ -3,6 +3,9 @@ import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
 import { access, unlink } from 'fs/promises';
 import fs from 'fs';
+import path from "path";
+import * as ICAL from "ical.js";
+import { fileURLToPath } from "url";
 
 
 // Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
@@ -19,7 +22,6 @@ async function checkAndDeleteIcon(path) {
     }
   }
 }
-
 
 /**
  * Contrôleur pour les comptes utilisateurs
@@ -56,6 +58,7 @@ export class AccountController extends Controller {
     // Crée un nouvel utilisateur avec les informations du formulaire
     const createdUser = await this.database.get("users").create({ email, username, password });
     await this.createDefaultAgenda(createdUser.id);
+    await this.holidayAgenda(createdUser.id);
     const token = await this.createJWT(createdUser);
     res.locals.user = token;
     res.cookie("accessToken", token, { httpOnly: true });
@@ -75,6 +78,49 @@ export class AccountController extends Controller {
       ownerId: userId,
       color: "#2196f3"
     });
+  }
+  /**
+   * Importer l'agenda des jours fériés de base
+   * @param userId {number} L'identifiant de l'utilisateur
+   * @returns {Promise<void>} Crée l'agenda de vacances par défaut
+   */
+  async holidayAgenda(userId) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath = path.resolve(__dirname, "../../data/holidays/Basic.ics");
+    const fileContent = fs.readFileSync(filePath, "utf8");
+
+    //Traite le fichier
+    const parsedCalendar = ICAL.default.parse(fileContent);
+    const comp = new ICAL.default.Component(parsedCalendar);
+    const vevents = comp.getAllSubcomponents("vevent");
+    const name = comp.getFirstPropertyValue("x-wr-calname");
+    const color = "#0000FF";
+    const summary = comp.getFirstPropertyValue("x-wr-caldesc");
+    const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
+
+    for (const vevent of vevents) {
+      const eventName = vevent.getFirstPropertyValue("summary");
+      const dtstartProp = vevent.getFirstProperty("dtstart");
+      const dtendProp = vevent.getFirstProperty("dtend");
+      const startDate = new Date(dtstartProp.getFirstValue().toString());
+      const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
+      const eventDescription = vevent.getFirstPropertyValue("description") || "";
+
+      const dtstartValue = dtstartProp.getFirstValue();
+      const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
+
+      if (eventName && startDate && endDate) {
+        await this.events.create({
+          name: eventName,
+          agendaId: agenda.agendaId,
+          startDate: startDate,
+          endDate: endDate,
+          description: eventDescription,
+          allDay: isAllDay
+        });
+      }
+    }
   }
 
   /**

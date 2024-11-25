@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", function handleClickOutside(event) {
     if (event.target === modal) {
       modal.style.display = "none";
-      window.removeEventListener("click", handleClickOutside);
     }
   });
 });

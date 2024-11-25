@@ -17,7 +17,8 @@ if (deleteAgendaButton) {
   };
 
   confirmDeleteButton.onclick = async function () {
-    const response = await fetch(`/api/agenda/${agenda.agendaId}/delete`, {
+    const agendaId = document.getElementById("shareOrExport").value;
+    const response = await fetch(`/api/agenda/${agendaId}/delete`, {
       method: "DELETE"
     });
 
@@ -37,7 +38,6 @@ if (deleteAgendaButton) {
 if (editAgendaButton) {
   editAgendaButton.onclick = function () {
     editAgendaModal.style.display = "block";
-    document.getElementById("new-agenda-name").value = agenda.name;
   };
 }
 
@@ -47,58 +47,34 @@ closeEditAgendaButton.onclick = function () {
 
 editAgendaForm.onsubmit = async function (e) {
   e.preventDefault();
+  const agendaId = document.getElementById("shareOrExport").value;
   const newAgendaName = document.getElementById("new-agenda-name").value;
-  const agendaName = document.getElementById(`agenda-name-${agenda.agendaId}`);
+  const newAgendaColor = document.getElementById("new-agenda-color").value;
+  const newAgendaDescription = document.getElementById("new-agenda-description").value;
 
-  // Vérifie que le nom n'est pas vide et qu'il n'est pas déjà pris
-  fetch(`/api/agenda/${agenda.agendaId}/update`, {
+  fetch(`/api/agenda/${agendaId}/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ name: newAgendaName })
+    body: JSON.stringify({ name: newAgendaName, color: newAgendaColor, description: newAgendaDescription })
   })
     .then((response) => response.json())
     .then((data) => {
-      // Affiche les messages flash et recharge la page après leur disparition
       addFlashMessages(data.flashMessages);
 
-      // Met à jour le nom de l'agenda sur la page sans recharger
       agenda.name = newAgendaName;
-      document.querySelector(".header-title").textContent = newAgendaName;
+      agenda.color = newAgendaColor;
+      agenda.description = newAgendaDescription;
+
       editAgendaModal.style.display = "none";
-
-      // Met à jour le nom de l'agenda dans la liste déroulante des agendas
-      const agendaItems = document.querySelectorAll("#agenda-list .agenda-item");
-      // Parcourt chaque élément de la liste pour trouver celui avec l'ID correspondant
-      agendaItems.forEach((item) => {
-        const checkbox = item.querySelector(".agenda-checkbox");
-        const agendaLink = item.querySelector("a");
-        // Si l'ID de la checkbox correspond à celui de l'agenda, on met à jour le nom
-        if (checkbox && checkbox.value === agenda.agendaId) {
-          agendaLink.textContent = agenda.name;
-          agendaLink.style.color = agenda.color;
-        }
-      });
-
-      // Met à jour le nom de l'agenda dans la liste déroulante des agendas pour créer un événement
-      const selectEvents = document.getElementById("event-agenda");
-      const agendaOptions = selectEvents.options;
-      for (let i = 0; i < agendaOptions.length; i++) {
-        if (agendaOptions[i].value === agenda.agendaId) {
-          agendaOptions[i].text = agenda.name;
-          break;
-        }
-      }
-
-      // Met à jour le nom de l'agenda dans la liste des agendas qu'on peut sélectionner/partager/exporter
-      agendaName.textContent = newAgendaName;
+      location.reload();
     })
     .catch((error) => console.error("Erreur:", error));
 };
 
 document.onclick = function (event) {
-  // Si on clic en dehors de la modale, on la ferme
+  // Si on clique en dehors de la modale, on la ferme
   if (event.target === editAgendaModal) {
     editAgendaModal.style.display = "none";
   } else if (event.target === deleteAgendaModal) {

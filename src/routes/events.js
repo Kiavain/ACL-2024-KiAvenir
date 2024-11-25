@@ -139,7 +139,7 @@ export default class EventRouteur extends Routeur {
       // Parcours chaque agendaId et récupère les événements correspondants
       for (const agendaId of agendaIds) {
         const agenda = this.server.database.tables.get("agendas").get(agendaId);
-        if (!agenda) {
+        if (!agenda || !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))) {
           continue;
         }
 
@@ -170,6 +170,7 @@ export default class EventRouteur extends Routeur {
 
         // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         let currentDate = new Date(start);
+        currentDate.setUTCHours(23, 59, 59, 999);
         const endCalendar = new Date(end);
 
         while (currentDate < endCalendar) {
@@ -230,7 +231,9 @@ export default class EventRouteur extends Routeur {
 
             if (displayEvent) {
               // Calculons la nouvelle date de début
-              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour));
+              const adjustedEventStart = new Date(
+                Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours(), eventStart.getUTCMinutes())
+              );
 
               // On clone l'évènement en ajustant la date de début et de fin
               const adjustedEvent = {

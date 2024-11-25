@@ -42,6 +42,11 @@ export default class Agenda extends EntityStructure {
      * @type {string}
      */
     this.description = data.description;
+    /**
+     * Permet de savoir si l'agenda est spécial (Autres agendas)
+     * @type {boolean}
+     */
+    this.special = data.special;
   }
 
   /**
