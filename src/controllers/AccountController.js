@@ -285,8 +285,8 @@ export class AccountController extends Controller {
       fs.copyFileSync(newIconPath, iconPath); // Copie le fichier dans le dossier des avatars et le renomme
       checkAndDeleteIcon(newIconPath);  // Supprime le fichier original dans 'uploads/'
 
-      // On renvoie l'utilisateur sur la page d'accueil
-      return res.redirect("/");
+      // On renvoie l'utilisateur sur la page du compte
+      return res.redirect("/account");
     } catch (error) {
       console.error(error);
       res.status(500).send('Erreur lors de l\'upload de l\'image.');
