@@ -5,10 +5,12 @@ canvas#userIconPreview {
 }
 .custom-file {
     position: relative;
-    display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+}
+.custom-file .file-name {
+    padding-left: 5px;
+    text-align: center;
 }
 .custom-file input[type="file"] {
     display: none;
