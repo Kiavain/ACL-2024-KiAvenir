@@ -49,7 +49,7 @@ export const initCalendar = () => {
     },
     customButtons: {
       customButton: {
-        text: "B",
+        text: "",
         click: () => {
           // Toggle the sliding panel
           if (slidingPanel.classList.contains("open")) {
