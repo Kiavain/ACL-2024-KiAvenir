@@ -18,7 +18,7 @@
         </ul>
         <!-- S'il y a au moins un partage qui le concerne -->
         <% if (guestsShared.length > 0) { %>
-            <h3 class="agenda-title">Agendas partagés</h3>
+            <h3 class="agenda-title" style="padding-top: 10px">Agendas partagés</h3>
             <ul class="agenda-list" id="share-agenda-list">
                 <% guestsShared.forEach(guest => {
                     const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
@@ -34,7 +34,7 @@
             </ul>
         <% }%>
         <!-- Autres agendas -->
-        <div style="display: ruby;">
+        <div style="display: flex; justify-content: center; align-items: center; padding-top: 10px">
             <h3 class="agenda-title" style="margin-left: 45px;">Autres agendas</h3>
             <button id="otherAgenda" class="icon-button" style="padding: 5px">
                 <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
