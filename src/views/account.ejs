@@ -2,12 +2,74 @@
 <html lang="fr">
 <head>
     <title>KiAvenir - Mon compte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* Responsive adjustments */
+      canvas#userIconPreview {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .custom-file {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+      }
+
+      /* Modale responsive */
+      .modal-content {
+        top: 20vh !important;
+        margin: auto;
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          top: 10vh !important;
+          width: 90%; /* Adaptation pour mobiles */
+        }
+
+        /* Ajustement de la hauteur de la modale */
+        .modal-content {
+          position: relative;
+          margin: 0 auto;
+          top: 10vh; /* Assure une bonne apparence sur mobile */
+        }
+
+        /* Pour s'assurer que le footer ne chevauche pas le contenu */
+        .vh-100 {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          overflow-y: auto; /* Ajoute un défilement si nécessaire */
+        }
+
+        #deleteAccount button {
+          margin: 0; /* Centrer le bouton si nécessaire */
+          width: 100%;
+        }
+
+        #accountDiv { /* ajoute du padding en haut */
+            padding-top: 550px;
+        }
+      }
+
+      /* Input "browse" style */
+      .custom-file input[type="file"] {
+        display: none;
+      }
+
+      .custom-file label {
+        cursor: pointer;
+      }
+    </style>
 </head>
 <body>
 <%- include('partials/header') %>
 <% /* global locals */ %>
 
-<div class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
+<div id="accountDiv" class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
 <% if (!locals.user) { %>
     <h1 class="text-center mt-4 mb-4 fw-bold text-primary">Vous n'êtes pas connecté !</h1>
     <div>
@@ -71,9 +133,17 @@
                             <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
                         </div>
                     </div>
-                    <div class="d-grid w-75 mx-auto">
-                        <button type="submit" class="btn btn-primary fw-bold">Enregistrer mes modifications</button>
+                    <div class="d-grid w-100 mx-auto mt-3">
+                        <button type="submit" class="btn btn-primary fw-bold w-100">Enregistrer mes modifications</button>
                     </div>
+
+                    <div id="deleteAccount" class="d-grid gap-2 d-md-block m-3 p-3 text-end">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
+                            Supprimer mon compte
+                        </button>
+                    </div>
+
+
                 </form>
             </div>
         </div>
@@ -81,19 +151,6 @@
 
     <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
 </div>
-
-<div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
-        Supprimer mon compte
-    </button>
-</div>
-
-
-<style>
-    .modal-backdrop {
-        z-index: 2 !important;
-    }
-</style>
 
 <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -118,7 +175,7 @@
 <script type="module" src="/js/account/accountEdition.js"></script>
 <script src="/js/account/loadIconPreview.js"></script>
 <% } %>
-  
+
 
 <%- include('partials/footer') %>
 </body>
