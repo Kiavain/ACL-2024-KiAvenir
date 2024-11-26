@@ -8,6 +8,24 @@ export function refreshCalendar() {
   getCalendarInstance().refetchEvents();
 }
 
+function getHeaderToolbarConfig() {
+  if (window.innerWidth < 768) {
+    // Configuration pour mobile
+    return {
+      left: "customButton",
+      center: "title",
+      right: "mobileMenuButton"
+    };
+  } else {
+    // Configuration pour desktop
+    return {
+      left: "customButton prev,next today",
+      center: "title",
+      right: "dayGridMonth,timeGridWeek,timeGridDay"
+    };
+  }
+}
+
 export function getEventsUrl() {
   let selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
     .map((checkbox) => checkbox.value)
@@ -42,11 +60,7 @@ export const initCalendar = () => {
     timeZone: "UTC",
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
-    headerToolbar: {
-      left: "customButton prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay"
-    },
+    headerToolbar: getHeaderToolbarConfig(),
     customButtons: {
       customButton: {
         text: "",
@@ -60,6 +74,14 @@ export const initCalendar = () => {
             calendarEl.style.marginLeft = "300px";
           }
           calendar.updateSize();
+        }
+      },
+      mobileMenuButton: {
+        text: "Actions",
+        click: () => {
+          // Créez un menu contextuel pour afficher les actions
+          const menu = document.getElementById("mobile-menu");
+          menu.style.display = menu.style.display === "block" ? "none" : "block";
         }
       }
     },
@@ -110,6 +132,19 @@ export const initCalendar = () => {
       modal.style.display = "block";
     }
   });
+
+  const monthlyView = document.getElementById("monthlyView");
+  const weeklyView = document.getElementById("weeklyView");
+  const dailyView = document.getElementById("dailyView");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  // Ajouter des écouteurs d'événements pour les boutons de navigation de la vue mobile
+  monthlyView.addEventListener("click", () => calendar.changeView("dayGridMonth"));
+  weeklyView.addEventListener("click", () => calendar.changeView("timeGridWeek"));
+  dailyView.addEventListener("click", () => calendar.changeView("timeGridDay"));
+  prevBtn.addEventListener("click", () => calendar.prev());
+  nextBtn.addEventListener("click", () => calendar.next());
 
   calendarInstance = calendar;
 

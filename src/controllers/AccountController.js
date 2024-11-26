@@ -1,10 +1,27 @@
 import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
+import { access, unlink } from 'fs/promises';
+import fs from 'fs';
 import path from "path";
-import fs from "node:fs";
 import * as ICAL from "ical.js";
 import { fileURLToPath } from "url";
+
+
+// Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
+async function checkAndDeleteIcon(path) {
+  try {
+    await access(path); // Vérifie si le fichier existe
+    await unlink(path); // Supprime le fichier
+    // console.log(`Le fichier ${path} a été supprimé avec succès.`);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      console.log(`Le fichier ${path} n'existe pas.`);
+    } else {
+      console.error(`Erreur : ${err.message}`);
+    }
+  }
+}
 
 /**
  * Contrôleur pour les comptes utilisateurs
@@ -238,6 +255,45 @@ export class AccountController extends Controller {
   }
 
   /**
+   * Modifie l'avatar du compte de l'utilisateur connecté.
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<void>}
+   */
+  async editUserIcon(req, res) {
+    // Vérifie si l'utilisateur est connecté
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.status(401).redirect("/401");
+    }
+    try {
+      if (!req.file) {
+        return res.status(400).send('Aucune image uploadée.');
+      }
+      // Fichier uploadé
+      const newIconPath = req.file.path; // Chemin du fichier enregistré
+      // const originalName = req.file.originalname;
+      // console.log(`Image uploadée : ${originalName}, chemin : ${newIconPath}`);
+
+      //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
+      
+      // Supprime l'avatar s'il existe
+      await checkAndDeleteIcon(iconPath);
+
+      // Upload du nouvel avatar
+      fs.copyFileSync(newIconPath, iconPath); // Copie le fichier dans le dossier des avatars et le renomme
+      checkAndDeleteIcon(newIconPath);  // Supprime le fichier original dans 'uploads/'
+
+      // On renvoie l'utilisateur sur la page du compte
+      return res.redirect("/account");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Erreur lors de l\'upload de l\'image.');
+    }
+  }
+
+  /**
    * Prépare l'objet utilisateur avec les modifications
    * @param user L'utilisateur
    * @param email Le nouvel email
@@ -316,6 +372,12 @@ export class AccountController extends Controller {
     try {
       // Supprime l'utilisateur et le déconnecte
       const user = this.database.get("users").get(localUser.id);
+
+      // Supprime l'avatar s'il existe
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
+      checkAndDeleteIcon(iconPath);
+
+      // Supprime l'utilisateur
       await user.delete();
       this.logout(req, res);
     } catch (err) {
