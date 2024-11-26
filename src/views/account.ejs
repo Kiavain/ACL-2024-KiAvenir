@@ -3,84 +3,24 @@
 <head>
     <title>KiAvenir - Mon compte</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      /* Responsive adjustments */
-      canvas#userIconPreview {
-        max-width: 100%;
-        height: auto;
-      }
-
-      .custom-file {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-      }
-
-      /* Modale responsive */
-      .modal-content {
-        top: 20vh !important;
-        margin: auto;
-      }
-
-      @media (max-width: 768px) {
-        .modal-content {
-          top: 10vh !important;
-          width: 90%; /* Adaptation pour mobiles */
-        }
-
-        /* Ajustement de la hauteur de la modale */
-        .modal-content {
-          position: relative;
-          margin: 0 auto;
-          top: 10vh; /* Assure une bonne apparence sur mobile */
-        }
-
-        /* Pour s'assurer que le footer ne chevauche pas le contenu */
-        .vh-100 {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          overflow-y: auto; /* Ajoute un défilement si nécessaire */
-        }
-
-        #deleteAccount button {
-          margin: 0; /* Centrer le bouton si nécessaire */
-          width: 100%;
-        }
-
-        #accountDiv { /* ajoute du padding en haut */
-            padding-top: 550px;
-        }
-      }
-
-      /* Input "browse" style */
-      .custom-file input[type="file"] {
-        display: none;
-      }
-
-      .custom-file label {
-        cursor: pointer;
-      }
-    </style>
+    <link rel="stylesheet" href="/css/account.css">
 </head>
 <body>
 <%- include('partials/header') %>
 <% /* global locals */ %>
 
-<div id="accountDiv" class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
+<div id="accountDiv" class="d-flex flex-column align-items-center"> <!-- justify-content-center -->
 <% if (!locals.user) { %>
     <h1 class="text-center mt-4 mb-4 fw-bold text-primary">Vous n'êtes pas connecté !</h1>
     <div>
         Vous pouvez <a href="/signin" class="link-underline link-underline-opacity-0">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0">vous connecter</a> pour accéder à cette page.
     </div>
 <% } else { %>
-    <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+    <div class="d-flex justify-content-center align-items-center h-100 w-100 mt-4 mb-4 p-3">
         <div class="row w-100">
-            <div class="col-md-4">
+            <div class="col-md-5 border-end border-dark-subtle" id="iconFormDiv">
                 <!-- Formulaire pour l'avatar -->
-                <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
+                <h2 class="text-center fw-bold text-primary">Mon avatar</h2>
                 <form name="iconForm" action="/account/edit-icon" method="POST" enctype="multipart/form-data">
                     <div class="text-center">
                         <canvas id="userIconPreview" class="figure-img img-fluid rounded border border-dark"></canvas>
@@ -100,10 +40,12 @@
                     </div>
                 </form>
             </div>
-            <!-- <div class="col-md-1 vr"></div> -->
-            <div class="col-md-8">
+
+            <hr class="mt-3 mb-3" id="hrAccount"/>
+
+            <div class="col-md-7">
                 <!-- Formulaire pour les infos du compte -->
-                <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h2>
+                <h2 class="text-center fw-bold text-primary">Mes informations</h2>
                 <form name="accountEdition" action="/account/edit" method="POST">
                     <div class="row">
                         <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Votre adresse mail</label>
@@ -138,7 +80,7 @@
                     </div>
 
                     <div id="deleteAccount" class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
                             Supprimer mon compte
                         </button>
                     </div>
@@ -152,9 +94,11 @@
     <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
 </div>
 
-<div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+
+<!-- S'affiche sur pression du bouton "Supprimer mon compte" -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModal" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content" style="top: 20vh !important;">
+        <div class="modal-content bg-light-subtle">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -171,6 +115,7 @@
         </div>
     </div>
 </div>
+    
 
 <script type="module" src="/js/account/accountEdition.js"></script>
 <script src="/js/account/loadIconPreview.js"></script>

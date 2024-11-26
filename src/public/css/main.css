@@ -1,29 +1,29 @@
 html, body {
-    height: 100%;
+  height: 100%;
 }
 
 body {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .content {
-    flex: 1;
+  flex: 1;
 }
 
 
 .nav-separator {
-    display: inline-block;
-    height: 24px;
-    width: 1px;
-    background-color: #ccc; /* Couleur du séparateur */
-    margin: 10px; /* Espace autour du séparateur */
+  display: inline-block;
+  height: 24px;
+  width: 1px;
+  background-color: #ccc; /* Couleur du séparateur */
+  margin: 10px; /* Espace autour du séparateur */
 }
 
 @media (max-width: 991px) {
-        .nav-separator {
-        display: none;
-    }
+    .nav-separator {
+    display: none;
+  }
 }
 
 .navbar {
@@ -54,6 +54,14 @@ body {
   align-items: center;
 }
 
+.navbar-nav, .navbar-collapse, #menuAgendas {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+
 .header-title, .icon-button {
   margin-top: 0;
   margin-bottom: 0;
@@ -62,13 +70,6 @@ body {
 
 .icon-button .material-symbols-outlined {
   font-size: 1.2rem;
-}
-
-.navbar-nav, .navbar-collapse, #menuAgendas {
-  margin-top: 0;
-  margin-bottom: 0;
-  padding-top: 0;
-  padding-bottom: 0;
 }
 
 .popUpWindow {

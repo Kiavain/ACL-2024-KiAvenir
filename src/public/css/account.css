@@ -1,0 +1,45 @@
+/* Responsive adjustments */
+canvas#userIconPreview {
+    max-width: 100%;
+    height: auto;
+}
+.custom-file {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+.custom-file input[type="file"] {
+    display: none;
+}
+.custom-file label {
+    cursor: pointer;
+}
+
+#hrAccount{
+    display: none;
+}
+
+/* Modale responsive */
+.modal-content {
+    top: 20vh !important;
+    margin: auto;
+}
+
+
+@media (max-width: 768px) {
+    #hrAccount {
+        display: block;
+    }
+    #iconFormDiv {
+        border: 0px !important;
+    }
+
+    .modal-content {
+        position: relative;
+        top: 10vh;
+        margin: 0 auto;
+        width: 90% !important;
+    }
+}

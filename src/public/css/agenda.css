@@ -36,7 +36,7 @@ body {
 }
 
 /* Pied de page */
-.footer {
+/* .footer {
   width: 100%;
   text-align: center;
   padding: 10px;
@@ -45,7 +45,7 @@ body {
   font-weight: bold;
   color: #000000;
   border-top: 1px solid #ccc;
-}
+} */
 
 /* Planning */
 .planning-grid {

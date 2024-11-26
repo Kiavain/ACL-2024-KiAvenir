@@ -8,7 +8,7 @@
   max-width: 300px;
   background-color: #f7f7f7;
   border-right: 1px solid #ddd;
-  height: 100%;
+  /* height: 100%; */
   position: absolute;
   top: 0;
   left: -300px; /* Caché par défaut */
