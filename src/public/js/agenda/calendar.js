@@ -49,7 +49,7 @@ export const initCalendar = () => {
     },
     customButtons: {
       customButton: {
-        text: "Menu",
+        text: "B",
         click: () => {
           // Toggle the sliding panel
           if (slidingPanel.classList.contains("open")) {
@@ -57,9 +57,9 @@ export const initCalendar = () => {
             calendarEl.style.marginLeft = "0";
           } else {
             slidingPanel.classList.add("open");
-            calendarEl.style.marginLeft = "300px"; // Ajustez selon la largeur de #sliding-panel
+            calendarEl.style.marginLeft = "300px";
           }
-          calendar.updateSize(); // Redimensionne le calendrier
+          calendar.updateSize();
         }
       }
     },
