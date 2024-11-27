@@ -61,6 +61,8 @@ export const initCalendar = () => {
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: getHeaderToolbarConfig(),
+    editable: true,
+    eventEditableStart: true,
     customButtons: {
       customButton: {
         text: "",
@@ -102,6 +104,10 @@ export const initCalendar = () => {
     },
     eventClick: (info) => {
       openModal(info.event);
+    },
+    eventDrop: (info) => {
+      //gérer pour ne pas passer de allDay a pas allDay
+      console.log(info.event.startDate);
     },
     eventDidMount: function (info) {
       info.el.style.backgroundColor = info.event.backgroundColor;
