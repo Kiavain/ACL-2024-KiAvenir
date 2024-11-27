@@ -181,6 +181,7 @@ export const openEventDetailsModal = (eventData) => {
   const owner = document.getElementById("event-owner-preview");
   title.innerText = eventData.title;
   color.style.backgroundColor = eventData.backgroundColor;
+  owner.innerText = eventData.extendedProps.owner;
   if (eventData.extendedProps.description && eventData.extendedProps.description.trim() !== "") {
     document.getElementById("event-description-to-hide").style.display = "flex";
     description.innerText = eventData.extendedProps.description;

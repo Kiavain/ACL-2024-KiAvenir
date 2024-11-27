@@ -8,7 +8,7 @@
                 <button id="editEvent" class="btn-icon" title="Modifier">
                     <i class="material-symbols-outlined">edit</i>
                 </button>
-                <button id="deleteEvent" class="btn-icon" title="Supprimer">
+                <button id="deleteEvent" class="btn-icon" <% if(cantEdit) {%> hidden <%}%> title="Supprimer">
                     <i class="material-symbols-outlined">delete</i>
                 </button>
                 <button id="closeModal" class="btn-icon" title="Fermer">
@@ -36,7 +36,7 @@
             </div>
             <div class="event-details">
                 <i class="material-symbols-outlined">event</i>
-                <span id="event-owner-preview">Moi</span>
+                <span id="event-owner-preview"></span>
             </div>
         </div>
     </div>

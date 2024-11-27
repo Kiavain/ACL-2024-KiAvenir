@@ -20,7 +20,6 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Header de la modale */
 .small-modal-header {
   display: flex;
   justify-content: flex-end;
@@ -43,14 +42,13 @@
   color: #202124;
 }
 
-/* Corps de la modale */
 .small-modal-body {
   padding: 20px;
 }
 
 .event-header {
   display: flex;
-  align-items: flex-start; /* Aligne le carré de couleur avec le haut du texte */
+  align-items: flex-start;
   margin-bottom: 10px;
 }
 
@@ -79,17 +77,23 @@
   height: 16px;
   border-radius: 50%;
   margin-right: 10px;
-  flex-shrink: 0; /* Empêche la couleur de rétrécir */
 }
 
 .event-details {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   color: #444746;
   min-height: 32px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .event-details i {
+  align-self: flex-start;
   width: 40px;
+}
+
+.event-details span {
+  line-height: 1.4;
 }
 
