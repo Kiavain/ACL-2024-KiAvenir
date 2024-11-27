@@ -101,6 +101,7 @@ export const initCalendar = () => {
       };
     },
     eventClick: (info) => {
+      openEventDetailsModal(info.event);
       openModal(info.event);
     },
     eventDidMount: function (info) {
@@ -160,6 +161,13 @@ export const getCalendarInstance = () => {
     console.warn("Le calendrier n'est pas encore initialisé.");
   }
   return calendarInstance;
+};
+// Fonction pour ouvrir la modale
+export const openEventDetailsModal = (eventData) => {
+  const modal = document.getElementById("eventDetailsModal");
+  modal.style.display = "flex";
+  const modalModifier = document.getElementById("editEvent");
+  openModal(eventData);
 };
 
 // Fonction pour ouvrir la modale
@@ -253,7 +261,7 @@ export const saveEvent = (calendar) => {
   const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
   const updatedData = {
     title: document.getElementById("eventTitle").value,
-    description: document.getElementById("eventDetails").value,
+    description: document.getElementById("eventDetails.ejs").value,
     start: document.getElementById("startEventTime").value + stringAppend,
     end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,

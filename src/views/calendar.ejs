@@ -6,7 +6,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
 <script type="module" src="/js/agenda/agenda.js"></script>
 
-<!-- Modale pour afficher les informations de l'événement -->
+<!-- Modale pour les details de l'evenement -->
+<%- include('partials/modals/eventDetails') %>
+
+<!-- Modale pour modifier les informations de l'événement -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
         <span class="close close-btn">&times;</span>
