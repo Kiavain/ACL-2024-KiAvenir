@@ -15,22 +15,22 @@
         <span class="close close-btn">&times;</span>
         <h2>Modifier l'événement</h2>
         <label for="eventTitle">Titre : <span class="requis">*</span></label>
-        <input type="text" id="eventTitle" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="text" id="eventTitle" class="input-field" />
 
         <label for="eventDetails">Détails :</label>
-        <textarea id="eventDetails" class="input-field" <% if(cantEdit) {%> disabled <%}%>></textarea>
+        <textarea id="eventDetails" class="input-field"></textarea>
 
         <label for="startEventTime">Date de début : <span class="requis">*</span></label>
-        <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="datetime-local" id="startEventTime" class="input-field" />
 
         <div style="display: flex; align-items: center;">
             <label for="eventAllDay">Toute la journée :</label>
-            <input type="checkbox" id="eventAllDay" style="margin-top: 12px; margin-left: 5px;" name="eventAllDay" <% if(cantEdit) {%> disabled <%}%> />
+            <input type="checkbox" id="eventAllDay" style="margin-top: 12px; margin-left: 5px;" name="eventAllDay" />
         </div>
 
         <div style="display: flex; align-items: center;">
             <label for="eventRecurrence">Se répète :</label>
-            <select name="eventRecurrence" id="eventRecurrence" style="margin-top: 12px; margin-left: 5px; width:200px;" <% if(cantEdit) {%> disabled <%}%>>
+            <select name="eventRecurrence" id="eventRecurrence" style="margin-top: 12px; margin-left: 5px; width:200px;">
                 <option value="0">Une seule fois</option>
                 <option value="1">Tous les jours</option>
                 <option value="2">Toutes les semaines</option>
@@ -40,12 +40,12 @@
         </div>
 
         <label for="endEventTime">Date de fin : <span class="requis">*</span></label>
-        <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="datetime-local" id="endEventTime" class="input-field" />
         <label id="error-update-event" class="form-label text-danger"></label>
 
         <!-- Boutons pour enregistrer ou annuler -->
-        <button id="updateEvent" <% if(cantEdit) {%> hidden <%}%>>Enregistrer les modifications</button>
-        <button id="deleteEvent" <% if(cantEdit) {%> hidden <%}%>>Supprimer l'événement</button>
+        <button id="updateEvent">Enregistrer les modifications</button>
+        <button id="deleteEvent">Supprimer l'événement</button>
     </div>
 </div>
 

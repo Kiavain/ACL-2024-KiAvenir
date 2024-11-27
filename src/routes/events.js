@@ -159,7 +159,8 @@ export default class EventRouteur extends Routeur {
             allDay: e.allDay,
             recurrence: e.recurrence,
             agendaId,
-            owner: agenda.getOwner().username
+            owner: agenda.getOwner().username,
+            canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
           }));
 
         // On récupère les évènements récurrents

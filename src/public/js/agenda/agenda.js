@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeButton = document.querySelector(".close");
   const saveButton = document.getElementById("updateEvent");
   const deleteButton = document.getElementById("deleteEvent");
+  const deletePreviewButton = document.getElementById("deleteEventPreview");
 
   // Initialisation du calendrier
   const calendar = initCalendar();
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     saveButton.onclick = () => saveEvent(calendar);
     deleteButton.onclick = () => deleteEvent(calendar);
+    deletePreviewButton.onclick = () => deleteEvent(calendar);
 
     // Rendre le calendrier responsive lors du redimensionnement
     window.addEventListener("resize", () => {

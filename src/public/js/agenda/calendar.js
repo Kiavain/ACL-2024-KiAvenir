@@ -210,6 +210,11 @@ export const openEventDetailsModal = (eventData) => {
     modal.style.display = "none";
     openModal(eventData);
   });
+  if (!eventData.extendedProps.canEdit) {
+    document.getElementById("deleteEventPreview").hidden = true;
+  } else {
+    document.getElementById("deleteEventPreview").removeAttribute("hidden");
+  }
   modal.style.display = "flex";
 };
 
@@ -270,9 +275,30 @@ export const openModal = (eventData) => {
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
-
+  disableIfCantEdit(eventData.extendedProps.canEdit);
   modal.style.display = "block";
 };
+function disableIfCantEdit(canEdit) {
+  if (!canEdit) {
+    document.getElementById("eventTitle").disabled = true;
+    document.getElementById("eventDetails").disabled = true;
+    document.getElementById("startEventTime").disabled = true;
+    document.getElementById("eventAllDay").disabled = true;
+    document.getElementById("eventRecurrence").disabled = true;
+    document.getElementById("endEventTime").disabled = true;
+    document.getElementById("updateEvent").hidden = true;
+    document.getElementById("deleteEvent").hidden = true;
+  } else {
+    document.getElementById("eventTitle").disabled = false;
+    document.getElementById("eventDetails").disabled = false;
+    document.getElementById("startEventTime").disabled = false;
+    document.getElementById("eventAllDay").disabled = false;
+    document.getElementById("eventRecurrence").disabled = false;
+    document.getElementById("endEventTime").disabled = false;
+    document.getElementById("updateEvent").hidden = false;
+    document.getElementById("deleteEvent").hidden = false;
+  }
+}
 
 //Fonction pour écouter la barre de filtrage des évenements
 const listenFilter = (calendar) => {
