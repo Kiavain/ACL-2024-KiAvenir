@@ -50,8 +50,28 @@
 
 .event-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* Aligne le carré de couleur avec le haut du texte */
   margin-bottom: 10px;
+}
+
+.event-title-date {
+  display: flex;
+  flex-direction: column;
+  margin-left: 14px;
+}
+
+.event-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #202124;
+  line-height: 16px;
+}
+
+.event-date {
+  margin-top: 2px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #5f6368;
 }
 
 .event-color {
@@ -59,29 +79,17 @@
   height: 16px;
   border-radius: 50%;
   margin-right: 10px;
+  flex-shrink: 0; /* Empêche la couleur de rétrécir */
 }
 
-.event-title {
-  font-size: 16px;
-  font-weight: bold;
-  color: #202124;
-}
-
-.event-date {
-  margin-bottom: 10px;
-  color: #444746;
-  margin-left: 28px;
-  font-size: .875rem;
-  font-weight: 400;
-}
-
-.event-owner {
+.event-details {
   display: flex;
   align-items: center;
   color: #444746;
+  min-height: 32px;
 }
 
-.event-owner i {
+.event-details i {
   width: 40px;
 }
 

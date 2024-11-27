@@ -102,7 +102,6 @@ export const initCalendar = () => {
     },
     eventClick: (info) => {
       openEventDetailsModal(info.event);
-      openModal(info.event);
     },
     eventDidMount: function (info) {
       info.el.style.backgroundColor = info.event.backgroundColor;
@@ -165,9 +164,52 @@ export const getCalendarInstance = () => {
 // Fonction pour ouvrir la modale
 export const openEventDetailsModal = (eventData) => {
   const modal = document.getElementById("eventDetailsModal");
+  if (!modal) {
+    return;
+  }
+  const closeModal = document.getElementById("closeModal");
+  closeModal.addEventListener("click", () => {
+    closeEventDetailsModal();
+  });
+  //Pour la suppression d'event
+  const saveButton = document.getElementById("updateEvent");
+  saveButton.dataset.eventId = eventData.extendedProps.eventId;
+  const title = document.getElementById("event-title");
+  const date = document.getElementById("event-date-preview");
+  const color = document.getElementById("event-color-preview");
+  const description = document.getElementById("event-description-preview");
+  const owner = document.getElementById("event-owner-preview");
+  title.innerText = eventData.title;
+  color.style.backgroundColor = eventData.backgroundColor;
+  if (eventData.extendedProps.description && eventData.extendedProps.description.trim() !== "") {
+    document.getElementById("event-description-to-hide").style.display = "flex";
+    description.innerText = eventData.extendedProps.description;
+  } else {
+    document.getElementById("event-description-to-hide").style.display = "none";
+  }
+  if (eventData.allDay) {
+    const startDate = new Date(eventData.start);
+    const endDate = new Date(eventData.end);
+    endDate.setUTCDate(endDate.getUTCDate() - 1);
+
+    if (startDate.getUTCDate() === endDate.getUTCDate()) {
+      date.innerText = moment(startDate)
+        .format("dddd, DD MMMM")
+        .replace(/^\w/, (c) => c.toUpperCase());
+    } else {
+      date.innerText = `${moment(startDate).format("DD")} – ${moment(endDate).format("DD MMMM YYYY")}`;
+    }
+  } else {
+    const startDate = moment(eventData.start).toISOString().substring(0, 16);
+    const endDate = moment(eventData.end).toISOString().substring(0, 16);
+    date.innerText = moment(startDate).format("dddd, DD MMMM - HH:mm") + " à " + moment(endDate).format("HH:mm");
+  }
+  const editModal = document.getElementById("editEvent");
+  editModal.addEventListener("click", () => {
+    modal.style.display = "none";
+    openModal(eventData);
+  });
   modal.style.display = "flex";
-  const modalModifier = document.getElementById("editEvent");
-  openModal(eventData);
 };
 
 // Fonction pour ouvrir la modale
@@ -239,17 +281,26 @@ const listenFilter = (calendar) => {
   });
 };
 
-// Fonction pour fermer la modale
+// Fonction pour fermer la modale d'édition
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
+  modal.style.display = "none";
+};
+// Fonction pour fermer la modale des détails
+export const closeEventDetailsModal = () => {
+  const modal = document.getElementById("eventDetailsModal");
   modal.style.display = "none";
 };
 
 // Fonction pour gérer la fermeture du menu contextuel
 export const handleOutsideClick = (event) => {
   const modal = document.getElementById("eventModal");
+  const modalDetails = document.getElementById("eventDetailsModal");
   if (event.target === modal) {
     closeModal();
+  }
+  if (event.target === modalDetails) {
+    closeEventDetailsModal();
   }
 };
 
@@ -261,7 +312,7 @@ export const saveEvent = (calendar) => {
   const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
   const updatedData = {
     title: document.getElementById("eventTitle").value,
-    description: document.getElementById("eventDetails.ejs").value,
+    description: document.getElementById("eventDetails").value,
     start: document.getElementById("startEventTime").value + stringAppend,
     end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,

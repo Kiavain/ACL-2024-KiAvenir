@@ -17,20 +17,26 @@
             </div>
         </div>
 
-        <!-- Corps de la modale -->
         <div class="small-modal-body">
             <div class="event-header">
-                <div class="event-color" style="background-color: blueviolet"></div>
-                <div class="event-title">Titre</div>
+                <div class="event-color" id="event-color-preview" style="background-color: blueviolet"></div>
+                <div class="event-title-date">
+                    <div class="event-title">
+                        <span id="event-title"></span>
+                    </div>
+                    <div class="event-date">
+                        <span id="event-date-preview"></span>
+                    </div>
+                </div>
             </div>
-            <div class="event-date">
-                Mercredi, 27 novembre⋅12:30
-                à
-                1:30pm
+
+            <div class="event-details" id="event-description-to-hide">
+                <i class="material-symbols-outlined">notes</i>
+                <span id="event-description-preview"></span>
             </div>
-            <div class="event-owner">
+            <div class="event-details">
                 <i class="material-symbols-outlined">event</i>
-                Moi
+                <span id="event-owner-preview">Moi</span>
             </div>
         </div>
     </div>
