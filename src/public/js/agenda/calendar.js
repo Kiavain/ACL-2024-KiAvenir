@@ -62,7 +62,7 @@ export const initCalendar = () => {
     firstDay: 1,
     headerToolbar: getHeaderToolbarConfig(),
     editable: true,
-    eventEditableStart: true,
+    eventStartEditable: true,
     customButtons: {
       customButton: {
         text: "",
@@ -107,7 +107,7 @@ export const initCalendar = () => {
     },
     eventDrop: (info) => {
       //gérer pour ne pas passer de allDay a pas allDay
-      console.log(info.event.startDate);
+      openModal(info.event);
     },
     eventDidMount: function (info) {
       info.el.style.backgroundColor = info.event.backgroundColor;
@@ -241,6 +241,7 @@ const listenFilter = (calendar) => {
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
   modal.style.display = "none";
+  refreshCalendar();
 };
 
 // Fonction pour gérer la fermeture du menu contextuel
@@ -248,6 +249,7 @@ export const handleOutsideClick = (event) => {
   const modal = document.getElementById("eventModal");
   if (event.target === modal) {
     closeModal();
+    refreshCalendar();
   }
 };
 
