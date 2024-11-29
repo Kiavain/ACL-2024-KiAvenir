@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeModalBtn = document.getElementById("close-btn");
   const createButton = document.getElementById("saveEvent");
   const allDay = getElement("event-all-day");
+  allDay.checked = false;
 
   //Change le format de la date en all day, sans heures
   allDay.addEventListener("click", () => {
@@ -62,10 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   createButton.onclick = (e) => {
+    const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
     const name = getInputValue("event-name");
-    const dateDebut = getInputValue("event-date");
+    const dateDebut = getInputValue("event-date") + stringAppend;
+    const dateFin = getInputValue("event-date-end") + stringAppend;
     const description = getInputValue("event-description") || " ";
-    const dateFin = getInputValue("event-date-end");
     const agendaValue = getInputValue("event-agenda");
     const errorElement = getElement("date-error");
     const errAgenda = getElement("agenda-error");
@@ -74,20 +76,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const recurrence = getElement("event-recurrence");
     e.preventDefault();
 
-    errName.style.display = agendaValue ? "none" : "block";
-    errorElement.style.display = name <= dateFin ? "none" : "block";
+    const startDateObj = new Date(dateDebut);
+    const endDateObj = new Date(dateFin);
+
+    errName.style.display = name.trim() ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
+    errorElement.style.display = startDateObj <= endDateObj ? "none" : "block";
 
     if (!name.trim()) {
       errName.style.display = "block";
       return;
     }
     // Vérifie la validité des dates
-    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
+    if (!dateDebut || !dateFin || !agendaValue || startDateObj > endDateObj) {
       return;
     }
-    // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
-    if (recurrence.value != 0 && recurrence.value != 1 && recurrence.value != 2 && recurrence.value != 3 && recurrence.value != 4) {
+    const recurrenceValue = parseInt(recurrence.value, 10);
+    if (![0, 1, 2, 3, 4, 5].includes(recurrenceValue)) {
       return;
     }
 
@@ -98,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       startDate: dateDebut,
       endDate: dateFin,
       allDay: allDay.checked,
-      recurrence: recurrence.value
+      recurrence: recurrenceValue
     };
 
     modal.style.display = "none";
@@ -118,12 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((data) => {
         // Réinitialise le formulaire
         setElementValue("event-name", "");
-        setElementValue("event-date", "");
-        setElementValue("event-date-end", "");
         setElementValue("event-description", "");
         errName.style.display = "none";
         errorElement.style.display = "none";
         errAgenda.style.display = "none";
+        allDay.checked = false;
 
         refreshCalendar();
         addFlashMessages([data.message]);
