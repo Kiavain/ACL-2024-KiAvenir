@@ -62,6 +62,44 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  const recurrenceSelect = document.getElementById("event-recurrence");
+  const showRecurrencePanel = document.getElementById("show-recurrence-options");
+  const recurrenceCustomSelect = document.getElementById("event-recurrence-custom");
+  const recurrenceCustomInterval = document.getElementById("event-recurrence-interval");
+
+  if (showRecurrencePanel) {
+    showRecurrencePanel.style.display = "none";
+  }
+
+  if (recurrenceSelect) {
+    recurrenceSelect.addEventListener("change", () => {
+      if (parseInt(recurrenceSelect.value) === 5) {
+        showRecurrencePanel.style.display = "flex";
+
+        recurrenceCustomSelect.addEventListener("change", () => {
+          handleCustomRecurrence();
+        });
+
+        recurrenceCustomInterval.addEventListener("input", () => {
+          handleCustomRecurrence();
+        });
+      } else {
+        showRecurrencePanel.style.display = "none";
+      }
+    });
+  }
+
+  function handleCustomRecurrence() {
+    const unit = parseInt(recurrenceCustomSelect.value);
+    const interval = parseInt(recurrenceCustomInterval.value);
+
+    if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
+      return [unit, interval];
+    } else {
+      console.warn("Unité ou intervalle invalide.");
+    }
+  }
+
   createButton.onclick = (e) => {
     const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
     const name = getInputValue("event-name");
@@ -73,7 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const errAgenda = getElement("agenda-error");
     const errName = getElement("name-error");
     const allDay = getElement("event-all-day");
-    const recurrence = getElement("event-recurrence");
     e.preventDefault();
 
     const startDateObj = new Date(dateDebut);
@@ -91,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!dateDebut || !dateFin || !agendaValue || startDateObj > endDateObj) {
       return;
     }
-    const recurrenceValue = parseInt(recurrence.value, 10);
+    const recurrenceValue = parseInt(recurrenceSelect.value, 10);
     if (![0, 1, 2, 3, 4, 5].includes(recurrenceValue)) {
       return;
     }
@@ -105,6 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
       allDay: allDay.checked,
       recurrence: recurrenceValue
     };
+
+    const valRecurrences = handleCustomRecurrence();
+    if (valRecurrences) {
+      data["unit"] = valRecurrences[0];
+      data["interval"] = valRecurrences[1];
+    }
 
     modal.style.display = "none";
     popup.classList.toggle("show");

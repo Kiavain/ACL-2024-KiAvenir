@@ -157,7 +157,7 @@ export const openModal = (eventData) => {
 
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById("eventRecurrence");
-  let recurrence = eventData.extendedProps.recurrence;
+  let recurrence = eventData.recurrence;
   let recurrenceOptions = recurrenceSelect.children;
 
   for (let i = 0; i <= 5; i++) {
@@ -166,7 +166,7 @@ export const openModal = (eventData) => {
   recurrenceOptions[recurrence].selected = true;
 
   const saveButton = document.getElementById("updateEvent");
-  saveButton.dataset.eventId = eventData.extendedProps.eventId;
+  saveButton.dataset.eventId = eventData.eventId;
 
   modal.style.display = "block";
 };

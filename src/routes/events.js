@@ -79,7 +79,7 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    // Route pour créer un événement
+    // Route pour créer un événement lambda ou avec une récurrence simple
     this.router.post("/api/events/create", async (req, res) => {
       if (!res.locals.user) {
         return res.json({
@@ -142,7 +142,8 @@ export default class EventRouteur extends Routeur {
                 case 4: // Annuel
                   currentDate.setUTCFullYear(currentDate.getUTCFullYear() + 1);
                   break;
-                case 5: // TODO: Autre logique
+                case 5: // Flexibilité
+                  handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
                   break;
                 default:
                   break;
@@ -158,6 +159,25 @@ export default class EventRouteur extends Routeur {
         })
         .catch((error) => console.error("Erreur lors de la création de l'événement :", error));
     });
+
+    function handleFlexibleRecurrence(currentDate, unit, interval) {
+      switch (unit) {
+        case 0: // Quotidien
+          currentDate.setUTCDate(currentDate.getUTCDate() + interval);
+          break;
+        case 1: // Hebdomadaire
+          currentDate.setUTCDate(currentDate.getUTCDate() + interval * 7);
+          break;
+        case 2: // Mensuel
+          currentDate.setUTCMonth(currentDate.getUTCMonth() + interval);
+          break;
+        case 3: // Annuel
+          currentDate.setUTCFullYear(currentDate.getUTCFullYear() + interval);
+          break;
+        default:
+          break;
+      }
+    }
 
     this.router.get("/api/events/:agendaIds", async (req, res) => {
       if (!res.locals.user) {
@@ -195,7 +215,8 @@ export default class EventRouteur extends Routeur {
 
         // Récupère les occurrences d'événements récurrents
         const recurringEvents = this.server.database.tables.get("event_occurrences").filter((o) => {
-          const isWithinDateRange = new Date(o.occurrenceStart) <= new Date(end) && new Date(o.occurrenceEnd) >= new Date(start);
+          const isWithinDateRange =
+            new Date(o.occurrenceStart) <= new Date(end) && new Date(o.occurrenceEnd) >= new Date(start);
           const matchesSearch = search ? o.name.toLowerCase().includes(search.toLowerCase()) : true;
           const parentEventInAgenda = agenda
             .getEvents()
