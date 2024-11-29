@@ -38,6 +38,7 @@ export const initCalendar = () => {
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
+    timeZone: "UTC",
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: {
@@ -85,8 +86,8 @@ export const initCalendar = () => {
       description.value = "";
 
       if (!info.allDay) {
-        startDate.value = info.dateStr.replace("+01:00", "");
-        endDate.value = moment(startDate.value).add(2, "hour").toISOString().substring(0, 16);
+        startDate.value = moment(info.dateStr).toISOString().substring(0, 16);
+        endDate.value = moment(info.dateStr).add(1, "hour").toISOString().substring(0, 16);
       }
 
       modal.style.display = "block";
@@ -120,11 +121,18 @@ export const openModal = (eventData) => {
 
   allDay.addEventListener("click", () => {
     if (allDay.checked) {
+      const newStartDate = startDate.value.split("T")[0];
       startDate.type = "date";
       endDate.type = "date";
+      startDate.value = newStartDate;
+      endDate.value = startDate.value;
     } else {
+      const newStartDate = startDate.value + "T07:00";
+      const newEndDate = startDate.value + "T08:00";
       startDate.type = "datetime-local";
       endDate.type = "datetime-local";
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
     }
   });
   document.getElementById("eventTitle").value = eventData.title;
@@ -135,8 +143,8 @@ export const openModal = (eventData) => {
     startDate.type = "datetime-local";
     endDate.type = "datetime-local";
 
-    startDate.value = moment(eventData.start).add(1, "hour").toISOString().substring(0, 16);
-    endDate.value = moment(eventData.end).add(1, "hour").toISOString().substring(0, 16);
+    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
   } else {
     allDay.click();
     const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
@@ -146,17 +154,16 @@ export const openModal = (eventData) => {
     endDate.value = endDateValue.toISOString().split("T")[0];
     startDate.value = startDateValue;
   }
-  
+
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById("eventRecurrence");
   let recurrence = eventData.extendedProps.recurrence;
   let recurrenceOptions = recurrenceSelect.children;
-  
-  for (let i = 0; i <= 4; i++) {
+
+  for (let i = 0; i <= 5; i++) {
     recurrenceOptions[i].selected = false;
   }
   recurrenceOptions[recurrence].selected = true;
-
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
@@ -192,11 +199,13 @@ export const saveEvent = (calendar) => {
   const errorMessages = document.getElementById("error-update-event");
   const eventId = saveButton.dataset.eventId;
 
+  const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
+
   const updatedData = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
-    start: document.getElementById("startEventTime").value,
-    end: document.getElementById("endEventTime").value,
+    start: document.getElementById("startEventTime").value + stringAppend,
+    end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value
   };
