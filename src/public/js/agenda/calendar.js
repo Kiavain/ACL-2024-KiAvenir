@@ -107,7 +107,24 @@ export const initCalendar = () => {
     },
     eventDrop: (info) => {
       //gérer pour ne pas passer de allDay a pas allDay
-      openModal(info.event);
+      //const startDate = document.getElementById("startEventTime");
+      //const endDate = document.getElementById("endEventTime");
+      //startDate.value = moment(info.event.start).toISOString().substring(0, 16);
+      //endDate.value = moment(info.event.end).toISOString().substring(0, 16);
+      //const saveButton = document.getElementById("updateEvent");
+      //saveButton.dataset.eventId = info.event.extendedProps.eventId;
+      //saveEvent(calendar);
+      //
+      if (info.event.allDay === info.oldEvent.allDay) {
+        openModal(info.event);
+      } else {
+        refreshCalendar();
+      }
+    },
+    eventResize: (info) => {
+      if (info.event.end !== info.oldEvent.end) {
+        openModal(info.event);
+      }
     },
     eventDidMount: function (info) {
       info.el.style.backgroundColor = info.event.backgroundColor;
