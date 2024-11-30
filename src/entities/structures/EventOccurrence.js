@@ -61,6 +61,18 @@ export default class EventOccurrence extends EntityStructure {
      * @type {Boolean}
      */
     this.isCancelled = data.isCancelled || false;
+
+    /**
+     * Type de récurrence de l'occurrence
+     * @type {int}
+     */
+    this.unit = data.unit;
+
+    /**
+     * Intervalle de récurrence de l'occurrence
+     * @type {int}
+     */
+    this.interval = data.interval;
   }
 
   /**

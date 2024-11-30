@@ -39,6 +39,12 @@ export default class EventOccurrencesEntity extends Entity {
       isCancelled: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+      },
+      unit: {
+        type: DataTypes.INTEGER
+      },
+      interval: {
+        type: DataTypes.INTEGER
       }
     });
   }
