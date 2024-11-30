@@ -157,12 +157,57 @@ export const openModal = (eventData) => {
 
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById("eventRecurrence");
-  let recurrence = eventData.recurrence;
+  const showRecPanel = document.getElementById("showRecurrenceOptionsEdit");
+  const recurrenceCustomSelect = document.getElementById("eventRecurrenceCustom");
+  const recurrenceCustomInterval = document.getElementById("eventRecurrenceInterval");
+
+  let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
   let recurrenceOptions = recurrenceSelect.children;
 
-  for (let i = 0; i <= 5; i++) {
-    recurrenceOptions[i].selected = false;
+  let unit = eventData.extendedProps.unit ?? 0;
+  console.log(eventData);
+  let interval = eventData.extendedProps.interval ?? 2;
+  recurrenceCustomSelect.value = unit;
+  recurrenceCustomInterval.value = interval;
+
+  console.log(unit, interval);
+
+  // Custom de la récurrence
+  if (showRecPanel && recurrence !== 5) {
+    showRecPanel.style.display = "none";
+  } else {
+    showRecPanel.style.display = "flex";
   }
+
+  if (recurrenceSelect) {
+    recurrenceSelect.addEventListener("change", () => {
+      if (parseInt(recurrenceSelect.value) === 5) {
+        showRecPanel.style.display = "flex";
+
+        recurrenceCustomSelect.addEventListener("change", () => {
+          handleCustomRecurrence();
+        });
+
+        recurrenceCustomInterval.addEventListener("input", () => {
+          handleCustomRecurrence();
+        });
+      } else {
+        showRecPanel.style.display = "none";
+      }
+    });
+  }
+
+  function handleCustomRecurrence() {
+    const unit = parseInt(recurrenceCustomSelect.value);
+    const interval = recurrenceCustomInterval.value;
+
+    if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
+      return [unit, interval];
+    } else {
+      console.warn("Les champs de récurrence personnalisée doivent être des nombres entiers positifs.");
+    }
+  }
+
   recurrenceOptions[recurrence].selected = true;
 
   const saveButton = document.getElementById("updateEvent");
@@ -207,8 +252,23 @@ export const saveEvent = (calendar) => {
     start: document.getElementById("startEventTime").value + stringAppend,
     end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
-    recurrence: document.getElementById("eventRecurrence").value
+    recurrence: document.getElementById("eventRecurrence").value,
+    occurrence: 0
   };
+  if (updatedData.recurrence === "5") {
+    const unit = document.getElementById("eventRecurrenceCustom").value;
+    const interval = document.getElementById("eventRecurrenceInterval").value;
+
+    updatedData["unit"] = unit;
+    updatedData["interval"] = interval;
+    updatedData["occurrence"] = 1;
+
+    if (isNaN(unit) || isNaN(interval) || interval < 1 || interval > 30) {
+      errorMessages.innerText = "Les champs doivent être des nombres entiers positifs.";
+    }
+  } else {
+    updatedData["occurrence"] = 0;
+  }
   if (!updatedData.title.trim()) {
     errorMessages.innerText = "Le champ titre est obligatoire.";
     return;

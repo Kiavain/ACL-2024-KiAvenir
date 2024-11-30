@@ -40,7 +40,13 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
+      if (req.body.occurrence === 1) {
+        console.log("Update Occurrence");
+      } else {
+        console.log("Update Event");
+      }
+
+      /* const event = this.server.database.tables.get("events").get(req.params.eventId);
       //Permet de rajouter un jour au jour de Fin à un event all Day
       if (req.body.allDay) {
         let endDate = new Date(req.body.end);
@@ -76,7 +82,7 @@ export default class EventRouteur extends Routeur {
           success: false,
           message: "Erreur lors de la mise à jour de l'événement"
         });
-      }
+      }*/
     });
 
     // Route pour créer un événement lambda ou avec une récurrence simple
@@ -126,7 +132,9 @@ export default class EventRouteur extends Routeur {
                 description: newEvent.description,
                 occurrenceStart: occurrenceStart.toISOString(),
                 occurrenceEnd: occurrenceEnd.toISOString(),
-                allDay: newEvent.allDay
+                allDay: newEvent.allDay,
+                unit: req.body.unit,
+                interval: req.body.interval
               });
 
               switch (req.body.recurrence) {
@@ -249,7 +257,9 @@ export default class EventRouteur extends Routeur {
           end: moment(o.occurrenceEnd).toISOString(),
           color: agenda.color,
           allDay: o.allDay,
-          isCancelled: o.isCancelled
+          isCancelled: o.isCancelled,
+          unit: o.unit,
+          interval: o.interval
         }));
 
         // Ajoute les événements de cet agenda au tableau global
