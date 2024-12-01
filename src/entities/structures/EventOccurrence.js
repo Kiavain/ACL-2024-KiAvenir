@@ -104,7 +104,10 @@ export default class EventOccurrence extends EntityStructure {
       occurrenceEnd: this.occurrenceEnd,
       name: this.name,
       description: this.description,
-      isCancelled: this.isCancelled
+      isCancelled: this.isCancelled,
+      allDay: this.allDay,
+      unit: this.unit,
+      interval: this.interval
     };
   }
 }

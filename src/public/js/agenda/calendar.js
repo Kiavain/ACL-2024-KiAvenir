@@ -165,12 +165,9 @@ export const openModal = (eventData) => {
   let recurrenceOptions = recurrenceSelect.children;
 
   let unit = eventData.extendedProps.unit ?? 0;
-  console.log(eventData);
   let interval = eventData.extendedProps.interval ?? 2;
   recurrenceCustomSelect.value = unit;
   recurrenceCustomInterval.value = interval;
-
-  console.log(unit, interval);
 
   // Custom de la récurrence
   if (showRecPanel && recurrence !== 5) {
@@ -211,7 +208,8 @@ export const openModal = (eventData) => {
   recurrenceOptions[recurrence].selected = true;
 
   const saveButton = document.getElementById("updateEvent");
-  saveButton.dataset.eventId = eventData.eventId;
+  saveButton.dataset.eventId = eventData.extendedProps.eventId;
+  saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
 
   modal.style.display = "block";
 };
@@ -238,38 +236,45 @@ export const handleOutsideClick = (event) => {
   }
 };
 
-// Fonction pour mettre à jour un événement
 export const saveEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
   const errorMessages = document.getElementById("error-update-event");
-  const eventId = saveButton.dataset.eventId;
+  let eventId = saveButton.dataset.eventId;
 
   const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
 
   const updatedData = {
-    title: document.getElementById("eventTitle").value,
-    description: document.getElementById("eventDetails").value,
+    title: document.getElementById("eventTitle").value.trim(),
+    description: document.getElementById("eventDetails").value.trim(),
     start: document.getElementById("startEventTime").value + stringAppend,
     end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value,
-    occurrence: 0
+    occurrence: 0 // Par défaut, c'est un événement principal
   };
+
+  // Vérifie si une récurrence personnalisée est activée
   if (updatedData.recurrence === "5") {
     const unit = document.getElementById("eventRecurrenceCustom").value;
     const interval = document.getElementById("eventRecurrenceInterval").value;
 
-    updatedData["unit"] = unit;
-    updatedData["interval"] = interval;
-    updatedData["occurrence"] = 1;
+    eventId = saveButton.dataset.occurrenceId;
+    updatedData.unit = parseInt(unit, 10);
+    updatedData.interval = parseInt(interval, 10);
+    updatedData.occurrence = 1; // Marque comme une occurrence
 
-    if (isNaN(unit) || isNaN(interval) || interval < 1 || interval > 30) {
+    if (
+      isNaN(updatedData.unit) ||
+      isNaN(updatedData.interval) ||
+      updatedData.interval < 1 ||
+      updatedData.interval > 30
+    ) {
       errorMessages.innerText = "Les champs doivent être des nombres entiers positifs.";
+      return;
     }
-  } else {
-    updatedData["occurrence"] = 0;
   }
-  if (!updatedData.title.trim()) {
+
+  if (!updatedData.title) {
     errorMessages.innerText = "Le champ titre est obligatoire.";
     return;
   }
@@ -277,14 +282,16 @@ export const saveEvent = (calendar) => {
     errorMessages.innerText = "Les champs dates sont obligatoires.";
     return;
   }
-  // Vérifie si la date de fin est supérieure à la date de début
-  if (
-    (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||
-    (new Date(updatedData.start) > new Date(updatedData.end) && updatedData.allDay)
-  ) {
+
+  // Vérifie la cohérence des dates
+  const startDate = new Date(updatedData.start);
+  const endDate = new Date(updatedData.end);
+  if ((startDate >= endDate && !updatedData.allDay) || (startDate > endDate && updatedData.allDay)) {
     errorMessages.innerText = "La date de fin doit être supérieure à la date de début.";
     return;
   }
+
+  console.log("Données envoyées :", updatedData);
 
   fetch(`/api/events/update/${eventId}`, {
     method: "PUT",
@@ -298,10 +305,13 @@ export const saveEvent = (calendar) => {
         closeModal();
         addFlashMessages(["Événement mis à jour avec succès"]);
       } else {
-        alert("Échec de la mise à jour de l'événement.");
+        errorMessages.innerText = data.message || "Échec de la mise à jour de l'événement.";
       }
     })
-    .catch((error) => console.error("Erreur:", error));
+    .catch((error) => {
+      console.error("Erreur:", error);
+      errorMessages.innerText = "Une erreur est survenue lors de la mise à jour.";
+    });
 };
 
 // Fonction pour supprimer un événement

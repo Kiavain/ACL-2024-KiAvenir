@@ -31,58 +31,68 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.put("/api/events/update/:eventId", (req, res) => {
-      // Vérifie si l'utilisateur est connecté
+    this.router.put("/api/events/update/:eventId", async (req, res) => {
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: "Vous devez être connecté pour effectuer cette action."
         });
       }
 
-      if (req.body.occurrence === 1) {
-        console.log("Update Occurrence");
-      } else {
-        console.log("Update Event");
+      const { title, description, start, end, allDay, recurrence, occurrence, unit, interval } = req.body;
+
+      if (!title || !start || !end) {
+        return res.json({
+          success: false,
+          message: "Les champs titre, date de début et date de fin sont obligatoires."
+        });
       }
 
-      /* const event = this.server.database.tables.get("events").get(req.params.eventId);
-      //Permet de rajouter un jour au jour de Fin à un event all Day
-      if (req.body.allDay) {
-        let endDate = new Date(req.body.end);
+      let adjustedEnd = end;
+      if (allDay) {
+        const endDate = new Date(end);
         endDate.setUTCDate(endDate.getUTCDate() + 1);
-        req.body.end = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+        adjustedEnd = endDate.toISOString();
       }
+
       const fields = {
-        name: req.body.title,
-        description: req.body.description,
-        startDate: req.body.start,
-        endDate: req.body.end,
-        allDay: req.body.allDay,
-        recurrence: req.body.recurrence
+        name: title,
+        description: description,
+        startDate: start,
+        endDate: adjustedEnd,
+        allDay: allDay,
+        recurrence: recurrence
       };
 
-      if (event) {
-        event
-          .update(fields)
-          .then(() => {
-            res.json({
-              success: true,
-              message: "Événement mis à jour avec succès"
-            });
-          })
-          .catch(() => {
-            res.json({
-              success: false,
-              message: "Erreur lors de la mise à jour de l'événement"
-            });
+      let table = "events";
+      if (occurrence === 1) {
+        // Distinction entre événement et occurrence => ajout des champs unit et interval
+        table = "event_occurrences";
+        fields.unit = unit;
+        fields.interval = interval;
+      }
+
+      try {
+        const event = this.server.database.tables.get(table).get(req.params.eventId);
+
+        if (!event) {
+          return res.json({
+            success: false,
+            message: "Événement ou occurrence introuvable."
           });
-      } else {
+        }
+        await event.update(fields);
+        res.json({
+          success: true,
+          message: "Mise à jour effectuée avec succès."
+        });
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour :", error);
         res.json({
           success: false,
-          message: "Erreur lors de la mise à jour de l'événement"
+          message: "Une erreur est survenue lors de la mise à jour."
         });
-      }*/
+      }
     });
 
     // Route pour créer un événement lambda ou avec une récurrence simple
@@ -250,6 +260,7 @@ export default class EventRouteur extends Routeur {
 
         // Mappe les occurrences dans le bon format
         const formattedOccurrences = recurringEvents.map((o) => ({
+          occurrenceId: o.occurrenceId,
           eventId: o.eventId,
           description: o.description,
           title: o.name,
