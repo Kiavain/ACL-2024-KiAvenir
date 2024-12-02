@@ -82,6 +82,33 @@ export default class EventRouteur extends Routeur {
           });
         }
         await event.update(fields);
+        const occurrences_to_update = this.server.database.tables
+          .get("event_occurrences")
+          .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
+        if (occurrences_to_update) {
+          if (recurrence === 5) {
+            let startDate = new Date(event.occurrenceStart);
+            let endDate = new Date(event.occurrenceEnd);
+            for (const occurrence of occurrences_to_update) {
+              handleFlexibleRecurrence(startDate, unit, interval);
+              handleFlexibleRecurrence(endDate, unit, interval);
+
+              await occurrence.update({
+                occurrenceStart: startDate.toISOString(),
+                occurrenceEnd: endDate.toISOString(),
+                unit: unit,
+                interval: interval
+              });
+            }
+          } else {
+            event.update({ isCancelled: true });
+            for (const occurrence of occurrences_to_update) {
+              await occurrence.update({
+                isCancelled: true
+              });
+            }
+          }
+        }
         res.json({
           success: true,
           message: "Mise à jour effectuée avec succès."
@@ -242,7 +269,7 @@ export default class EventRouteur extends Routeur {
             .includes(o.eventId);
 
           // Vérifie si l'ID de l'occurrence appartient à un événement valide
-          return isWithinDateRange && matchesSearch && parentEventInAgenda;
+          return isWithinDateRange && matchesSearch && parentEventInAgenda && !o.isCancelled;
         });
 
         // Mappe les événements dans le bon format
