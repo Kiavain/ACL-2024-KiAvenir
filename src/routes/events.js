@@ -152,7 +152,7 @@ export default class EventRouteur extends Routeur {
         .create(req.body)
         .then((newEvent) => {
           // Si l'événement est récurrent, créer les occurrences
-          if (req.body.recurrence !== 0) {
+          if (req.body.recurrence !== 4) {
             const start = new Date(req.body.startDate);
             const end = new Date(req.body.endDate);
             const occurrences = [];
@@ -174,25 +174,12 @@ export default class EventRouteur extends Routeur {
                 interval: req.body.interval
               });
 
-              switch (req.body.recurrence) {
-                case 1: // Quotidien
-                  currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-                  break;
-                case 2: // Hebdomadaire
-                  currentDate.setUTCDate(currentDate.getUTCDate() + 7);
-                  break;
-                case 3: // Mensuel
-                  currentDate.setUTCMonth(currentDate.getUTCMonth() + 1);
-                  break;
-                case 4: // Annuel
-                  currentDate.setUTCFullYear(currentDate.getUTCFullYear() + 1);
-                  break;
-                case 5: // Flexibilité
-                  handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
-                  break;
-                default:
-                  break;
+              // Gestion des récurrences flexibles ou non
+              if (req.body.recurrence !== 5) {
+                req.body.interval = 1;
+                req.body.unit = req.body.recurrence;
               }
+              handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
             }
 
             // Création des occurrences en lot
@@ -255,7 +242,7 @@ export default class EventRouteur extends Routeur {
           const isWithinDateRange = new Date(e.startDate) <= new Date(end) && new Date(e.endDate) >= new Date(start);
           const matchesSearch = search ? e.name.toLowerCase().includes(search.toLowerCase()) : true;
 
-          return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 0;
+          return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 4;
         });
 
         // Récupère les occurrences d'événements récurrents
