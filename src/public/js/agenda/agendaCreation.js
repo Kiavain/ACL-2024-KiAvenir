@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("Création de l'agenda...");
     const name = getInputValue("agenda-name");
-    const description = getInputValue("agenda-description") || " ";
+    const description = getInputValue("agenda-description") || "Pas de détails disponibles.";
     const color = getInputValue("agenda-color") || "#2196f3";
 
     const data = {
