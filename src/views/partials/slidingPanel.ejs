@@ -7,7 +7,7 @@
             <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
                 <li class="agenda-item" data-description="<%= agenda.description %>" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                     <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" data-agenda-color="<%= agenda.color %>" data-agenda-description="<%= agenda.description %>" onclick="event.stopPropagation()">
+                    <a data-agenda-name="<%= agenda.name %>" data-agenda-color="<%= agenda.color %>" data-agenda-description="<%= agenda.description %>" onclick="event.stopPropagation()">
                         <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                     </a>
                     <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
@@ -25,7 +25,7 @@
                 if (agenda) { %>
                     <li class="agenda-item" data-agenda-name="<%= agenda.name%>" data-description="<%= agenda.description %>" style= "justify-content: unset;">
                         <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                        <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                        <a data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
                             <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                         </a>
                     </li>
@@ -44,7 +44,7 @@
             <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true).forEach(agenda => { %>
                 <li class="agenda-item" data-agenda-name="<%= agenda.name%>" data-description="<%= agenda.description %>" style= "justify-content: unset;<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
                     <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                    <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
+                    <a data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
                         <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                     </a>
                 </li>

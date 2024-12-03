@@ -23,12 +23,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const selectedAgendaIds = localStorage.getItem("selectedAgendaIds");
   if (selectedAgendaIds) {
     const agendaIds = JSON.parse(selectedAgendaIds);
-    const firstAgenda = window.location.pathname.split("/")[2].split(",")[0];
+    const firstAgenda = agenda.agendaId;
+
+    if (agendaIds.length === 0) {
+      agendaIds.push(firstAgenda);
+    }
 
     document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
-      if (agendaIds.includes(checkbox.value) || firstAgenda === checkbox.value) {
+      if (agendaIds.includes(checkbox.value)) {
         checkbox.checked = true;
-        checkbox.disabled = firstAgenda === checkbox.value;
       }
     });
   }

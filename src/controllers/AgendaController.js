@@ -29,6 +29,7 @@ export class AgendaController extends Controller {
     this.deleteAgenda = this.deleteAgenda.bind(this);
     this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
     this.deleteHolidayAgenda = this.deleteHolidayAgenda.bind(this);
+    this.getAgendas = this.getAgendas.bind(this);
   }
 
   /**
@@ -43,9 +44,31 @@ export class AgendaController extends Controller {
       return res.redirect("/login");
     }
 
-    // Récupérer le premier agenda de la liste pour l'utilisateur courant
-    const agenda = this.database.get("agendas").filter((agenda) => agenda.ownerId === res.locals.user.id);
-    res.redirect("/agenda/" + agenda[0].agendaId);
+    // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
+    const agendas = this.server.database.tables
+      .get("agendas")
+      .filter((agenda) => agenda.verifyAgendaAccess(res.locals.user.id));
+
+    // Récupère les agendas où l'utilisateur est invité
+    const guests = this.server.database.tables.get("guests");
+    const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
+
+    if (agendas.length > 0) {
+      const agenda = agendas[0];
+      res.render("agenda", { agenda, agendas, guestsShared });
+    } else {
+      res.redirect("/404");
+    }
+  }
+
+  async getAgendas(req, res) {
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+
+    const agendas = this.agendas.filter((agenda) => agenda.ownerId === localUser.id);
+    res.json(agendas.map((agenda) => agenda.toJSON()));
   }
 
   /**
@@ -98,7 +121,10 @@ export class AgendaController extends Controller {
     this.agendas
       .create({ name, description, ownerId: localUser.id, color })
       .then((agenda) => res.success(`L'agenda ${agenda.name} a été créé avec succès.`, { agendaId: agenda.agendaId }))
-      .catch((error) => res.err(500, error));
+      .catch((error) => {
+        console.error(error);
+        res.err(500, error);
+      });
   }
 
   /**

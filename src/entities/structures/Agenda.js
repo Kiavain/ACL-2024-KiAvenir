@@ -139,4 +139,15 @@ export default class Agenda extends EntityStructure {
   getGuests() {
     return this.guests.filter((x) => x.agendaId === this.agendaId);
   }
+
+  toJSON() {
+    return {
+      agendaId: this.agendaId,
+      ownerId: this.ownerId,
+      name: this.name,
+      color: this.color,
+      description: this.description,
+      special: this.special
+    };
+  }
 }
