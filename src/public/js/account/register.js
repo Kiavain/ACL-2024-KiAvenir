@@ -65,6 +65,4 @@ async function validateAccountCreation(e) {
   if (!accountForm.checkValidity()) {
     e.preventDefault();
   }
-
-  console.log("fin de la fonction");
 }

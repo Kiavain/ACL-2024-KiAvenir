@@ -7,21 +7,6 @@ import path from "path";
 import * as ICAL from "ical.js";
 import { fileURLToPath } from "url";
 
-// Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
-async function checkAndDeleteIcon(path) {
-  try {
-    await access(path); // Vérifie si le fichier existe
-    await unlink(path); // Supprime le fichier
-    // console.log(`Le fichier ${path} a été supprimé avec succès.`);
-  } catch (err) {
-    if (err.code === "ENOENT") {
-      console.log(`Le fichier ${path} n'existe pas.`);
-    } else {
-      console.error(`Erreur : ${err.message}`);
-    }
-  }
-}
-
 /**
  * Contrôleur pour les comptes utilisateurs
  * @extends Controller
@@ -40,6 +25,7 @@ export class AccountController extends Controller {
     this.renderResetPassword = this.renderResetPassword.bind(this);
     this.forgetPassword = this.forgetPassword.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
+    this.editUserIcon = this.editUserIcon.bind(this);
   }
 
   /**
@@ -321,6 +307,24 @@ export class AccountController extends Controller {
   }
 
   /**
+   * Supprime l'avatar de l'utilisateur
+   * @param path {string} Le chemin du fichier
+   * @returns {Promise<void>}
+   */
+  async checkAndDeleteIcon(path) {
+    try {
+      await access(path); // Vérifie si le fichier existe
+      await unlink(path); // Supprime le fichier
+    } catch (err) {
+      if (err.code === "ENOENT") {
+        this.logger.warn(`Le fichier ${path} n'existe pas.`);
+      } else {
+        this.logger.error(`Erreur : ${err.message}`, err);
+      }
+    }
+  }
+
+  /**
    * Modifie l'avatar du compte de l'utilisateur connecté.
    * @param req La requête
    * @param res La réponse
@@ -332,26 +336,23 @@ export class AccountController extends Controller {
     if (!localUser) {
       return res.status(401).redirect("/401");
     }
+
     try {
       if (!req.file) {
         return res.status(400).send("Aucune image uploadée.");
       }
+
       // Fichier uploadé
-      const newIconPath = req.file.path; // Chemin du fichier enregistré
-      // const originalName = req.file.originalname;
-      // console.log(`Image uploadée : ${originalName}, chemin : ${newIconPath}`);
+      const newIconPath = req.file.path;
 
-      //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
+      // Supprime l'ancien avatar s'il existe
       const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
+      await this.checkAndDeleteIcon(iconPath);
 
-      // Supprime l'avatar s'il existe
-      await checkAndDeleteIcon(iconPath);
+      // Importe le nouvel avatar et supprime le fichier de "uploads"
+      fs.copyFileSync(newIconPath, iconPath);
+      await this.checkAndDeleteIcon(newIconPath);
 
-      // Upload du nouvel avatar
-      fs.copyFileSync(newIconPath, iconPath); // Copie le fichier dans le dossier des avatars et le renomme
-      checkAndDeleteIcon(newIconPath); // Supprime le fichier original dans 'uploads/'
-
-      // On renvoie l'utilisateur sur la page du compte
       return res.redirect("/account");
     } catch (error) {
       console.error(error);
@@ -441,7 +442,7 @@ export class AccountController extends Controller {
 
       // Supprime l'avatar s'il existe
       const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
-      checkAndDeleteIcon(iconPath);
+      await this.checkAndDeleteIcon(iconPath);
 
       // Supprime l'utilisateur
       await user.delete();

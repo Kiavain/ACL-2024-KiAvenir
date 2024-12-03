@@ -129,7 +129,7 @@ function submitShareAgenda() {
           otherError.textContent = data.message;
           otherError.style.display = "block";
         }
-        console.log("Erreur partage d'agenda : " + data.message);
+        console.error("Erreur partage d'agenda : " + data.message);
       }
     })
     .catch((error) => console.error("Erreur:", error));

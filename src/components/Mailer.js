@@ -35,7 +35,6 @@ export default class Mailer {
       html: html
     };
 
-    console.log(html);
     return this.transport.sendMail(mailOptions);
   }
 }

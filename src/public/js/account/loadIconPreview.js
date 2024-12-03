@@ -6,7 +6,6 @@ const fileName = document.querySelector(".file-name");
 const userIconPreview = document.getElementById("userIconPreview");
 const ctx = userIconPreview.getContext("2d");
 
-const uploadButton = document.getElementById("uploadIcon");
 let resizedImageBlob = null;
 
 const MAX_WIDTH = 400; // Largeur maximale
@@ -51,8 +50,6 @@ fileInput.addEventListener("change", () => {
         ctx.clearRect(0, 0, userIconPreview.width, userIconPreview.height);
         ctx.drawImage(img, 0, 0, width, height);
 
-        console.log(`Image redimensionnée à : ${width}x${height}px`);
-
         // Convertir l'image redimensionnée en Blob
         userIconPreview.toBlob(
           (blob) => {
@@ -91,10 +88,9 @@ iconForm.addEventListener("submit", async (e) => {
   })
     .then((response) => {
       if (response.ok) {
-        // console.log('Image envoyée avec succès !');
         window.location.reload();
       } else {
-        console.log("Erreur lors de l'envoi de l'image.");
+        console.error("Erreur lors de l'envoi de l'image.");
       }
     })
     .catch((error) => {
