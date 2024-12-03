@@ -33,7 +33,8 @@ export default class EventRouteur extends Routeur {
 
     this.router.put("/api/events/update/:eventId", (req, res) => {
       // Vérifie si l'utilisateur est connecté
-      if (!res.locals.user) {
+      const user = res.locals.user;
+      if (!user) {
         return res.json({
           success: false,
           message: "Vous devez être connecté pour effectuer cette action"
@@ -41,6 +42,13 @@ export default class EventRouteur extends Routeur {
       }
 
       const event = this.server.database.tables.get("events").get(req.params.eventId);
+      if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
+        return res.json({
+          success: false,
+          message: "Vous n'avez pas la permission de modifier cet événement"
+        });
+      }
+
       //Permet de rajouter un jour au jour de Fin à un event all Day
       if (req.body.allDay) {
         let endDate = new Date(req.body.end);

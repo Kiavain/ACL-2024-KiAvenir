@@ -399,9 +399,10 @@ export const saveEvent = (calendar) => {
     .then((data) => {
       if (data.success) {
         addFlashMessages(["Événement mis à jour avec succès"]);
-        calendar.refetchEvents();
+        refreshCalendar();
         closeModal();
       } else {
+        refreshCalendar();
         alert("Échec de la mise à jour de l'événement.");
       }
     })
