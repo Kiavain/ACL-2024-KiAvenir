@@ -1,12 +1,11 @@
 import jwt from "jsonwebtoken";
 import { encryptPassword, getSecret } from "../utils/index.js";
 import Controller from "./Controller.js";
-import { access, unlink } from 'fs/promises';
-import fs from 'fs';
+import { access, unlink } from "fs/promises";
+import fs from "fs";
 import path from "path";
 import * as ICAL from "ical.js";
 import { fileURLToPath } from "url";
-
 
 // Fonction pour supprimer l'icone utilisateur lors de la suppression du compte
 async function checkAndDeleteIcon(path) {
@@ -15,7 +14,7 @@ async function checkAndDeleteIcon(path) {
     await unlink(path); // Supprime le fichier
     // console.log(`Le fichier ${path} a été supprimé avec succès.`);
   } catch (err) {
-    if (err.code === 'ENOENT') {
+    if (err.code === "ENOENT") {
       console.log(`Le fichier ${path} n'existe pas.`);
     } else {
       console.error(`Erreur : ${err.message}`);
@@ -38,6 +37,75 @@ export class AccountController extends Controller {
     this.login = this.login.bind(this);
     this.editAccount = this.editAccount.bind(this);
     this.deleteAccount = this.deleteAccount.bind(this);
+    this.renderResetPassword = this.renderResetPassword.bind(this);
+    this.forgetPassword = this.forgetPassword.bind(this);
+    this.resetPassword = this.resetPassword.bind(this);
+  }
+
+  /**
+   * Rend la page de réinitialisation de mot de passe
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<void>}
+   */
+  async renderForgetPassword(req, res) {
+    res.render("forget-password");
+  }
+
+  /**
+   * Rend la page de réinitialisation de mot de passe
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<*>}
+   */
+  async renderResetPassword(req, res) {
+    const { token, email } = req.query;
+    const user = this.database.get("users").find((user) => user.email === email);
+
+    if (!user.checkResetToken(token)) {
+      return res.render("errors/bad_token");
+    }
+
+    res.render("reset-password", { token, email });
+  }
+
+  /**
+   * Réinitialise le mot de passe de l'utilisateur
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<void>}
+   */
+  async resetPassword(req, res) {
+    const { email, password } = req.body;
+    const user = this.database.get("users").find((user) => user.email === email);
+
+    user.update({ password: encryptPassword(password, user.salt) });
+    res.redirect("/");
+  }
+
+  /**
+   * Envoie un email de réinitialisation de mot de passe à l'utilisateur
+   * @param req La requête
+   * @param res La réponse
+   * @returns {Promise<*>}
+   */
+  async forgetPassword(req, res) {
+    const { email } = req.body;
+    const user = this.database.get("users").find((user) => user.email === email);
+
+    if (!user) {
+      return res.render("forget-password", {
+        errorMessage: "Aucun compte n'existe pour cette adresse email."
+      });
+    }
+
+    // Génère le token de réinitialisation de mot de passe
+    await user.resetPassword();
+
+    // Envoi du mail de réinitialisation de mot de passe
+    await this.server.mailer.sendResetPasswordEmail(user, user.reset_token);
+    req.flash("Un email de réinitialisation de mot de passe a été envoyé.");
+    res.json();
   }
 
   /**
@@ -268,7 +336,7 @@ export class AccountController extends Controller {
     }
     try {
       if (!req.file) {
-        return res.status(400).send('Aucune image uploadée.');
+        return res.status(400).send("Aucune image uploadée.");
       }
       // Fichier uploadé
       const newIconPath = req.file.path; // Chemin du fichier enregistré
@@ -277,19 +345,19 @@ export class AccountController extends Controller {
 
       //note: on pourrait mettre un champ fantôme dans le form pour récupérer l'id via la requête au lieu de localUser.id 🤔
       const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
-      
+
       // Supprime l'avatar s'il existe
       await checkAndDeleteIcon(iconPath);
 
       // Upload du nouvel avatar
       fs.copyFileSync(newIconPath, iconPath); // Copie le fichier dans le dossier des avatars et le renomme
-      checkAndDeleteIcon(newIconPath);  // Supprime le fichier original dans 'uploads/'
+      checkAndDeleteIcon(newIconPath); // Supprime le fichier original dans 'uploads/'
 
       // On renvoie l'utilisateur sur la page du compte
       return res.redirect("/account");
     } catch (error) {
       console.error(error);
-      res.status(500).send('Erreur lors de l\'upload de l\'image.');
+      res.status(500).send("Erreur lors de l'upload de l'image.");
     }
   }
 
