@@ -1,0 +1,33 @@
+name: Exécution des tests
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Étape 1 : Vérifie le code source
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Étape 2 : Configure Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Adaptez la version si nécessaire
+
+      # Étape 3 : Installe les dépendances
+      - name: Install dependencies
+        run: npm install
+
+      # Étape 4 : Lance les tests avec couverture
+      - name: Run tests with coverage
+        env:
+          NODE_ENV: test
+        run: npx cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage
