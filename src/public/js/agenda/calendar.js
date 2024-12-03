@@ -106,24 +106,27 @@ export const initCalendar = () => {
       openModal(info.event);
     },
     eventDrop: (info) => {
-      //gérer pour ne pas passer de allDay a pas allDay
-      //const startDate = document.getElementById("startEventTime");
-      //const endDate = document.getElementById("endEventTime");
-      //startDate.value = moment(info.event.start).toISOString().substring(0, 16);
-      //endDate.value = moment(info.event.end).toISOString().substring(0, 16);
-      //const saveButton = document.getElementById("updateEvent");
-      //saveButton.dataset.eventId = info.event.extendedProps.eventId;
-      //saveEvent(calendar);
-      //
       if (info.event.allDay === info.oldEvent.allDay) {
-        openModal(info.event);
-      } else {
-        refreshCalendar();
+        document.getElementById("eventTitle").value = info.event.title;
+        document.getElementById("eventDetails").value = info.event.extendedProps.description;
+        document.getElementById("eventAllDay").checked = info.event.allDay;
+        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
+        document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
+        document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
+        saveEvent(info.event);
       }
     },
     eventResize: (info) => {
       if (info.event.end !== info.oldEvent.end) {
-        openModal(info.event);
+        document.getElementById("eventTitle").value = info.event.title;
+        document.getElementById("eventDetails").value = info.event.extendedProps.description;
+        document.getElementById("eventAllDay").checked = info.event.allDay;
+        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
+        document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
+        document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
+        saveEvent(calendar);
       }
     },
     eventDidMount: function (info) {
@@ -309,9 +312,9 @@ export const saveEvent = (calendar) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
+        addFlashMessages(["Événement mis à jour avec succès"]);
         calendar.refetchEvents();
         closeModal();
-        addFlashMessages(["Événement mis à jour avec succès"]);
       } else {
         alert("Échec de la mise à jour de l'événement.");
       }
