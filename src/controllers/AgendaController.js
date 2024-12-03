@@ -29,7 +29,6 @@ export class AgendaController extends Controller {
     this.deleteAgenda = this.deleteAgenda.bind(this);
     this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
     this.deleteHolidayAgenda = this.deleteHolidayAgenda.bind(this);
-    this.getAgendas = this.getAgendas.bind(this);
   }
 
   /**
@@ -59,16 +58,6 @@ export class AgendaController extends Controller {
     } else {
       res.redirect("/404");
     }
-  }
-
-  async getAgendas(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
-      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
-    }
-
-    const agendas = this.agendas.filter((agenda) => agenda.ownerId === localUser.id);
-    res.json(agendas.map((agenda) => agenda.toJSON()));
   }
 
   /**
