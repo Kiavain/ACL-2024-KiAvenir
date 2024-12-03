@@ -61,6 +61,8 @@ export const initCalendar = () => {
     noEventsContent: "Aucun événement disponible",
     firstDay: 1,
     headerToolbar: getHeaderToolbarConfig(),
+    editable: true,
+    eventStartEditable: true,
     customButtons: {
       customButton: {
         text: "",
@@ -102,6 +104,30 @@ export const initCalendar = () => {
     },
     eventClick: (info) => {
       openEventDetailsModal(info.event);
+    },
+    eventDrop: (info) => {
+      if (info.event.allDay === info.oldEvent.allDay) {
+        document.getElementById("eventTitle").value = info.event.title;
+        document.getElementById("eventDetails").value = info.event.extendedProps.description;
+        document.getElementById("eventAllDay").checked = info.event.allDay;
+        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
+        document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
+        document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
+        saveEvent(info.event);
+      }
+    },
+    eventResize: (info) => {
+      if (info.event.end !== info.oldEvent.end) {
+        document.getElementById("eventTitle").value = info.event.title;
+        document.getElementById("eventDetails").value = info.event.extendedProps.description;
+        document.getElementById("eventAllDay").checked = info.event.allDay;
+        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
+        document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
+        document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
+        saveEvent(calendar);
+      }
     },
     eventDidMount: function (info) {
       info.el.style.backgroundColor = info.event.backgroundColor;
@@ -312,6 +338,7 @@ const listenFilter = (calendar) => {
 export const closeModal = () => {
   const modal = document.getElementById("eventModal");
   modal.style.display = "none";
+  refreshCalendar();
 };
 // Fonction pour fermer la modale des détails
 export const closeEventDetailsModal = () => {
@@ -325,6 +352,7 @@ export const handleOutsideClick = (event) => {
   const modalDetails = document.getElementById("eventDetailsModal");
   if (event.target === modal) {
     closeModal();
+    refreshCalendar();
   }
   if (event.target === modalDetails) {
     closeEventDetailsModal();
@@ -370,9 +398,9 @@ export const saveEvent = (calendar) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
+        addFlashMessages(["Événement mis à jour avec succès"]);
         calendar.refetchEvents();
         closeModal();
-        addFlashMessages(["Événement mis à jour avec succès"]);
       } else {
         alert("Échec de la mise à jour de l'événement.");
       }
