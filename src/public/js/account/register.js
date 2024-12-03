@@ -32,10 +32,9 @@ async function validateAccountCreation(e) {
   });
 
   const emailIsEmpty = emailInput.value === "";
-  var emailIsCorrect = !emailIsEmpty;
+  let emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
-    console.log("Email is empty !");
     e.preventDefault();
     return;
   }

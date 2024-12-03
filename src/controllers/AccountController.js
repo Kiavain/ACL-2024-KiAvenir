@@ -79,7 +79,7 @@ export class AccountController extends Controller {
     const { email, password } = req.body;
     const user = this.database.get("users").find((user) => user.email === email);
 
-    user.update({ password: encryptPassword(password, user.salt) });
+    user.update({ password: encryptPassword(password, user.salt), reset_token: "" });
     res.redirect("/");
   }
 
@@ -93,10 +93,8 @@ export class AccountController extends Controller {
     const { email } = req.body;
     const user = this.database.get("users").find((user) => user.email === email);
 
-    if (!user) {
-      return res.render("forget-password", {
-        errorMessage: "Aucun compte n'existe pour cette adresse email."
-      });
+    if (user === undefined) {
+      return res.json({ success: false, message: "Utilisateur non trouvé." });
     }
 
     // Génère le token de réinitialisation de mot de passe
@@ -105,7 +103,7 @@ export class AccountController extends Controller {
     // Envoi du mail de réinitialisation de mot de passe
     await this.server.mailer.sendResetPasswordEmail(user, user.reset_token);
     req.flash("Un email de réinitialisation de mot de passe a été envoyé.");
-    res.json();
+    res.json({ success: true, message: "Un email de réinitialisation de mot de passe a été envoyé." });
   }
 
   /**

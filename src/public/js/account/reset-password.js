@@ -2,6 +2,8 @@ import { addFlashMessages, hashSHA256 } from "../utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const resetForm = document.forms["accountResetPassword"];
+  const errorMessage = document.getElementById("error_reset_password");
+
   resetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -10,12 +12,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = resetForm["token"].value;
 
     if (!password || !passwordConfirm) {
-      alert("Veuillez saisir votre mot de passe.");
+      errorMessage.textContent = "Veuillez saisir votre mot de passe et le confirmer.";
+      errorMessage.style.display = "block";
       return;
     }
 
     if (password !== passwordConfirm) {
-      alert("Les mots de passe ne correspondent pas.");
+      errorMessage.textContent = "Les mots de passe ne correspondent pas.";
+      errorMessage.style.display = "block";
+      return;
+    }
+
+    if (password.length < 8) {
+      errorMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+      errorMessage.style.display = "block";
       return;
     }
 
@@ -27,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify({ password: await hashSHA256(password), email: token })
     });
 
+    errorMessage.style.display = "none";
     if (response.ok) {
       window.location.href = "/login";
     } else {

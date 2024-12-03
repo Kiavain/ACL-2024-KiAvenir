@@ -7,9 +7,6 @@ import dotenv from "dotenv";
 export default class Mailer {
   constructor(server) {
     const mailEnv = dotenv.config({ path: "./mail.env" }).parsed;
-    console.log(process.env.EMAIL);
-    console.log(process.env.EMAIL_PASSWORD);
-
     this.server = server;
     this.transport = nodeMailer.createTransport({
       service: "gmail",

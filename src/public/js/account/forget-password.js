@@ -1,13 +1,20 @@
-import { addFlashMessages } from "../utils.js";
+import { addFlashMessages, checkEmail } from "../utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const forgetForm = document.forms["accountForgetPassword"];
+  const errMsg = document.getElementById("error_message_forget");
+
   forgetForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const email = forgetForm["email"].value;
     if (!email) {
       alert("Veuillez saisir votre adresse e-mail.");
+      return;
+    }
+
+    if (!(await checkEmail(forgetForm["email"]))) {
+      e.preventDefault();
       return;
     }
 
@@ -19,11 +26,15 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify({ email })
     });
 
-    if (response.ok) {
-      addFlashMessages(["Un email de réinitialisation de mot de passe vous a été envoyé."]);
+    const json = await response.json();
+
+    if (json.success) {
+      addFlashMessages([json.message]);
+      errMsg.style.display = "none";
       forgetForm.reset();
     } else {
-      addFlashMessages(["Erreur lors de l'envoi de l'email de réinitialisation de mot de passe."]);
+      errMsg.textContent = json.message;
+      errMsg.style.display = "block";
     }
   });
 });
