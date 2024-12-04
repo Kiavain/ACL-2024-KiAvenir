@@ -138,7 +138,7 @@
                     </div>
 
                     <div id="deleteAccount" class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteAccount">
                             Supprimer mon compte
                         </button>
                     </div>
@@ -152,7 +152,7 @@
     <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
 </div>
 
-<div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" style="top: 20vh !important;">
             <div class="modal-header">

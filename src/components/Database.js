@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 import fs from "fs/promises";
 import { getDirname } from "../utils/index.js";
-import { fileURLToPath, pathToFileURL } from "url";
+import { pathToFileURL } from "url";
 import path from "path";
 
 // Obtenir __dirname en mode ES module

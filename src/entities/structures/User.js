@@ -75,6 +75,12 @@ export default class User extends EntityStructures {
    * @returns {Promise<User>} L'utilisateur
    */
   async update(data) {
+    this.reset_token = data.reset_token || this.reset_token;
+    this.password = data.password || this.password;
+    this.salt = data.salt || this.salt;
+    this.username = data.username || this.username;
+    this.email = data.email || this.email;
+
     return this.entity.update((x) => x.id === this.id, data);
   }
 

@@ -461,29 +461,7 @@ export class AgendaController extends Controller {
         return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
       }
       const agenda = await this.agendas.create({ name, description: summary, ownerId: localUser.id, color });
-
-      for (const vevent of vevents) {
-        const eventName = vevent.getFirstPropertyValue("summary");
-        const dtstartProp = vevent.getFirstProperty("dtstart");
-        const dtendProp = vevent.getFirstProperty("dtend");
-        const startDate = new Date(dtstartProp.getFirstValue().toString());
-        const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
-        const eventDescription = vevent.getFirstPropertyValue("description") || "";
-
-        const dtstartValue = dtstartProp.getFirstValue();
-        const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
-
-        if (eventName && startDate && endDate) {
-          await this.events.create({
-            name: eventName,
-            agendaId: agenda.agendaId,
-            startDate: startDate,
-            endDate: endDate,
-            description: eventDescription,
-            allDay: isAllDay
-          });
-        }
-      }
+      await this.importEvents(vevents, agenda);
     } else {
       return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
     }
