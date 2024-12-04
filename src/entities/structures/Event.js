@@ -77,6 +77,13 @@ export default class Event extends EntityStructures {
    * @returns {Promise<Event>} Une promesse de l'événement
    */
   async update(data) {
+    this.name = data.name;
+    this.description = data.description;
+    this.startDate = data.startDate;
+    this.endDate = data.endDate;
+    this.allDay = data.allDay;
+    this.recurrence = data.recurrence;
+
     return this.entity.update((x) => x.eventId === this.eventId, data);
   }
 

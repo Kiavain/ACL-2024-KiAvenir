@@ -61,6 +61,8 @@ export default class Guest extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
+    this.role = data.role;
+
     return this.entity.update((x) => x.id === this.id, data);
   }
 

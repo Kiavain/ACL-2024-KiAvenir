@@ -79,6 +79,11 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
+    this.name = data.name;
+    this.color = data.color;
+    this.description = data.description;
+    this.special = data.special;
+
     return this.entity.update((x) => x.agendaId === this.agendaId, data);
   }
 

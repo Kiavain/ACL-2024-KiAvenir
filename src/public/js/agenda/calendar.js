@@ -132,7 +132,6 @@ export const initCalendar = () => {
       saveEvent(calendar);
     },
     eventResize: (info) => {
-      console.log("Resize");
       if (info.event.end !== info.oldEvent.end) {
         document.getElementById("eventTitle").value = info.event.title;
         document.getElementById("eventDetails").value = info.event.extendedProps.description;

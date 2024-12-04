@@ -68,8 +68,6 @@ export default class EventRouteur extends Routeur {
         recurrence: req.body.recurrence
       };
 
-      console.log(fields);
-
       if (event) {
         event
           .update(fields)
