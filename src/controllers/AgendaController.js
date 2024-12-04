@@ -347,9 +347,7 @@ export class AgendaController extends Controller {
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
       fs.writeFileSync(downloadsPath, data, "utf8");
-
-      // eslint-disable-next-line no-unused-vars
-      res.download(downloadsPath, filename, (err) => {});
+      res.download(downloadsPath, filename, () => {});
     } else if (format === "ICS") {
       // Crée un calendrier ICAL avec les événements
       const calendar = ical({ name: agenda.name, description: agenda.description });
@@ -382,8 +380,7 @@ export class AgendaController extends Controller {
       // Enregistre la chaîne ICS dans un fichier
       fs.writeFileSync(downloadsPath, icsContent, "utf8");
 
-      // eslint-disable-next-line no-unused-vars
-      res.download(downloadsPath, filename, (err) => {});
+      res.download(downloadsPath, filename, () => {});
     } else {
       return res.err(400, "Format inconnu.");
     }
