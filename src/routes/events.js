@@ -24,8 +24,7 @@ export default class EventRouteur extends Routeur {
 
       const { recurrence, applyToAll } = req.body;
 
-      if (recurrence === 4) {
-        console.log("Supp 1 seul");
+      if (Number(recurrence) === 4) {
         // Suppression d'un seul événement qui ne se répète pas
         const event = this.server.database.tables.get("events").get(req.params.eventId);
         if (event) {
@@ -35,7 +34,6 @@ export default class EventRouteur extends Routeur {
           res.json({ success: false });
         }
       } else if (applyToAll) {
-        console.log("Supp all");
         // Suppression de toutes les récurrences d'un événement
         const occ = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
         let parentEventId = occ.eventId;
@@ -54,7 +52,6 @@ export default class EventRouteur extends Routeur {
         }
       } else {
         // Suppression d'une seule occurrence
-        console.log("Supp 1 occ");
         const event = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
         if (event) {
           await event.update({ isCancelled: true });

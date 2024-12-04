@@ -191,9 +191,6 @@ export const openModal = (eventData) => {
         showRecPanel.style.display = "none";
       }
     });
-    console.log("Recurrence", recurrence);
-    console.log("Unit", unit);
-    console.log("Interval", interval);
   }
 
   function handleCustomRecurrence() {
@@ -208,7 +205,13 @@ export const openModal = (eventData) => {
   }
 
   recurrenceSelect.value = recurrence;
-  console.log("recurrenceSelect", recurrenceSelect);
+
+  const optionApplyToAll = document.getElementById("optionApplyToAll");
+  if (recurrence !== 4) {
+    optionApplyToAll.style.display = "block";
+  } else {
+    optionApplyToAll.style.display = "none";
+  }
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
@@ -331,10 +334,12 @@ export const deleteEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
   let eventId = saveButton.dataset.eventId;
   const recurrence = document.getElementById("eventRecurrence").value;
+  const applyToAll = document.getElementById("applyToAllOccurrences").checked;
+  console.log("Suppression de l'événement", applyToAll);
 
   const deleteNature = {
     recurrence: recurrence,
-    applyToAll: false
+    applyToAll: applyToAll
   };
 
   if (Number(recurrence) !== 4) {
