@@ -21,10 +21,28 @@ async function validateAccountCreation(e) {
     emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
   });
 
-  const emailIsEmpty = emailInput.value === "";
+  const emailIsEmpty = emailInput.value.trim() === "";
   let emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
+    emailInput.setCustomValidity("L'adresse mail est obligatoire.");
+    emailInput.reportValidity();
+
+    emailInput.addEventListener("input", () => {
+      emailInput.setCustomValidity("");
+    });
+    e.preventDefault();
+    return;
+  }
+
+  const username = accountForm.username.value;
+  if (username.trim() === "") {
+    accountForm.username.setCustomValidity("Le nom d'utilisateur est obligatoire.");
+    accountForm.username.reportValidity();
+
+    accountForm.username.addEventListener("input", () => {
+      accountForm.username.setCustomValidity("");
+    });
     e.preventDefault();
     return;
   }
