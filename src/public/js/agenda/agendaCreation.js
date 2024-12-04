@@ -28,6 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = getInputValue("agenda-description") || "Pas de détails disponibles.";
     const color = getInputValue("agenda-color") || "#2196f3";
 
+    // Empêche les agendas au nom vide
+    if (!name.trim()) {
+      agendaCreationError.style.display = "block";
+      return;
+    }
+
     const data = {
       name: name,
       description: description,
