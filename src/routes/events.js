@@ -22,12 +22,46 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
-      if (event) {
-        await event.delete();
-        res.json({ success: true });
+      const { recurrence, applyToAll } = req.body;
+
+      if (recurrence === 4) {
+        console.log("Supp 1 seul");
+        // Suppression d'un seul événement qui ne se répète pas
+        const event = this.server.database.tables.get("events").get(req.params.eventId);
+        if (event) {
+          await event.delete();
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
+      } else if (applyToAll) {
+        console.log("Supp all");
+        // Suppression de toutes les récurrences d'un événement
+        const occ = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
+        let parentEventId = occ.eventId;
+        const event = this.server.database.tables.get("events").get(parentEventId);
+        if (event) {
+          await event.delete();
+          const occurrences = this.server.database.tables
+            .get("event_occurrences")
+            .filter((o) => o.eventId === event.eventId);
+          for (const occurrence of occurrences) {
+            await occurrence.delete();
+          }
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
       } else {
-        res.json({ success: false });
+        // Suppression d'une seule occurrence
+        console.log("Supp 1 occ");
+        const event = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
+        if (event) {
+          await event.update({ isCancelled: true });
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
       }
     });
 
@@ -85,8 +119,9 @@ export default class EventRouteur extends Routeur {
         const occurrences_to_update = this.server.database.tables
           .get("event_occurrences")
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
-        if (occurrences_to_update) {
-          if (recurrence === 5) {
+        let rec = Number(recurrence);
+        if (occurrences_to_update.length > 0) {
+          if (rec === 5) {
             let startDate = new Date(event.occurrenceStart);
             let endDate = new Date(event.occurrenceEnd);
             for (const occurrence of occurrences_to_update) {
@@ -100,13 +135,52 @@ export default class EventRouteur extends Routeur {
                 interval: interval
               });
             }
-          } else {
-            event.update({ isCancelled: true });
+          } else if (rec === 4) {
             for (const occurrence of occurrences_to_update) {
               await occurrence.update({
                 isCancelled: true
               });
             }
+          } else {
+            let startDate = new Date(event.occurrenceStart);
+            let endDate = new Date(event.occurrenceEnd);
+            for (const occurrence of occurrences_to_update) {
+              handleFlexibleRecurrence(startDate, rec, 1);
+              handleFlexibleRecurrence(endDate, rec, 1);
+
+              await occurrence.update({
+                occurrenceStart: startDate.toISOString(),
+                occurrenceEnd: endDate.toISOString(),
+                unit: rec,
+                interval: 1
+              });
+            }
+          }
+        } else {
+          // Si aucune occurrence à mettre à jour, on crée les occurrences
+          const start = new Date(event.startDate);
+          const occurrences_to_create = [];
+          let currentDate = new Date(start);
+          while (currentDate <= new Date(start.getTime() + 2 * 365 * 24 * 60 * 60 * 1000)) {
+            const occurrenceStart = new Date(currentDate);
+            const occurrenceEnd = new Date(currentDate.getTime() + (end - start));
+            let occ = {
+              eventId: event.eventId,
+              name: event.name,
+              description: event.description,
+              allDay: event.allDay,
+              occurrenceStart: occurrenceStart.toISOString(),
+              occurrenceEnd: occurrenceEnd.toISOString(),
+              unit: unit,
+              interval: interval
+            };
+            console.log("Occ1", occ);
+            occurrences_to_create.push(occ);
+            handleFlexibleRecurrence(currentDate, unit, interval);
+          }
+          for (const occ of occurrences_to_create) {
+            console.log("Occ", occ);
+            await this.server.database.tables.get("event_occurrences").create(occ);
           }
         }
         res.json({

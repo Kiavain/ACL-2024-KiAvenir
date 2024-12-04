@@ -162,7 +162,6 @@ export const openModal = (eventData) => {
   const recurrenceCustomInterval = document.getElementById("eventRecurrenceInterval");
 
   let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
-  let recurrenceOptions = recurrenceSelect.children;
 
   let unit = eventData.extendedProps.unit ?? 0;
   let interval = eventData.extendedProps.interval ?? 2;
@@ -192,6 +191,9 @@ export const openModal = (eventData) => {
         showRecPanel.style.display = "none";
       }
     });
+    console.log("Recurrence", recurrence);
+    console.log("Unit", unit);
+    console.log("Interval", interval);
   }
 
   function handleCustomRecurrence() {
@@ -205,7 +207,8 @@ export const openModal = (eventData) => {
     }
   }
 
-  recurrenceOptions[recurrence].selected = true;
+  recurrenceSelect.value = recurrence;
+  console.log("recurrenceSelect", recurrenceSelect);
 
   const saveButton = document.getElementById("updateEvent");
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
@@ -250,11 +253,14 @@ export const saveEvent = (calendar) => {
     end: document.getElementById("endEventTime").value + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value,
-    occurrence: 0 // Par défaut, c'est un événement principal
+    occurrence: 0, // Par défaut, c'est un événement principal
+    idSent: eventId
   };
 
   // Vérifie si une récurrence personnalisée est activée
-  if (updatedData.recurrence === "5") {
+  let rec = updatedData.recurrence;
+  if (rec === "5") {
+    console.log("Récurrence personnalisée");
     const unit = document.getElementById("eventRecurrenceCustom").value;
     const interval = document.getElementById("eventRecurrenceInterval").value;
 
@@ -272,6 +278,12 @@ export const saveEvent = (calendar) => {
       errorMessages.innerText = "Les champs doivent être des nombres entiers positifs.";
       return;
     }
+  } else if (rec === "0" || rec === "1" || rec === "2" || rec === "3") {
+    console.log("Récurrence prédéfinie");
+    eventId = saveButton.dataset.occurrenceId;
+    updatedData.occurrence = 1; // Marque comme une occurrence
+    updatedData.unit = rec;
+    updatedData.interval = 1;
   }
 
   if (!updatedData.title) {
@@ -317,9 +329,23 @@ export const saveEvent = (calendar) => {
 // Fonction pour supprimer un événement
 export const deleteEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
-  const eventId = saveButton.dataset.eventId;
+  let eventId = saveButton.dataset.eventId;
+  const recurrence = document.getElementById("eventRecurrence").value;
 
-  fetch(`/api/events/delete/${eventId}`, { method: "DELETE" })
+  const deleteNature = {
+    recurrence: recurrence,
+    applyToAll: false
+  };
+
+  if (Number(recurrence) !== 4) {
+    eventId = saveButton.dataset.occurrenceId;
+  }
+
+  fetch(`/api/events/delete/${eventId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(deleteNature)
+  })
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
