@@ -248,6 +248,7 @@ export const saveEvent = (calendar) => {
   let eventId = saveButton.dataset.eventId;
 
   const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
+  const applyToAll = document.getElementById("applyToAllOccurrences").checked;
 
   const updatedData = {
     title: document.getElementById("eventTitle").value.trim(),
@@ -257,7 +258,7 @@ export const saveEvent = (calendar) => {
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value,
     occurrence: 0, // Par défaut, c'est un événement principal
-    idSent: eventId
+    applyToAll: applyToAll
   };
 
   // Vérifie si une récurrence personnalisée est activée
@@ -335,7 +336,6 @@ export const deleteEvent = (calendar) => {
   let eventId = saveButton.dataset.eventId;
   const recurrence = document.getElementById("eventRecurrence").value;
   const applyToAll = document.getElementById("applyToAllOccurrences").checked;
-  console.log("Suppression de l'événement", applyToAll);
 
   const deleteNature = {
     recurrence: recurrence,

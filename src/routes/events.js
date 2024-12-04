@@ -70,7 +70,7 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const { title, description, start, end, allDay, recurrence, occurrence, unit, interval } = req.body;
+      const { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
 
       if (!title || !start || !end) {
         return res.json({
@@ -118,6 +118,14 @@ export default class EventRouteur extends Routeur {
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
         let rec = Number(recurrence);
         if (occurrences_to_update.length > 0) {
+          if (applyToAll) {
+            for (const occurrence of occurrences_to_update) {
+              await occurrence.update({
+                name: title,
+                description: description
+              });
+            }
+          }
           if (rec === 5) {
             let startDate = new Date(event.occurrenceStart);
             let endDate = new Date(event.occurrenceEnd);
@@ -171,7 +179,6 @@ export default class EventRouteur extends Routeur {
               unit: unit,
               interval: interval
             };
-            console.log("Occ1", occ);
             occurrences_to_create.push(occ);
             handleFlexibleRecurrence(currentDate, unit, interval);
           }
