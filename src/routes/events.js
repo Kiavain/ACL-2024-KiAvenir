@@ -33,7 +33,8 @@ export default class EventRouteur extends Routeur {
 
     this.router.put("/api/events/update/:eventId", (req, res) => {
       // Vérifie si l'utilisateur est connecté
-      if (!res.locals.user) {
+      const user = res.locals.user;
+      if (!user) {
         return res.json({
           success: false,
           message: "Vous devez être connecté pour effectuer cette action"
@@ -41,12 +42,23 @@ export default class EventRouteur extends Routeur {
       }
 
       const event = this.server.database.tables.get("events").get(req.params.eventId);
+      if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
+        return res.json({
+          success: false,
+          message: "Vous n'avez pas la permission de modifier cet événement"
+        });
+      }
+
       //Permet de rajouter un jour au jour de Fin à un event all Day
       if (req.body.allDay) {
         let endDate = new Date(req.body.end);
+        let startDate = new Date(req.body.start);
         endDate.setUTCDate(endDate.getUTCDate() + 1);
-        req.body.end = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+        startDate.setUTCDate(startDate.getUTCDate() + 1);
+        req.body.end = endDate.toISOString();
+        req.body.start = startDate.toISOString();
       }
+
       const fields = {
         name: req.body.title,
         description: req.body.description,
@@ -139,7 +151,7 @@ export default class EventRouteur extends Routeur {
       // Parcours chaque agendaId et récupère les événements correspondants
       for (const agendaId of agendaIds) {
         const agenda = this.server.database.tables.get("agendas").get(agendaId);
-        if (!agenda) {
+        if (!agenda || !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))) {
           continue;
         }
 
@@ -158,7 +170,9 @@ export default class EventRouteur extends Routeur {
             color: agenda.color,
             allDay: e.allDay,
             recurrence: e.recurrence,
-            agendaId
+            agendaId,
+            owner: agenda.getOwner().username,
+            canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
           }));
 
         // On récupère les évènements récurrents
@@ -170,6 +184,7 @@ export default class EventRouteur extends Routeur {
 
         // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
         let currentDate = new Date(start);
+        currentDate.setUTCHours(23, 59, 59, 999);
         const endCalendar = new Date(end);
 
         while (currentDate < endCalendar) {
@@ -230,7 +245,9 @@ export default class EventRouteur extends Routeur {
 
             if (displayEvent) {
               // Calculons la nouvelle date de début
-              const adjustedEventStart = new Date(Date.UTC(annee, mois - 1, jour));
+              const adjustedEventStart = new Date(
+                Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours(), eventStart.getUTCMinutes())
+              );
 
               // On clone l'évènement en ajustant la date de début et de fin
               const adjustedEvent = {

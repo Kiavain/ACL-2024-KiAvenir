@@ -9,6 +9,7 @@ import KiLogger from "./components/KiLogger.js";
 import { getSecret } from "./utils/index.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import Mailer from "./components/Mailer.js";
 
 // Charge les variables d'environnement
 dotenv.config();
@@ -26,10 +27,12 @@ class KiAvenir {
    */
   constructor() {
     this.app = express();
+    this.ADDRESS = "localhost";
     this.PORT = 3000;
     this.routes = [];
     this.database = new Database(this);
     this.logger = new KiLogger(this);
+    this.mailer = new Mailer(this);
   }
 
   /**
@@ -126,7 +129,7 @@ class KiAvenir {
   async start() {
     await this.initRoutes();
     this.app.listen(this.PORT, () => {
-      this.logger.success(`Serveur en cours d'exécution : http://localhost:${this.PORT}`);
+      this.logger.success(`Serveur en cours d'exécution : http://${this.ADDRESS}:${this.PORT}`);
     });
   }
 

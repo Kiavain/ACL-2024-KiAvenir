@@ -1,5 +1,3 @@
-import { addFlashMessages } from "../utils.js";
-
 document.addEventListener("DOMContentLoaded", () => {
   const createAgenda = document.getElementById("createAgenda");
   const viewCreateAgenda = document.getElementById("newAgenda");
@@ -26,10 +24,15 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const agendaCreationError = getElement("agenda-creation-error");
 
-    console.log("Création de l'agenda...");
     const name = getInputValue("agenda-name");
-    const description = getInputValue("agenda-description") || " ";
+    const description = getInputValue("agenda-description") || "Pas de détails disponibles.";
     const color = getInputValue("agenda-color") || "#2196f3";
+
+    // Empêche les agendas au nom vide
+    if (!name.trim()) {
+      agendaCreationError.style.display = "block";
+      return;
+    }
 
     const data = {
       name: name,
@@ -44,14 +47,22 @@ document.addEventListener("DOMContentLoaded", () => {
     })
       .then((response) => response.json())
       .then((data) => {
-        addFlashMessages(data.flashMessages);
         if (data.success) {
           agendaCreationError.style.display = "none";
           viewCreateAgenda.style.display = "none";
-          window.location.href = "/agenda/" + data.agendaId;
+
+          // Met à jour la sélection des agendas
+          const oldSelection = JSON.parse(localStorage.getItem("selectedAgendaIds"));
+          if (oldSelection) {
+            oldSelection.push(data.agendaId);
+            localStorage.setItem("selectedAgendaIds", JSON.stringify(oldSelection));
+          } else {
+            localStorage.setItem("selectedAgendaIds", JSON.stringify([data.agendaId]));
+          }
+
+          window.location.reload();
         } else {
           agendaCreationError.style.display = "block";
-          console.log(data.message);
         }
       })
       .catch((error) => console.error("Erreur:", error));

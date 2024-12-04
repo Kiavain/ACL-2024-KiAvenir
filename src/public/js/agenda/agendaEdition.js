@@ -17,7 +17,8 @@ if (deleteAgendaButton) {
   };
 
   confirmDeleteButton.onclick = async function () {
-    const response = await fetch(`/api/agenda/${agenda.agendaId}/delete`, {
+    const agendaId = document.getElementById("shareOrExport").value;
+    const response = await fetch(`/api/agenda/${agendaId}/delete`, {
       method: "DELETE"
     });
 
@@ -46,11 +47,12 @@ closeEditAgendaButton.onclick = function () {
 
 editAgendaForm.onsubmit = async function (e) {
   e.preventDefault();
+  const agendaId = document.getElementById("shareOrExport").value;
   const newAgendaName = document.getElementById("new-agenda-name").value;
   const newAgendaColor = document.getElementById("new-agenda-color").value;
   const newAgendaDescription = document.getElementById("new-agenda-description").value;
 
-  fetch(`/api/agenda/${agenda.agendaId}/update`, {
+  fetch(`/api/agenda/${agendaId}/update`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json"

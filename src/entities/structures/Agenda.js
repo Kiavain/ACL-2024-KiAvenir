@@ -79,6 +79,11 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
+    this.name = data.name;
+    this.color = data.color;
+    this.description = data.description;
+    this.special = data.special;
+
     return this.entity.update((x) => x.agendaId === this.agendaId, data);
   }
 
@@ -138,5 +143,16 @@ export default class Agenda extends EntityStructure {
    */
   getGuests() {
     return this.guests.filter((x) => x.agendaId === this.agendaId);
+  }
+
+  toJSON() {
+    return {
+      agendaId: this.agendaId,
+      ownerId: this.ownerId,
+      name: this.name,
+      color: this.color,
+      description: this.description,
+      special: this.special
+    };
   }
 }

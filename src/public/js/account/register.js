@@ -32,10 +32,9 @@ async function validateAccountCreation(e) {
   });
 
   const emailIsEmpty = emailInput.value === "";
-  var emailIsCorrect = !emailIsEmpty;
+  let emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
-    console.log("Email is empty !");
     e.preventDefault();
     return;
   }
@@ -66,6 +65,4 @@ async function validateAccountCreation(e) {
   if (!accountForm.checkValidity()) {
     e.preventDefault();
   }
-
-  console.log("fin de la fonction");
 }

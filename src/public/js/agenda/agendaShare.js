@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", function handleClickOutside(event) {
     if (event.target === modal) {
       modal.style.display = "none";
-      window.removeEventListener("click", handleClickOutside);
     }
   });
 });
@@ -130,7 +129,7 @@ function submitShareAgenda() {
           otherError.textContent = data.message;
           otherError.style.display = "block";
         }
-        console.log("Erreur partage d'agenda : " + data.message);
+        console.error("Erreur partage d'agenda : " + data.message);
       }
     })
     .catch((error) => console.error("Erreur:", error));

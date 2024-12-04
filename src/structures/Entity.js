@@ -14,7 +14,7 @@ export default class Entity {
   constructor(server, definition = {}, options = {}) {
     /**
      * Le cache de la table
-     * @type {Map<String, EntityStructure>}
+     * @type {Map<String, Object>}
      */
     this.cache = new Map();
 
@@ -75,7 +75,7 @@ export default class Entity {
    */
   async load() {
     try {
-      await this.table.sync({ alter: true }); // Synchronise la table avec les fichiers de structure
+      await this.table.sync(); // Synchronise la table avec les fichiers de structure
 
       // Récupère toutes les lignes de la table
       const rows = await this.table.findAll();

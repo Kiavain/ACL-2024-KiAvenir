@@ -43,9 +43,21 @@ export class AgendaController extends Controller {
       return res.redirect("/login");
     }
 
-    // Récupérer le premier agenda de la liste pour l'utilisateur courant
-    const agenda = this.database.get("agendas").filter((agenda) => agenda.ownerId === res.locals.user.id);
-    res.redirect("/agenda/" + agenda[0].agendaId);
+    // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
+    const agendas = this.server.database.tables
+      .get("agendas")
+      .filter((agenda) => agenda.verifyAgendaAccess(res.locals.user.id));
+
+    // Récupère les agendas où l'utilisateur est invité
+    const guests = this.server.database.tables.get("guests");
+    const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
+
+    if (agendas.length > 0) {
+      const agenda = agendas[0];
+      res.render("agenda", { agenda, agendas, guestsShared });
+    } else {
+      res.redirect("/404");
+    }
   }
 
   /**
@@ -98,7 +110,10 @@ export class AgendaController extends Controller {
     this.agendas
       .create({ name, description, ownerId: localUser.id, color })
       .then((agenda) => res.success(`L'agenda ${agenda.name} a été créé avec succès.`, { agendaId: agenda.agendaId }))
-      .catch((error) => res.err(500, error));
+      .catch((error) => {
+        console.error(error);
+        res.err(500, error);
+      });
   }
 
   /**
@@ -332,9 +347,7 @@ export class AgendaController extends Controller {
       const downloadsPath = path.join(os.homedir(), "Downloads", filename);
 
       fs.writeFileSync(downloadsPath, data, "utf8");
-
-      // eslint-disable-next-line no-unused-vars
-      res.download(downloadsPath, filename, (err) => {});
+      res.download(downloadsPath, filename, () => {});
     } else if (format === "ICS") {
       // Crée un calendrier ICAL avec les événements
       const calendar = ical({ name: agenda.name, description: agenda.description });
@@ -367,8 +380,7 @@ export class AgendaController extends Controller {
       // Enregistre la chaîne ICS dans un fichier
       fs.writeFileSync(downloadsPath, icsContent, "utf8");
 
-      // eslint-disable-next-line no-unused-vars
-      res.download(downloadsPath, filename, (err) => {});
+      res.download(downloadsPath, filename, () => {});
     } else {
       return res.err(400, "Format inconnu.");
     }
@@ -446,29 +458,7 @@ export class AgendaController extends Controller {
         return res.err(401, "Vous possédez déjà un agenda avec le même nom.");
       }
       const agenda = await this.agendas.create({ name, description: summary, ownerId: localUser.id, color });
-
-      for (const vevent of vevents) {
-        const eventName = vevent.getFirstPropertyValue("summary");
-        const dtstartProp = vevent.getFirstProperty("dtstart");
-        const dtendProp = vevent.getFirstProperty("dtend");
-        const startDate = new Date(dtstartProp.getFirstValue().toString());
-        const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
-        const eventDescription = vevent.getFirstPropertyValue("description") || "";
-
-        const dtstartValue = dtstartProp.getFirstValue();
-        const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
-
-        if (eventName && startDate && endDate) {
-          await this.events.create({
-            name: eventName,
-            agendaId: agenda.agendaId,
-            startDate: startDate,
-            endDate: endDate,
-            description: eventDescription,
-            allDay: isAllDay
-          });
-        }
-      }
+      await this.importEvents(vevents, agenda);
     } else {
       return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
     }

@@ -19,12 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function importAgenda() {
-  console.log("Ouverture du modal");
   modal.style.display = "block";
 }
 
 function submitImportAgenda() {
-  console.log("Confirmation");
   const importError = document.getElementById("file-error");
   const fileInput = document.getElementById("file-import");
   const file = fileInput.files[0]; // Récupère le fichier directement

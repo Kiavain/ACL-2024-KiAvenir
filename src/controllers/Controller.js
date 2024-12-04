@@ -1,4 +1,9 @@
 /**
+ * Type de données pour les composants iCal.js
+ * @typedef {import("ical.js").Component} Component
+ */
+
+/**
  * Classe de base pour les contrôleurs
  *
  * @class Controller
@@ -14,8 +19,8 @@ export default class Controller {
   }
 
   /**
-   * Récupère la base de données
-   * @returns {Map<String, Object>} La base de données
+   * Récupère le serveur
+   * @returns {Map<String, Object>}
    */
   get database() {
     return this.server.database.tables;
@@ -59,5 +64,35 @@ export default class Controller {
    */
   get events() {
     return this.database.get("events");
+  }
+
+  /**
+   * Importe les événements d'un fichier iCal
+   * @param events {Component[]} Les événements
+   * @param agendaId {String} L'identifiant de l'agenda
+   */
+  async importEvents(events, agendaId) {
+    for (const event of events) {
+      const eventName = event.getFirstPropertyValue("summary");
+      const dtstartProp = event.getFirstProperty("dtstart");
+      const dtendProp = event.getFirstProperty("dtend");
+      const startDate = new Date(dtstartProp.getFirstValue().toString());
+      const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
+      const eventDescription = event.getFirstPropertyValue("description") || "";
+
+      const dtstartValue = dtstartProp.getFirstValue();
+      const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
+
+      if (eventName && startDate && endDate) {
+        await this.events.create({
+          name: eventName,
+          agendaId,
+          startDate: startDate,
+          endDate: endDate,
+          description: eventDescription,
+          allDay: isAllDay
+        });
+      }
+    }
   }
 }

@@ -36,6 +36,10 @@ export default class UsersEntity extends Entity {
         salt: {
           type: DataTypes.STRING(4),
           defaultValue: ""
+        },
+        reset_token: {
+          type: DataTypes.STRING(32),
+          defaultValue: ""
         }
       },
       {

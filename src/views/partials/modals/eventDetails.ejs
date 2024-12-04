@@ -1,0 +1,43 @@
+<link rel="stylesheet" href="/css/eventDetails.css">
+
+<div id="eventDetailsModal" class="small-modal">
+    <div class="small-modal-content">
+        <!-- Header avec les boutons -->
+        <div class="small-modal-header">
+            <div class="small-modal-buttons">
+                <button id="editEvent" class="btn-icon" title="Modifier">
+                    <i class="material-symbols-outlined">edit</i>
+                </button>
+                <button id="deleteEventPreview" class="btn-icon" title="Supprimer">
+                    <i class="material-symbols-outlined">delete</i>
+                </button>
+                <button id="closeModal" class="btn-icon" title="Fermer">
+                    <i class="material-symbols-outlined">close</i>
+                </button>
+            </div>
+        </div>
+
+        <div class="small-modal-body">
+            <div class="event-header">
+                <div class="event-color" id="event-color-preview" style="background-color: blueviolet"></div>
+                <div class="event-title-date">
+                    <div class="event-title">
+                        <span id="event-title"></span>
+                    </div>
+                    <div class="event-date">
+                        <span id="event-date-preview"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-details" id="event-description-to-hide">
+                <i class="material-symbols-outlined">notes</i>
+                <span id="event-description-preview"></span>
+            </div>
+            <div class="event-details">
+                <i class="material-symbols-outlined">event</i>
+                <span id="event-owner-preview"></span>
+            </div>
+        </div>
+    </div>
+</div>

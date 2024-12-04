@@ -1,5 +1,6 @@
 import EntityStructures from "../../structures/EntityStructure.js";
 import { encryptPassword } from "../../utils/index.js";
+import crypto from "crypto";
 
 /**
  * Représente la structure d'un utilisateur
@@ -44,6 +45,12 @@ export default class User extends EntityStructures {
      * @type {String}
      */
     this.salt = data.salt;
+
+    /**
+     * Le token de réinitialisation
+     * @type {String}
+     */
+    this.reset_token = data.reset_token;
   }
 
   /**
@@ -68,6 +75,12 @@ export default class User extends EntityStructures {
    * @returns {Promise<User>} L'utilisateur
    */
   async update(data) {
+    this.reset_token = data.reset_token || this.reset_token;
+    this.password = data.password || this.password;
+    this.salt = data.salt || this.salt;
+    this.username = data.username || this.username;
+    this.email = data.email || this.email;
+
     return this.entity.update((x) => x.id === this.id, data);
   }
 
@@ -106,5 +119,29 @@ export default class User extends EntityStructures {
    */
   checkPassword(password) {
     return this.password === encryptPassword(password, this.salt);
+  }
+
+  /**
+   * Réinitialise le mot de passe de l'utilisateur
+   * @returns {Promise<void>}
+   */
+  async resetPassword() {
+    this.reset_token = crypto.randomBytes(32).toString("hex");
+    await this.update({ reset_token: this.reset_token });
+
+    // Valable 10 minutes
+    setTimeout(async () => {
+      this.reset_token = "";
+      await this.update({ reset_token: "" });
+    }, 600000);
+  }
+
+  /**
+   * Vérifie le token de réinitialisation
+   * @param token {String} Le token de réinitialisation
+   * @returns {boolean} Si le token est valide
+   */
+  checkResetToken(token) {
+    return this.reset_token === token && this.reset_token !== "";
   }
 }

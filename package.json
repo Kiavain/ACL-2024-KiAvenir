@@ -1,6 +1,6 @@
 {
   "name": "kiavenir",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Prévoir l'avenir avec KiAvenir !",
   "main": "index.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "ejs": "^3.1.10",
     "express": "^4.21.0",
     "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
     "fs-jetpack": "^5.1.0",
     "ical-generator": "^8.0.1",
     "ical.js": "^2.1.0",
@@ -48,6 +49,7 @@
     "kiavenir": "file:",
     "moment": "^2.30.1",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
     "nodemon": "^3.1.7",
     "redis": "^4.7.0",
     "sequelize": "^6.37.4",
