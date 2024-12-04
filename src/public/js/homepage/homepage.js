@@ -6,9 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch("/api/homepage/todayEvents", { method: "GET" })
       .then((response) => response.json())
       .then((data) => {
-        data.forEach((event) => {
-          previewPanel.textContent += event.title;
-        });
+        if (data.length > 0) {
+          data.forEach((event) => {
+            if (event.allDay) {
+              previewPanel.innerHTML += `<div><span class="fw-bold">${event.title}</span> toute la journée<br/></div>`;
+            } else {
+              let dateStart = new Date(event.start);
+              let start = dateStart.toLocaleString("fr-FR", { timeZone: "UTC" });
+              let dateEnd = new Date(event.end);
+              let end = dateEnd.toLocaleString("fr-FR", { timeZone: "UTC" });
+              previewPanel.innerHTML += `<div><span class="fw-bold">${event.title}</span> du ${start} au ${end}<br/></div>`;
+            }
+          });
+        } else {
+          previewPanel.innerHTML = "<div>Vous n'avez aucun événement aujourd'hui.<br/></div>";
+        }
       });
   }
 });
