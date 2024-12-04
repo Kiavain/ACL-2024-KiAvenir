@@ -1,6 +1,7 @@
 // Initialiser la langue de moment.js
 
 import { addFlashMessages } from "../utils.js";
+
 moment.locale("fr");
 
 export function refreshCalendar() {
@@ -106,18 +107,32 @@ export const initCalendar = () => {
       openEventDetailsModal(info.event);
     },
     eventDrop: (info) => {
-      if (info.event.allDay === info.oldEvent.allDay) {
-        document.getElementById("eventTitle").value = info.event.title;
-        document.getElementById("eventDetails").value = info.event.extendedProps.description;
-        document.getElementById("eventAllDay").checked = info.event.allDay;
-        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+      document.getElementById("eventTitle").value = info.event.title;
+      document.getElementById("eventDetails").value = info.event.extendedProps.description;
+      document.getElementById("eventAllDay").checked = info.event.allDay;
+      document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
+      document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
+      document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
+
+      // Si on passe de allDay à non allDay, on ajuste la date de fin
+      if (!info.event.allDay && info.oldEvent.allDay) {
+        document.getElementById("endEventTime").value = moment(info.event.start)
+          .add(1, "hour")
+          .toISOString()
+          .substring(0, 16);
+      } else if (info.event.allDay && !info.oldEvent.allDay) {
+        document.getElementById("endEventTime").value = moment(info.event.start)
+          .add(1, "day")
+          .toISOString()
+          .substring(0, 16);
+      } else {
         document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
-        document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
-        document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
-        saveEvent(info.event);
       }
+
+      saveEvent(calendar);
     },
     eventResize: (info) => {
+      console.log("Resize");
       if (info.event.end !== info.oldEvent.end) {
         document.getElementById("eventTitle").value = info.event.title;
         document.getElementById("eventDetails").value = info.event.extendedProps.description;
@@ -373,6 +388,7 @@ export const saveEvent = (calendar) => {
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value
   };
+
   if (!updatedData.title.trim()) {
     errorMessages.innerText = "Le champ titre est obligatoire.";
     return;

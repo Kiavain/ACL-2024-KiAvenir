@@ -52,9 +52,13 @@ export default class EventRouteur extends Routeur {
       //Permet de rajouter un jour au jour de Fin à un event all Day
       if (req.body.allDay) {
         let endDate = new Date(req.body.end);
+        let startDate = new Date(req.body.start);
         endDate.setUTCDate(endDate.getUTCDate() + 1);
-        req.body.end = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+        startDate.setUTCDate(startDate.getUTCDate() + 1);
+        req.body.end = endDate.toISOString();
+        req.body.start = startDate.toISOString();
       }
+
       const fields = {
         name: req.body.title,
         description: req.body.description,
@@ -63,6 +67,8 @@ export default class EventRouteur extends Routeur {
         allDay: req.body.allDay,
         recurrence: req.body.recurrence
       };
+
+      console.log(fields);
 
       if (event) {
         event

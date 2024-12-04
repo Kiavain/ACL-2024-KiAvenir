@@ -1,7 +1,3 @@
-import { addFlashMessages } from "../utils.js";
-import { refreshCalendar } from "./calendar.js";
-import { updateAgendaList } from "./agendasSelection.js";
-
 document.addEventListener("DOMContentLoaded", () => {
   const createAgenda = document.getElementById("createAgenda");
   const viewCreateAgenda = document.getElementById("newAgenda");
