@@ -4,6 +4,22 @@ import path from "path";
 import jetpack from "fs-jetpack";
 import { fileURLToPath } from "url";
 
+/**
+ * Typage de la configuration des niveaux
+ * @typedef {import("winston").AbstractConfigSetLevels} AbstractConfigSetLevels
+ * @typedef {import("winston.Logger") & CustomLogger} Logger
+ */
+
+/**
+ * Typage des niveaux personnalisés
+ * @typedef {Object} CustomLogger
+ * @property {function(message: string): void} error
+ * @property {function(message: string): void} warn
+ * @property {function(message: string): void} success
+ * @property {function(message: string): void} info
+ * @property {function(message: string): void} debug
+ */
+
 // Obtenir __dirname en mode ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,14 +33,18 @@ export default class KiLogger {
    * Crée un logger
    */
   constructor() {
+    /**
+     * Le logger
+     * @type {Logger}
+     */
     this.winston = null;
   }
 
   /**
-   * Load logger
-   * @returns {Promise<void>}
+   * Charger le système de fichiers
+   * @returns {Promise<{filename: string, json: boolean}>} Les options de fichier
    */
-  async load() {
+  async loadFileSystem() {
     const latestLogFilepath = path.resolve(__dirname, "../logs/latest.log");
     const latestLogExist = await existsAsync(latestLogFilepath);
 
@@ -41,11 +61,17 @@ export default class KiLogger {
       await fs.unlink(latestLogFilepath);
     }
 
-    const opt = {
+    return {
       filename: latestLogFilepath,
       json: false
     };
+  }
 
+  /**
+   * Charger les niveaux et les couleurs
+   * @returns {AbstractConfigSetLevels} Les niveaux
+   */
+  loadLevels() {
     // Définir les niveaux personnalisés
     const customLevels = {
       levels: {
@@ -53,7 +79,7 @@ export default class KiLogger {
         warn: 1,
         success: 2,
         info: 3,
-        debug: 5
+        debug: 4
       },
       colors: {
         error: "red",
@@ -64,16 +90,27 @@ export default class KiLogger {
       }
     };
 
+    // Ajouter les couleurs pour l'affichage dans la console
     addColors(customLevels.colors);
 
-    // Aucun transport de fichier sur Windows
+    return customLevels.levels;
+  }
+  /**
+   * Load logger
+   * @returns {Promise<void>}
+   */
+  async load() {
+    const levels = this.loadLevels();
+
+    // Configure les transports
+    const opt = await this.loadFileSystem();
     let transportsArray = [new transports.File(opt), new transports.Console({ level: "debug" })];
     if (process.platform === "win32" || process.platform === "win64") {
       transportsArray = [new transports.Console({ level: "debug" })];
     }
 
     this.winston = createLogger({
-      levels: customLevels.levels,
+      levels,
       format: format.combine(
         format.timestamp({ format: "DD/MM/YYYY à HH:mm:ss" }),
         format.printf((info) => {
