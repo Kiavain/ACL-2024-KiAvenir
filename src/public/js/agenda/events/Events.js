@@ -40,6 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   createEvent.onclick = () => {
     modal.style.display = "block";
+
+    const errorElement = getElement("date-error");
+    const errAgenda = getElement("agenda-error");
+    const errName = getElement("name-error");
+    errName.style.display = "none";
+    errorElement.style.display = "none";
+    errAgenda.style.display = "none";
   };
 
   // Fermer la fenêtre modale
@@ -75,14 +82,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const recurrenceValue = parseInt(getInputValue("event-recurrence"));
     e.preventDefault();
 
-    errName.style.display = agendaValue ? "none" : "block";
-    errorElement.style.display = dateDebut < dateFin ? "none" : "block";
+    errorElement.style.display = dateDebut < dateFin || (dateDebut === dateFin && allDay.checked) ? "none" : "block";
     errAgenda.style.display = agendaValue ? "none" : "block";
 
     if (!name.trim()) {
       errName.style.display = "block";
       return;
     }
+
     // Vérifie la validité des dates
     if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
       return;

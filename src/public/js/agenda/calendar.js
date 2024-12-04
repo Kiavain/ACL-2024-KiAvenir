@@ -164,6 +164,13 @@ export const initCalendar = () => {
       name.value = "";
       description.value = "";
 
+      const errorElement = document.getElementById("date-error");
+      const errAgenda = document.getElementById("agenda-error");
+      const errName = document.getElementById("name-error");
+      errName.style.display = "none";
+      errorElement.style.display = "none";
+      errAgenda.style.display = "none";
+
       if (!info.allDay) {
         startDate.value = moment(info.dateStr).toISOString().substring(0, 16);
         endDate.value = moment(info.dateStr).add(1, "hour").toISOString().substring(0, 16);
@@ -425,7 +432,7 @@ export const saveEvent = (calendar) => {
 };
 
 // Fonction pour supprimer un événement
-export const deleteEvent = (calendar) => {
+export const deleteEvent = () => {
   const saveButton = document.getElementById("updateEvent");
   const eventId = saveButton.dataset.eventId;
 
@@ -433,8 +440,10 @@ export const deleteEvent = (calendar) => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        calendar.refetchEvents();
-        window.location.reload();
+        closeModal();
+        closeEventDetailsModal();
+        refreshCalendar();
+        addFlashMessages(["Événement supprimé avec succès"]);
       } else {
         alert("Échec de la suppression de l'événement.");
       }
