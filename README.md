@@ -27,6 +27,10 @@ npm install && npm test
 - Filtrer les rendez-vous par nom avec une barre de recherche
 - Exporter et importer des agendas au format souhaité (JSON ou iCal)
 - Partager un agenda entre utilisateurs avec une gestion de permission
+- Mots de passe oublié
+- Modifier son avatar
+- Drag'n'drop des événements
+- Etirement des événements
 
 ## Projets et backlog associé
 - [Fonctionnalités](https://github.com/orgs/Kiavain/projects/2/views/1?filterQuery=fonc)
