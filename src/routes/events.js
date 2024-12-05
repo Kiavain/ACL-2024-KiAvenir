@@ -71,6 +71,10 @@ export default class EventRouteur extends Routeur {
       }
 
       const { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
+      const oldRecurrence = req.body.oldRecurrence;
+      const sentId = req.body.sentId;
+
+      const occurrencesTable = this.server.database.tables.get("event_occurrences");
 
       if (!title || !start || !end) {
         return res.json({
@@ -86,25 +90,29 @@ export default class EventRouteur extends Routeur {
         adjustedEnd = endDate.toISOString();
       }
 
-      const fields = {
+      const fieldsToUpdate = {
         name: title,
         description: description,
         startDate: start,
         endDate: adjustedEnd,
         allDay: allDay,
-        recurrence: recurrence
+        recurrence: recurrence,
+        unit: unit,
+        interval: interval
       };
 
       let table = "events";
-      if (occurrence === 1) {
+      let oldRec = Number(oldRecurrence);
+      if (occurrence === 1 && oldRec !== 4) {
         // Distinction entre événement et occurrence => ajout des champs unit et interval
         table = "event_occurrences";
-        fields.unit = unit;
-        fields.interval = interval;
       }
+      console.log("Table : ", table);
 
       try {
-        const event = this.server.database.tables.get(table).get(req.params.eventId);
+        let eventId = Number(sentId);
+        console.log("Event ID : ", sentId);
+        const event = this.server.database.tables.get(table).get(eventId);
 
         if (!event) {
           return res.json({
@@ -112,7 +120,7 @@ export default class EventRouteur extends Routeur {
             message: "Événement ou occurrence introuvable."
           });
         }
-        await event.update(fields);
+        await event.update(fieldsToUpdate);
         const occurrences_to_update = this.server.database.tables
           .get("event_occurrences")
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
@@ -163,28 +171,28 @@ export default class EventRouteur extends Routeur {
           }
         } else {
           // Si aucune occurrence à mettre à jour, on crée les occurrences
-          const start = new Date(event.startDate);
-          const occurrences_to_create = [];
-          let currentDate = new Date(start);
-          while (currentDate <= new Date(start.getTime() + 2 * 365 * 24 * 60 * 60 * 1000)) {
+          const test = "Here";
+          console.log(test);
+          const debut = new Date(start);
+          const ending = new Date(end);
+          let maxOccurrences = 300;
+          let count = 0;
+          let currentDate = new Date(debut);
+          while (currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) && count < maxOccurrences) {
             const occurrenceStart = new Date(currentDate);
-            const occurrenceEnd = new Date(currentDate.getTime() + (end - start));
-            let occ = {
-              eventId: event.eventId,
-              name: event.name,
-              description: event.description,
-              allDay: event.allDay,
+            const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
+            await occurrencesTable.create({
+              eventId: eventId,
+              name: title,
+              description: description,
+              allDay: allDay,
               occurrenceStart: occurrenceStart.toISOString(),
               occurrenceEnd: occurrenceEnd.toISOString(),
               unit: unit,
               interval: interval
-            };
-            occurrences_to_create.push(occ);
+            });
             handleFlexibleRecurrence(currentDate, unit, interval);
-          }
-          for (const occ of occurrences_to_create) {
-            console.log("Occ", occ);
-            await this.server.database.tables.get("event_occurrences").create(occ);
+            count++;
           }
         }
         res.json({
