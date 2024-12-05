@@ -474,7 +474,7 @@ export class AccountController extends Controller {
     const summary = comp.getFirstPropertyValue("x-wr-caldesc");
     const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
 
-    await this.importEvents(vevents, agenda.id);
+    await this.importEvents(vevents, agenda.agendaId);
   }
 
   /**
