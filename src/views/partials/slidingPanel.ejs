@@ -23,11 +23,14 @@
                 <% guestsShared.forEach(guest => {
                     const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
                 if (agenda) { %>
-                    <li class="agenda-item" data-agenda-name="<%= agenda.name%>" data-description="<%= agenda.description %>" style= "justify-content: unset;">
+                    <li class="agenda-item" data-agenda-name="<%= agenda.name%>" data-description="<%= agenda.description %>">
                         <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
                         <a data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
                             <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
                         </a>
+                        <button value="<%= guest.id %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">unsubscribe</span>
+                        </button>
                     </li>
                 <% }
                 }) %>

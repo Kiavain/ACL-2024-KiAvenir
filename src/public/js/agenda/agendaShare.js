@@ -144,7 +144,8 @@ function applyRoleDropdownListeners() {
       const guestListItem = guestItem.closest("li");
       const guestId = guestItem.dataset.guestId;
       const updatedData = {
-        guestId: guestId
+        guestId: guestId,
+        desabonnement: false
       };
 
       // Mise à jour de la BDD

@@ -262,11 +262,12 @@ export class AgendaController extends Controller {
       return res.err(401, "Vous devez être connecté pour accéder à cette page.");
     }
 
-    const { guestId } = req.body;
+    const { guestId, desabonnement } = req.body;
+
     const guest = this.guests.get(guestId);
     if (!guest) {
       return res.err(404, "Guest non trouvé.");
-    } else if (guest.getOwner().id !== localUser.id) {
+    } else if (guest.getOwner().id !== localUser.id && !desabonnement) {
       return res.err(403, "Vous n'êtes pas autorisé à supprimer ce guest.");
     }
 
