@@ -109,6 +109,16 @@ export class AccountController extends Controller {
       });
     }
 
+    // Vérifie si l'utilisateur a déjà demandé une réinitialisation de mot de passe
+    const lastUpdate = new Date(user.updatedAt).getTime();
+    const now = new Date().getTime();
+    if (now - lastUpdate < 15000) {
+      return res.json({
+        success: false,
+        message: `Veuillez patienter ${Math.ceil((15000 - (now - lastUpdate)) / 1000)} secondes avant de réessayer.`
+      });
+    }
+
     // Génère le token de réinitialisation de mot de passe
     await user.resetPassword();
 
