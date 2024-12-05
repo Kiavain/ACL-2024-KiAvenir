@@ -31,7 +31,7 @@ if (shareAgendaList && shareAgendaList.children.length > 0) {
         // Mise à jour de la BDD
         fetch("/api/agenda/removeGuest", {
           method: "DELETE",
-          headers: {"Content-Type": "application/json"},
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedData)
         })
           .then((response) => {
