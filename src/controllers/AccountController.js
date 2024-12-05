@@ -102,7 +102,10 @@ export class AccountController extends Controller {
 
     // Vérifie si l'utilisateur existe
     if (user === undefined) {
-      return res.error(404, "Aucun utilisateur trouvé avec cet email.");
+      return res.json({
+        success: false,
+        message: "Vous allez recevoir un courriel si un compte est lié à cette adresse."
+      });
     }
 
     // Génère le token de réinitialisation de mot de passe
@@ -110,7 +113,7 @@ export class AccountController extends Controller {
 
     // Envoi du mail de réinitialisation de mot de passe
     await this.server.mailer.sendResetPasswordEmail(user, user.reset_token);
-    return res.success("Un email de réinitialisation de mot de passe a été envoyé.");
+    return res.success("Vous allez recevoir un courriel si un compte est lié à cette adresse.");
   }
 
   /**

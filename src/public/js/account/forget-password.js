@@ -9,11 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const email = forgetForm["email"].value;
     if (!email) {
-      alert("Veuillez saisir votre adresse e-mail.");
+      errMsg.textContent = "Veuillez entrer votre adresse email";
       return;
     }
 
     if (!(await checkEmail(forgetForm["email"]))) {
+      errMsg.textContent = "Adresse email invalide";
       e.preventDefault();
       return;
     }
@@ -27,14 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const json = await response.json();
-
-    if (json.success) {
-      addFlashMessages([json.message]);
-      errMsg.style.display = "none";
-      forgetForm.reset();
-    } else {
-      errMsg.textContent = json.message;
-      errMsg.style.display = "block";
-    }
+    addFlashMessages([json.message]);
+    errMsg.textContent = "";
+    forgetForm.reset();
   });
 });

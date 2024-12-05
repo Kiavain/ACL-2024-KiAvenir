@@ -51,6 +51,12 @@ export default class User extends EntityStructures {
      * @type {String}
      */
     this.reset_token = data.reset_token;
+
+    /**
+     * La dernière date de mise à jour
+     * @type {Date}
+     */
+    this.updatedAt = new Date(data.updatedAt);
   }
 
   /**
@@ -128,12 +134,6 @@ export default class User extends EntityStructures {
   async resetPassword() {
     this.reset_token = crypto.randomBytes(32).toString("hex");
     await this.update({ reset_token: this.reset_token });
-
-    // Valable 10 minutes
-    setTimeout(async () => {
-      this.reset_token = "";
-      await this.update({ reset_token: "" });
-    }, 600000);
   }
 
   /**
@@ -142,6 +142,8 @@ export default class User extends EntityStructures {
    * @returns {boolean} Si le token est valide
    */
   checkResetToken(token) {
-    return this.reset_token === token && this.reset_token !== "";
+    const date = new Date();
+    const isExpired = date.getTime() - this.updatedAt > 600000;
+    return this.reset_token === token && this.reset_token !== "" && !isExpired;
   }
 }
