@@ -23,7 +23,6 @@ if (shareAgendaList && shareAgendaList.children.length > 0) {
     const guestId = sharedAgendaItemButton.value;
     sharedAgendaItemButton.addEventListener("click", () => {
       if (confirm("Êtes-vous sûr de vous désabonner de cet agenda ?")) {
-        console.log("Désabonnement de l'agenda");
         const updatedData = {
           guestId: guestId,
           desabonnement: true

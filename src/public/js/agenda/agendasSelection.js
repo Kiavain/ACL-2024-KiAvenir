@@ -21,18 +21,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   //  Récupère les IDs des agendas sélectionnés dans le local storage
   const selectedAgendaIds = localStorage.getItem("selectedAgendaIds");
+  let firstAgendaId = `${agenda.agendaId}`;
+  let agendaIds = [];
   if (selectedAgendaIds) {
-    const agendaIds = JSON.parse(selectedAgendaIds);
-    const firstAgenda = agenda.agendaId;
-
+    agendaIds = JSON.parse(selectedAgendaIds);
     if (agendaIds.length === 0) {
-      agendaIds.push(firstAgenda);
+      agendaIds.push(firstAgendaId);
     }
-
-    document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
-      if (agendaIds.includes(checkbox.value)) {
-        checkbox.checked = true;
-      }
-    });
+  } else {
+    agendaIds.push(firstAgendaId);
   }
+
+  document.querySelectorAll(".agenda-checkbox").forEach((checkbox) => {
+    if (agendaIds.some((id) => id == checkbox.value)) {
+      checkbox.checked = true;
+    }
+  });
 });
