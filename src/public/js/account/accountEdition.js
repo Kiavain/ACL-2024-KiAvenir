@@ -64,7 +64,7 @@ async function validateAccountCreation(e) {
   let password = accountForm.password.value;
   let passwordConfirmation = passwordRepeated["value"];
 
-  if (password !== "") {
+  if (password !== "" || passwordConfirmation !== "") {
     await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
   } else {
     accountForm.submit();
