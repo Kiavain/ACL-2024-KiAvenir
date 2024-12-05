@@ -43,9 +43,8 @@ function submitImportAgenda() {
     .then((data) => {
       if (data.success) {
         importError.style.display = "none";
-        addFlashMessages(data.flashMessages);
         modal.style.display = "none";
-        window.location.reload();
+        window.location.reload(); // Note : Notification prise en charge par le serveur
       } else {
         importError.textContent = data.message || "Erreur lors de l'importation.";
         importError.style.display = "block";

@@ -43,6 +43,13 @@ export class AgendaController extends Controller {
       return res.redirect("/login");
     }
 
+    // Récupère les notifications
+    const notification = req.cookies.notification;
+    if (notification) {
+      req.flash(notification);
+      res.clearCookie("notification");
+    }
+
     // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
     const agendas = this.server.database.tables
       .get("agendas")
@@ -107,6 +114,8 @@ export class AgendaController extends Controller {
       return res.err(400, "Un agenda avec le même nom existe déjà.");
     }
 
+    res.cookie("notification", "L'agenda a été créé avec succès.", { maxAge: 5000 });
+
     this.agendas
       .create({ name, description, ownerId: localUser.id, color })
       .then((agenda) => res.success(`L'agenda ${agenda.name} a été créé avec succès.`, { agendaId: agenda.agendaId }))
@@ -142,6 +151,7 @@ export class AgendaController extends Controller {
       return res.err(400, "La description de l'agenda ne peut pas dépasser 255 caractères.");
     }
 
+    res.cookie("notification", "L'agenda a été mis à jour avec succès.", { maxAge: 5000 });
     await agenda.update({ name, description, color });
     return res.success(`L'agenda ${agenda.name} a été mis à jour avec succès.`);
   }
@@ -212,6 +222,7 @@ export class AgendaController extends Controller {
       }
     }
 
+    res.cookie("notification", "L'agenda a été supprimé avec succès.", { maxAge: 5000 });
     agenda
       .delete()
       .then(() => res.success(`L'agenda ${agenda.name} a été supprimé avec succès.`))
@@ -273,6 +284,8 @@ export class AgendaController extends Controller {
 
     const agendaTitle = guest.getAgenda().name;
     const guestUsername = guest.getGuest().username;
+    res.cookie("notification", "Le partage a été supprimé avec succès.", { maxAge: 5000 });
+
     guest
       .delete()
       .then(() => res.success(`Le partage de ${agendaTitle} à ${guestUsername} a été supprimé avec succès.`))
@@ -463,6 +476,8 @@ export class AgendaController extends Controller {
     } else {
       return res.err(401, "Format de fichier non supporté. Importez un fichier JSON ou ICS.");
     }
+
+    res.cookie("notification", "L'agenda a été importé avec succès.", { maxAge: 5000 });
     res.success("L'agenda a été importé avec succès.");
   }
   /**

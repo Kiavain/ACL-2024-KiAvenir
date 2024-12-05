@@ -12,7 +12,7 @@ let shouldReaload = false;
 // Vérifie si le document est chargé
 document.addEventListener("DOMContentLoaded", () => {
   otherAgendaButton.onclick = () => openModal();
-  otherAgendaCloseButton.onclick = () => reload();
+  otherAgendaCloseButton.onclick = () => reload(); // Note : Notification prise en charge par le serveur
   basic.onclick = () => importHoliday(basic);
   zoneA.onclick = () => importHoliday(zoneA);
   zoneB.onclick = () => importHoliday(zoneB);
@@ -23,13 +23,13 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("click", function handleClickOutside(event) {
     if (event.target === modal) {
       window.removeEventListener("click", handleClickOutside);
-      reload();
+      reload(); // Note : Notification prise en charge par le serveur
     }
   });
 });
 function reload() {
   if (shouldReaload) {
-    window.location.reload();
+    window.location.reload(); // Note : Notification prise en charge par le serveur
   } else {
     modal.style.display = "none";
   }

@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     errorMessage.style.display = "none";
     if (response.ok) {
-      window.location.href = "/login";
+      window.location.href = "/login"; // Note : Les notifications sont traitées
     } else {
       addFlashMessages(["Erreur lors de la réinitialisation de votre mot de passe."]);
     }

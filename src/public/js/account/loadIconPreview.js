@@ -88,7 +88,7 @@ iconForm.addEventListener("submit", async (e) => {
   })
     .then((response) => {
       if (response.ok) {
-        window.location.reload();
+        window.location.reload(); // Note : Notification prise en charge par le serveur
       } else {
         console.error("Erreur lors de l'envoi de l'image.");
       }

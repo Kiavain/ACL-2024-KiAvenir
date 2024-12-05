@@ -36,7 +36,7 @@ if (shareAgendaList && shareAgendaList.children.length > 0) {
         })
           .then((response) => {
             if (response.ok) {
-              window.location.reload();
+              window.location.reload(); // Note : Notification prise en charge par le serveur
             }
           })
           .catch((error) => console.error("Erreur:", error));

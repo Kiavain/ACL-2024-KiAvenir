@@ -87,7 +87,8 @@ export class AccountController extends Controller {
     const user = await this.getUser(email);
     await user.update({ password: encryptPassword(password, user.salt), reset_token: "" });
 
-    res.redirect("/");
+    res.cookie("notification", "Le mot de passe a bien été réinitialisé.", { maxAge: 5000 });
+    res.json({ success: true });
   }
 
   /**
@@ -253,13 +254,13 @@ export class AccountController extends Controller {
 
     // Modifie les informations de l'utilisateur si des changements ont été effectués
     const updatedUser = this.prepareUpdatedUser(user, email, username, password);
-    await this.updateUserAccount(res, user, updatedUser);
+    await this.updateUserAccount(req, res, user, updatedUser);
   }
 
   /**
    * Modifie l'avatar du compte de l'utilisateur connecté.
-   * @param req La requête
-   * @param res La réponse
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
    * @returns {Promise<void>}
    */
   async editUserIcon(req, res) {
@@ -284,8 +285,8 @@ export class AccountController extends Controller {
       // Importe le nouvel avatar et supprime le fichier de "uploads"
       fs.copyFileSync(newIconPath, iconPath);
       await this.checkAndDeleteIcon(newIconPath);
-
-      return res.redirect("/account");
+      res.cookie("notification", "L'avatar a bien été modifié.", { maxAge: 5000 });
+      res.status(200).send("L'avatar a bien été modifié.");
     } catch (error) {
       console.error(error);
       res.status(500).send("Erreur lors de l'upload de l'image.");
@@ -294,17 +295,19 @@ export class AccountController extends Controller {
 
   /**
    * Met à jour le compte utilisateur
+   * @param req {Request} La requête
    * @param res {Response} La réponse
    * @param user {User} L'utilisateur
    * @param data {Object} Les données
    */
-  async updateUserAccount(res, user, data) {
+  async updateUserAccount(req, res, user, data) {
     try {
       await user.update(data);
       const updatedToken = await this.createJWT(user);
+      res.cookie("notification", "Vos modifications ont bien été enregistrées.", { maxAge: 5000 });
       res.cookie("accessToken", updatedToken, { httpOnly: true });
       res.locals.user = updatedToken;
-      return res.redirect("/");
+      return res.redirect("/account");
     } catch (error) {
       this.logger.error("Erreur lors de la mise à jour de l'utilisateur:", error);
       this.renderError(
@@ -397,6 +400,12 @@ export class AccountController extends Controller {
    *
    */
   renderLogin(req, res) {
+    const notification = req.cookies.notification;
+    if (notification) {
+      req.flash(notification);
+      res.clearCookie("notification");
+    }
+
     res.render("login", { title: "Connexion" });
   }
 
@@ -410,6 +419,13 @@ export class AccountController extends Controller {
     if (!res.locals.user) {
       return res.status(401).redirect("/401");
     }
+
+    const notification = req.cookies.notification;
+    if (notification) {
+      req.flash(notification);
+      res.clearCookie("notification");
+    }
+
     res.render("account");
   }
 

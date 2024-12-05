@@ -220,6 +220,7 @@ class KiAvenir {
 
     // Fonction pour ajouter des notifications
     req.flash = (message) => {
+      console.log("Message : ", message);
       req.session.flashMessages.push(message);
     };
 

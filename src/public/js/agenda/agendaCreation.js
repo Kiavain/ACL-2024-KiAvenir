@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("selectedAgendaIds", JSON.stringify([data.agendaId]));
           }
 
-          window.location.reload();
+          window.location.reload(); // Note : Notification prise en charge par le serveur
         } else {
           agendaCreationError.style.display = "block";
         }

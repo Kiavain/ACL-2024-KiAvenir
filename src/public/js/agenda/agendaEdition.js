@@ -23,7 +23,7 @@ if (deleteAgendaButton) {
     });
 
     if (response.ok) {
-      window.location.href = "/agenda";
+      window.location.href = "/agenda"; // Note : Les notifications sont traitées
     } else {
       const data = await response.json();
       deleteMessage.textContent = data.message;
@@ -68,7 +68,7 @@ editAgendaForm.onsubmit = async function (e) {
       agenda.description = newAgendaDescription;
 
       editAgendaModal.style.display = "none";
-      location.reload();
+      location.reload(); // Note : Notification prise en charge par le serveur
     })
     .catch((error) => console.error("Erreur:", error));
 };
