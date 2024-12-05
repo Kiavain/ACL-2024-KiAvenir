@@ -14,7 +14,17 @@ document.addEventListener("DOMContentLoaded", () => {
     closeButton.onclick = closeModal;
     window.onclick = handleOutsideClick;
 
-    saveButton.onclick = () => saveEvent(calendar);
+    saveButton.onclick = () => {
+      // Récupère les dates de début et de fin
+      let startDate = document.getElementById("startEventTime").value;
+      let endDate = document.getElementById("endEventTime").value;
+
+      // Convertir les dates en objet Date
+      startDate = moment(startDate).toISOString().substring(0, 16);
+      endDate = moment(endDate).toISOString().substring(0, 16);
+
+      saveEvent(startDate, endDate);
+    };
     deleteButton.onclick = () => deleteEvent(calendar);
     deletePreviewButton.onclick = () => deleteEvent(calendar);
 

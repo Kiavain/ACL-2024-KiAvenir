@@ -107,40 +107,38 @@ export const initCalendar = () => {
       openEventDetailsModal(info.event);
     },
     eventDrop: (info) => {
+      const startDate = moment(info.event.start).toISOString().substring(0, 16);
+      let endDate;
+
       document.getElementById("eventTitle").value = info.event.title;
       document.getElementById("eventDetails").value = info.event.extendedProps.description;
       document.getElementById("eventAllDay").checked = info.event.allDay;
-      document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
       document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
       document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
 
       // Si on passe de allDay à non allDay, on ajuste la date de fin
+
       if (!info.event.allDay && info.oldEvent.allDay) {
-        document.getElementById("endEventTime").value = moment(info.event.start)
-          .add(1, "hour")
-          .toISOString()
-          .substring(0, 16);
+        endDate = moment(info.event.start).add(1, "hour").toISOString().substring(0, 16);
       } else if (info.event.allDay && !info.oldEvent.allDay) {
-        document.getElementById("endEventTime").value = moment(info.event.start)
-          .add(1, "day")
-          .toISOString()
-          .substring(0, 16);
+        endDate = moment(info.event.start).add(1, "day").toISOString().substring(0, 16);
       } else {
-        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
+        endDate = moment(info.event.end).toISOString().substring(0, 16);
       }
 
-      saveEvent(calendar);
+      saveEvent(startDate, endDate);
     },
     eventResize: (info) => {
       if (info.event.end !== info.oldEvent.end) {
+        const startDate = moment(info.event.start).toISOString().substring(0, 16);
+        const endDate = moment(info.event.end).toISOString().substring(0, 16);
+
         document.getElementById("eventTitle").value = info.event.title;
         document.getElementById("eventDetails").value = info.event.extendedProps.description;
         document.getElementById("eventAllDay").checked = info.event.allDay;
-        document.getElementById("startEventTime").value = moment(info.event.start).toISOString().substring(0, 16);
-        document.getElementById("endEventTime").value = moment(info.event.end).toISOString().substring(0, 16);
         document.getElementById("eventRecurrence").value = info.event.extendedProps.recurrence;
         document.getElementById("updateEvent").dataset.eventId = info.event.extendedProps.eventId;
-        saveEvent(calendar);
+        saveEvent(startDate, endDate);
       }
     },
     eventDidMount: function (info) {
@@ -381,7 +379,7 @@ export const handleOutsideClick = (event) => {
 };
 
 // Fonction pour mettre à jour un événement
-export const saveEvent = (calendar) => {
+export const saveEvent = (startDate, endDate) => {
   const saveButton = document.getElementById("updateEvent");
   const errorMessages = document.getElementById("error-update-event");
   const eventId = saveButton.dataset.eventId;
@@ -389,8 +387,8 @@ export const saveEvent = (calendar) => {
   const updatedData = {
     title: document.getElementById("eventTitle").value,
     description: document.getElementById("eventDetails").value,
-    start: document.getElementById("startEventTime").value + stringAppend,
-    end: document.getElementById("endEventTime").value + stringAppend,
+    start: startDate + stringAppend,
+    end: endDate + stringAppend,
     allDay: document.getElementById("eventAllDay").checked,
     recurrence: document.getElementById("eventRecurrence").value
   };
