@@ -96,12 +96,6 @@ body {
   z-index: 1000;
 }
 
-
-.search-container {
-  position: relative;
-  margin-bottom: 10px;
-}
-
 .modal-container {
   position: absolute;
   top: 100%; /* Place la modal juste en dessous de la barre de recherche */
