@@ -138,21 +138,18 @@ export const openModal = (eventData) => {
   document.getElementById("eventTitle").value = eventData.title;
   document.getElementById("eventDetails").value = eventData.extendedProps.description || "Pas de détails disponibles.";
   allDay.checked = false;
-  if (!eventData.allDay) {
-    allDay.checked = false;
-    startDate.type = "datetime-local";
-    endDate.type = "datetime-local";
-
-    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
-    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
-  } else {
+  if (eventData.allDay) {
     allDay.click();
     const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
-    let endDateValue = new Date(moment(eventData.end).format("YYYY-MM-DD"));
-    // Soustraire un jour à la date de fin
-    endDateValue.setUTCDate(endDateValue.getUTCDate() - 1);
-    endDate.value = endDateValue.toISOString().split("T")[0];
+
+    // Calculer end uniquement si eventData.end est défini
+    let endDateValue = eventData.end ? moment(eventData.end).subtract(1, "days").format("YYYY-MM-DD") : startDateValue;
+
     startDate.value = startDateValue;
+    endDate.value = endDateValue;
+  } else {
+    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
   }
 
   // Définit la récurrence de l'event
@@ -247,6 +244,7 @@ export const saveEvent = (calendar) => {
   const saveButton = document.getElementById("updateEvent");
   const errorMessages = document.getElementById("error-update-event");
   let eventId = saveButton.dataset.eventId;
+  let sentId = eventId;
 
   const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
   const applyToAll = document.getElementById("applyToAllOccurrences").checked;
@@ -261,7 +259,7 @@ export const saveEvent = (calendar) => {
     recurrence: document.getElementById("eventRecurrence").value,
     occurrence: 0, // Par défaut, c'est un événement principal
     applyToAll: applyToAll,
-    sentId: eventId,
+    sentId: sentId,
     oldRecurrence: oldRecurrence
   };
 
@@ -272,6 +270,7 @@ export const saveEvent = (calendar) => {
     const interval = document.getElementById("eventRecurrenceInterval").value;
 
     eventId = saveButton.dataset.occurrenceId;
+    updatedData.sentId = eventId;
     updatedData.unit = parseInt(unit, 10);
     updatedData.interval = parseInt(interval, 10);
     updatedData.occurrence = 1; // Marque comme une occurrence
@@ -287,6 +286,7 @@ export const saveEvent = (calendar) => {
     }
   } else if ((rec === "0" || rec === "1" || rec === "2" || rec === "3") && oldRecurrence !== "4") {
     eventId = saveButton.dataset.occurrenceId;
+    updatedData.sentId = eventId;
     updatedData.occurrence = 1; // Marque comme une occurrence
     updatedData.unit = rec;
     updatedData.interval = 1;
