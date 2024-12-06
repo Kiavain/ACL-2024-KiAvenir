@@ -3,10 +3,9 @@ import * as fs from "node:fs";
 import Database from "./components/Database.js";
 import cookieParser from "cookie-parser";
 import path from "path";
-import { fileURLToPath } from "url";
 import session from "express-session";
 import KiLogger from "./components/KiLogger.js";
-import { getSecret } from "./utils/index.js";
+import { getDirname, getSecret } from "./utils/index.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import Mailer from "./components/Mailer.js";
@@ -16,8 +15,7 @@ import { WebSocketServer } from "ws";
 dotenv.config();
 
 // Créez l'équivalent de __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = getDirname(import.meta.url);
 
 /**
  * Classe principale de l'application
@@ -35,19 +33,51 @@ class KiAvenir {
     this.logger = new KiLogger(this);
     this.mailer = new Mailer(this);
     this.wss = new WebSocketServer({ port: 8080 });
+    this.server = null; // Instance du serveur Express
 
-    // Libère les ressources
-    process.on("SIGINT", () => {
-      this.logger.warn("Fermeture du serveur...");
-      this.wss.close();
-      process.exit();
-    });
+    // Libère les ressources lors des signaux d'arrêt
+    process.on("SIGINT", this.stop.bind(this));
+    process.on("SIGTERM", this.stop.bind(this));
+  }
 
-    process.on("SIGTERM", () => {
+  /**
+   * Méthode de fermeture propre
+   */
+  async stop() {
+    try {
       this.logger.warn("Fermeture du serveur...");
-      this.wss.close();
-      process.exit();
-    });
+
+      // Fermer les WebSockets
+      await new Promise((resolve) => {
+        this.wss.close(() => {
+          this.logger.info("WebSocketServer fermé.");
+          resolve();
+        });
+      });
+
+      // Fermer le serveur Express
+      if (this.server) {
+        await new Promise((resolve, reject) => {
+          this.server.close((err) => {
+            if (err) {
+              this.logger.error("Erreur lors de la fermeture du serveur Express : ", err);
+              return reject(err);
+            }
+            this.logger.info("Serveur Express fermé.");
+            resolve();
+          });
+        });
+      }
+
+      // Fermer la base de données
+      await this.database.connector.close();
+
+      this.logger.info("Toutes les ressources ont été libérées. Au revoir !");
+    } catch (error) {
+      this.logger.error("Erreur lors de la fermeture : ", error);
+    } finally {
+      process.exit(0); // Quitter le processus proprement
+    }
   }
 
   /**
@@ -164,7 +194,7 @@ class KiAvenir {
 
     this.logger.success("WebSocket à l'écoute sur le port 8080.");
 
-    this.app.listen(this.PORT, () => {
+    this.server = this.app.listen(this.PORT, () => {
       this.logger.success(`Serveur en cours d'exécution : http://${this.ADDRESS}:${this.PORT}`);
     });
   }
@@ -271,7 +301,7 @@ class KiAvenir {
 
   /**
    * Retourne le chemin complet d'un dossier
-   * @param folder Le dossier
+   * @param folder {string} Le dossier
    * @returns {string} Le chemin complet
    */
   getPath(folder) {
