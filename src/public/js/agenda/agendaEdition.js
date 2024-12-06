@@ -1,4 +1,5 @@
 import { addFlashMessages } from "../utils.js";
+import { notifyServer } from "../websocket.js";
 
 const editAgendaButton = document.getElementById("editAgenda");
 const deleteAgendaButton = document.getElementById("deleteAgenda");
@@ -23,6 +24,7 @@ if (deleteAgendaButton) {
     });
 
     if (response.ok) {
+      notifyServer({ type: "update", message: "Deleting agenda" });
       window.location.href = "/agenda"; // Note : Les notifications sont traitées
     } else {
       const data = await response.json();
@@ -68,6 +70,7 @@ editAgendaForm.onsubmit = async function (e) {
       agenda.description = newAgendaDescription;
 
       editAgendaModal.style.display = "none";
+      notifyServer({ type: "update", message: "Updating agenda" });
       location.reload(); // Note : Notification prise en charge par le serveur
     })
     .catch((error) => console.error("Erreur:", error));
