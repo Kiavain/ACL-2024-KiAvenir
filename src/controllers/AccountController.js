@@ -67,7 +67,7 @@ export class AccountController extends Controller {
     const user = await this.getUser(email);
 
     // Vérifie si le token est valide
-    if (!user.checkResetToken(token)) {
+    if (!user || !user.checkResetToken(token)) {
       return res.render("errors/bad_token");
     }
 
@@ -573,7 +573,7 @@ export class AccountController extends Controller {
     const users = this.users.getAll();
     const usernameAlreadyTaken = users.some((u) => u.username === username);
     const emailAlreadyTaken = users.some((u) => u.email === email);
-    const passwordTooShort = password.length < 8;
+    const passwordTooShort = !password || password.length < 8;
 
     return [usernameAlreadyTaken, emailAlreadyTaken, passwordTooShort];
   }

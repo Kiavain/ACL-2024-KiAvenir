@@ -35,6 +35,19 @@ class KiAvenir {
     this.logger = new KiLogger(this);
     this.mailer = new Mailer(this);
     this.wss = new WebSocketServer({ port: 8080 });
+
+    // Libère les ressources
+    process.on("SIGINT", () => {
+      this.logger.warn("Fermeture du serveur...");
+      this.wss.close();
+      process.exit();
+    });
+
+    process.on("SIGTERM", () => {
+      this.logger.warn("Fermeture du serveur...");
+      this.wss.close();
+      process.exit();
+    });
   }
 
   /**
