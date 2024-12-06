@@ -106,7 +106,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyCanEdit(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur");
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur" && !x.invited);
 
     return isOwner || isGuest;
   }
@@ -117,7 +117,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyAgendaAccess(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId);
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && !x.invited);
 
     return isOwner || isGuest;
   }

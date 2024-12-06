@@ -147,3 +147,18 @@ body {
   text-align: center;
   color: #888;
 }
+
+/* Limite la longueur du texte et affiche le texte complet au survol */
+.notification-text {
+  display: inline-block; /* Empêche les comportements inattendus lors du survol */
+  white-space: nowrap; /* Empêche le texte de passer à la ligne */
+  overflow: hidden; /* Coupe le texte qui dépasse */
+  text-overflow: ellipsis; /* Ajoute des points de suspension pour indiquer que le texte est tronqué */
+  max-width: 300px; /* Limite la largeur du texte */
+  vertical-align: middle; /* Maintient le texte aligné */
+}
+
+.notification-item:hover .notification-text {
+  max-width: none; /* Affiche le texte complet au survol */
+  white-space: nowrap; /* Assure que le texte ne se déforme pas */
+}

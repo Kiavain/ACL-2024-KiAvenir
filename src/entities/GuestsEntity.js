@@ -27,6 +27,10 @@ export default class GuestsEntity extends Entity {
       },
       role: {
         type: DataTypes.STRING(32)
+      },
+      invited: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       }
     });
   }

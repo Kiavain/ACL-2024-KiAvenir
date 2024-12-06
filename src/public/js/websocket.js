@@ -1,4 +1,5 @@
 import { refreshCalendar } from "./agenda/calendar.js";
+import { refreshNotifications } from "./notifications/notifications.js";
 
 let socket;
 let reconnectAttempts = 0;
@@ -24,6 +25,7 @@ function connectWebSocket() {
 
     if (data.type === "update") {
       refreshCalendar();
+      refreshNotifications();
     }
   };
 

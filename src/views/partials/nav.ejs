@@ -1,4 +1,8 @@
 <% /* global locals,currentPath,agendas, err */ %>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-body-secondary sticky-top">
     <div class="container-fluid">
@@ -54,6 +58,24 @@
                             <button id="importAgenda">Importer un agenda</button>
                         </div>
                     <% } %>
+
+                    <!-- Dropdown pour les notifications -->
+                    <script type="module" src="/js/notifications/notifications.js"></script>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <!-- Badge pour le nombre de notifications -->
+                            <span class="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger" id="notification-count" style="display: none">
+                                0
+                            </span>
+                        </a>
+                        <!-- Liste des notifications  avec le dataset-user-id pour les requêtes -->
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" id="notification-list" data-user-id="<%= locals.user.id %>">
+                            <!-- Liste des notifications -->
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown pour le compte utilisateur -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img class="d-inline-block align-text-top img-fluid rounded-circle" id="userIcon" width="30" src="/img/default_user_icon.jpg" alt="Logo" data-user-id="<%= locals.user.id %>">

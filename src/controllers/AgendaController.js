@@ -29,6 +29,29 @@ export class AgendaController extends Controller {
     this.deleteAgenda = this.deleteAgenda.bind(this);
     this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
     this.deleteHolidayAgenda = this.deleteHolidayAgenda.bind(this);
+    this.getNotifications = this.getNotifications.bind(this);
+    this.acceptShare = this.acceptShare.bind(this);
+  }
+
+  getNotifications(req, res) {
+    const user = res.locals.user;
+    if (!user) {
+      req.flash("Vous devez être connecté pour accéder à cette page.");
+      return res.redirect("/login");
+    }
+
+    // Récupère les notifications
+    const notifications = this.guests
+      .getAll()
+      .filter((guest) => guest.guestId === user.id && guest.invited)
+      .map((guest) => {
+        const agenda = guest.getAgenda();
+        const owner = guest.getOwner();
+
+        return { message: `${owner.username} veut partager '${agenda.name}' avec vous`, id: guest.id };
+      });
+
+    res.json(notifications);
   }
 
   /**
@@ -156,6 +179,27 @@ export class AgendaController extends Controller {
     return res.success(`L'agenda ${agenda.name} a été mis à jour avec succès.`);
   }
 
+  acceptShare(req, res) {
+    const localUser = res.locals.user;
+    if (!localUser) {
+      return res.err(401, "Vous devez être connecté pour accéder à cette page.");
+    }
+
+    const { id } = req.params;
+    const guest = this.guests.get(id);
+    if (!guest) {
+      return res.err(404, "Guest non trouvé.");
+    } else if (guest.guestId !== localUser.id) {
+      return res.err(403, "Vous n'êtes pas autorisé à accepter ce partage.");
+    }
+
+    const agenda = guest.getAgenda();
+    res.cookie("notification", `Vous avez accepté le partage de l'agenda ${agenda.name}.`, { maxAge: 5000 });
+    guest
+      .update({ invited: false })
+      .then(() => res.success(`Vous avez accepté le partage de l'agenda ${agenda.name}.`))
+      .catch((error) => res.err(500, error));
+  }
   /**
    * Partage un agenda
    * @param req

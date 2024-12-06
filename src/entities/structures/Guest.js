@@ -37,6 +37,12 @@ export default class Guest extends EntityStructure {
      * @type {string}
      */
     this.role = data.role;
+
+    /**
+     * Si le guest est invité sans validation
+     * @type {boolean}
+     */
+    this.invited = data.invited;
   }
 
   /**
@@ -62,6 +68,7 @@ export default class Guest extends EntityStructure {
    */
   async update(data) {
     this.role = data.role;
+    this.invited = data.invited;
 
     return this.entity.update((x) => x.id === this.id, data);
   }
