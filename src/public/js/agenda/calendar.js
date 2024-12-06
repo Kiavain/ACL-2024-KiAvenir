@@ -10,6 +10,10 @@ export function refreshCalendar() {
   getCalendarInstance().refetchEvents();
 }
 
+export function goTo(date) {
+  getCalendarInstance().gotoDate(date);
+}
+
 function getHeaderToolbarConfig() {
   if (window.innerWidth < 768) {
     // Configuration pour mobile
@@ -33,15 +37,8 @@ export function getEventsUrl() {
     .map((checkbox) => checkbox.value)
     .join(",");
 
-  // Vérifie aussi l'agendaId présent dans l'URL
-  const url = new URL(window.location.href);
-  const agendaId = url.pathname.split("/").pop();
-  if (agendaId && !selectedAgendaIds.includes(agendaId)) {
-    selectedAgendaIds += `,${agendaId}`;
-  }
-
-  const search = document.getElementById("searchInput").value;
-  const input = search && search.trim() !== "" ? `?search=${search}` : "";
+  const filter = document.getElementById("filterInput").value;
+  const input = filter && filter.trim() !== "" ? `?filter=${filter}` : "";
   return `/api/events/${selectedAgendaIds}${input}`;
 }
 
@@ -348,7 +345,7 @@ function disableIfCantEdit(canEdit) {
 
 //Fonction pour écouter la barre de filtrage des évenements
 const listenFilter = () => {
-  document.getElementById("searchInput").addEventListener("input", function () {
+  document.getElementById("filterInput").addEventListener("input", function () {
     refreshCalendar();
   });
 };

@@ -96,3 +96,60 @@ body {
   z-index: 1000;
 }
 
+
+.search-container {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.modal-container {
+  position: absolute;
+  top: 100%; /* Place la modal juste en dessous de la barre de recherche */
+  left: 0;
+  width: 100%;
+  max-width: 600px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+}
+
+.searc-result-content{
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.searc-result-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.searc-result-content li {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.event-title {
+  flex-grow: 1;
+  font-weight: bold;
+}
+
+.event-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.event-agenda {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #555;
+}
+
+#noResultsMessage {
+  text-align: center;
+  color: #888;
+}

@@ -27,8 +27,20 @@
                 <% if (locals.user) { %>
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
-                        <div class = "search-bar" id="searchBar">
-                            <input type="text" id="searchInput" placeholder="Rechercher un événement">
+                        <!-- Barre de recherche -->
+                        <div class="search-container">
+                            <input type="text" id="eventSearch" class="form-control" placeholder="Rechercher un événement...">
+                            <div id="searchResults" class="modal-container" style="display: none">
+                                <div class="searc-result-content">
+                                    <ul id="eventList"></ul>
+                                    <p id="noResultsMessage" style="display: none;">Aucun événement trouvé.</p>
+                                </div>
+                            </div>
+                            <script type="module" src="/js/agenda/events/eventSearch.js"></script>
+                        </div>
+
+                        <div class="search-bar">
+                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrer par nom">
                         </div>
 
                         <button class="icon-button" id="createAgendaOrEvent">

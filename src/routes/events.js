@@ -133,7 +133,7 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
-      const { search, start, end } = req.query;
+      const { filter, start, end } = req.query;
       let { agendaIds } = req.params;
 
       // Vérifie que start et end sont définis
@@ -159,7 +159,7 @@ export default class EventRouteur extends Routeur {
         const events = agenda
           .getEvents()
           .filter((e) => {
-            return agendaId === e.agendaId && (!search || e.name.toLowerCase().includes(search.toLowerCase()));
+            return agendaId === e.agendaId && (!filter || e.name.toLowerCase().includes(filter.toLowerCase()));
           })
           .map((e) => ({
             eventId: e.eventId,
