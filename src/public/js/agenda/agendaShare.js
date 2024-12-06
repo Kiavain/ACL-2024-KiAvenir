@@ -36,10 +36,11 @@ function shareAgenda() {
 
       // Ajouter les invités filtrés
       guests.forEach((guest) => {
+        const invited = guest.invited ? "<span class=\"material-symbols-outlined\">mail_outline</span>" : "";
         const listItem = document.createElement("li");
         listItem.innerHTML = `
             <div class="guest-item" data-guest-id="${guest.id}">
-              <span class="username">${guest.username}</span>
+              <span class="username">${guest.username} ${invited}</span>
               <div>
                 <button class="icon-button role-button">
                   <div style="display: inline-flex;">
