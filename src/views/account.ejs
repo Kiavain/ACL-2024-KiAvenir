@@ -81,7 +81,7 @@
             <div class="col-md-4">
                 <!-- Formulaire pour l'avatar -->
                 <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
-                <form name="iconForm" action="/account/edit-icon" method="POST" enctype="multipart/form-data">
+                <form name="iconForm" action="/api/account/edit-icon" method="POST" enctype="multipart/form-data">
                     <div class="text-center">
                         <canvas id="userIconPreview" class="figure-img img-fluid rounded border border-dark"></canvas>
                     </div>
@@ -89,7 +89,7 @@
                     <div class="mb-3 d-flex flex-column align-items-center">
                         <label for="imageUpload" class="form-label fw-bold">Choisissez une image :</label>
                         <div class="custom-file w-100 border rounded bg-white">
-                            <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" style="display: none;" required>
+                            <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" style="display: none;">
                             <label for="imageUpload" class="btn btn-light m-0 mr-3 border">Parcourir...</label>
                             <span class="file-name text-muted">Aucun fichier sélectionné.</span>
                         </div>
@@ -104,7 +104,7 @@
             <div class="col-md-8">
                 <!-- Formulaire pour les infos du compte -->
                 <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h2>
-                <form name="accountEdition" action="/account/edit" method="POST">
+                <form name="accountEdition" action="/api/account/edit" method="POST">
                     <div class="row">
                         <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Votre adresse mail</label>
                         <div class="col-md-7">
@@ -164,7 +164,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <form action="/account/delete" method="post">
+                <form action="/api/account/delete" method="post">
                     <button type="submit" class="btn btn-danger">Supprimer</button>
                 </form>
             </div>
@@ -173,7 +173,7 @@
 </div>
 
 <script type="module" src="/js/account/accountEdition.js"></script>
-<script src="/js/account/loadIconPreview.js"></script>
+<script type="module" src="/js/account/loadIconPreview.js"></script>
 <% } %>
 
 

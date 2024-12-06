@@ -21,7 +21,7 @@ describe("Test - Page d'accueil", () => {
 describe("Test - Partie Compte Utilisateur", () => {
   test("Création d'un compte avec données valides", async () => {
     const res = await request(server)
-      .post("/account/new")
+      .post("/api/account/new")
       .send({ email: `${id}@example.com`, username: `${id}`, password: "password123" });
 
     expect(res.statusCode).toBe(302);
@@ -34,7 +34,7 @@ describe("Test - Partie Compte Utilisateur", () => {
   });
 
   test("Déconnexion de l'utilisateur", async () => {
-    const res = await request(server).post("/account/logout");
+    const res = await request(server).post("/api/account/logout");
     expect(res.statusCode).toBe(302);
     expect(res.header["set-cookie"]).toBeDefined();
     expect(res.header["content-type"]).toMatch(/text\/plain/);
@@ -43,7 +43,7 @@ describe("Test - Partie Compte Utilisateur", () => {
 
   test("Connexion de l'utilisateur", async () => {
     const res = await request(server)
-      .post("/account/login")
+      .post("/api/account/login")
       .send({ username: `${id}`, password: "password123" });
 
     expect(res.statusCode).toBe(302);
@@ -54,7 +54,7 @@ describe("Test - Partie Compte Utilisateur", () => {
 
   test("Connexion de l'utilisateur (invalide", async () => {
     const res = await request(server)
-      .post("/account/login")
+      .post("/api/account/login")
       .send({ username: `${id}`, password: "password" });
 
     expect(res.statusCode).toBe(200);
@@ -79,7 +79,7 @@ describe("Test - Partie Compte Utilisateur", () => {
 
   test("Création d'un compte avec données invalides", async () => {
     const res = await request(server)
-      .post("/account/new");
+      .post("/api/account/new");
 
     expect(res.statusCode).toBe(200);
     expect(res.header["set-cookie"]).toBeDefined();

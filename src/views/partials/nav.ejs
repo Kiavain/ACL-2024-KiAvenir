@@ -54,7 +54,7 @@
                             <li>
                                 <script type="module" src="/js/account/logout.js"></script>
                                 <a id="logout_link" class="dropdown-item"  href="#">Déconnexion</a>
-                                <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
+                                <form id="logoutForm" action="/api/account/logout" method="POST" style="display: none;">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 </form>
                             </li>

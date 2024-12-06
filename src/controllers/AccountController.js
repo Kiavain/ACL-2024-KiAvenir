@@ -16,7 +16,7 @@ import { fileURLToPath } from "url";
  * Typage des options des réponses
  * @typedef {import("express").Response & {
  * success: (message: String, opt: Object = {}) => void,
- * error: (statusCode: int, message: String, opt: Object = {}) => void}
+ * err: (statusCode: int, message: String, opt: Object = {}) => void}
  * } Response
  */
 
@@ -103,20 +103,17 @@ export class AccountController extends Controller {
 
     // Vérifie si l'utilisateur existe
     if (user === undefined) {
-      return res.json({
-        success: false,
-        message: "Vous allez recevoir un courriel si un compte est lié à cette adresse."
-      });
+      return res.err(404, "Vous allez recevoir un courriel si un compte est lié à cette adresse.");
     }
 
     // Vérifie si l'utilisateur a déjà demandé une réinitialisation de mot de passe
     const lastUpdate = new Date(user.updatedAt).getTime();
     const now = new Date().getTime();
     if (now - lastUpdate < 15000) {
-      return res.json({
-        success: false,
-        message: `Veuillez patienter ${Math.ceil((15000 - (now - lastUpdate)) / 1000)} secondes avant de réessayer.`
-      });
+      return res.err(
+        429,
+        `Veuillez patienter ${Math.ceil((15000 - (now - lastUpdate)) / 1000)} secondes avant de réessayer.`
+      );
     }
 
     // Génère le token de réinitialisation de mot de passe
@@ -281,12 +278,13 @@ export class AccountController extends Controller {
     }
 
     try {
-      if (!req.file) {
+      const { file } = req;
+      if (!file) {
         return res.status(400).send("Aucune image uploadée.");
       }
 
       // Fichier uploadé
-      const newIconPath = req.file.path;
+      const newIconPath = file.path;
 
       // Supprime l'ancien avatar s'il existe
       const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
