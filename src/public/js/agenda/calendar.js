@@ -1,6 +1,7 @@
 // Initialiser la langue de moment.js
 
 import { addFlashMessages } from "../utils.js";
+import { notifyServer } from "../websocket.js";
 
 moment.locale("fr");
 
@@ -195,7 +196,7 @@ export const initCalendar = () => {
 
   calendar.render();
   document.querySelector(".fc-customButton-button").innerHTML = "<i class=material-symbols-outlined>menu</i>";
-  listenFilter(calendar);
+  listenFilter();
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
 
@@ -346,10 +347,9 @@ function disableIfCantEdit(canEdit) {
 }
 
 //Fonction pour écouter la barre de filtrage des évenements
-const listenFilter = (calendar) => {
+const listenFilter = () => {
   document.getElementById("searchInput").addEventListener("input", function () {
-    calendar.setOption("events", getEventsUrl());
-    calendar.refetchEvents();
+    refreshCalendar();
   });
 };
 
@@ -419,6 +419,7 @@ export const saveEvent = (startDate, endDate) => {
     .then((data) => {
       if (data.success) {
         addFlashMessages(["Événement mis à jour avec succès"]);
+        notifyServer({ type: "update", message: "Event updating" });
         refreshCalendar();
         closeModal();
       } else {
@@ -440,6 +441,7 @@ export const deleteEvent = () => {
       if (data.success) {
         closeModal();
         closeEventDetailsModal();
+        notifyServer({ type: "update", message: "Event deletion" });
         refreshCalendar();
         addFlashMessages(["Événement supprimé avec succès"]);
       } else {

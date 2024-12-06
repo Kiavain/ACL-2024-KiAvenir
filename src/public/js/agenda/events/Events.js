@@ -1,5 +1,6 @@
 import { refreshCalendar } from "../calendar.js";
 import { addFlashMessages } from "../../utils.js";
+import { notifyServer } from "../../websocket.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Utilitaires pour sélectionner les éléments
@@ -134,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         errorElement.style.display = "none";
         errAgenda.style.display = "none";
 
+        notifyServer({ type: "update", message: "Event creation" });
         refreshCalendar();
         addFlashMessages([data.message]);
       })

@@ -10,6 +10,7 @@ import { getSecret } from "./utils/index.js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import Mailer from "./components/Mailer.js";
+import { WebSocketServer } from "ws";
 
 // Charge les variables d'environnement
 dotenv.config();
@@ -33,6 +34,7 @@ class KiAvenir {
     this.database = new Database(this);
     this.logger = new KiLogger(this);
     this.mailer = new Mailer(this);
+    this.wss = new WebSocketServer({ port: 8080 });
   }
 
   /**
@@ -128,6 +130,27 @@ class KiAvenir {
    */
   async start() {
     await this.initRoutes();
+
+    this.wss.on("connection", (ws) => {
+      this.logger.success("Client connecté.");
+
+      // Recevoir les messages des clients
+      ws.on("message", (data) => {
+        // Diffuser la mise à jour à tous les autres clients
+        this.wss.clients.forEach((client) => {
+          if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(data); // Envoyer les données reçues
+          }
+        });
+      });
+
+      ws.on("close", () => {
+        this.logger.warn("Client déconnecté.");
+      });
+    });
+
+    this.logger.success("WebSocket à l'écoute sur le port 8080.");
+
     this.app.listen(this.PORT, () => {
       this.logger.success(`Serveur en cours d'exécution : http://${this.ADDRESS}:${this.PORT}`);
     });

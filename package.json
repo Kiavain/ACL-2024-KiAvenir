@@ -54,7 +54,8 @@
     "redis": "^4.7.0",
     "sequelize": "^6.37.4",
     "sqlite3": "^5.1.7",
-    "winston": "^3.15.0"
+    "winston": "^3.15.0",
+    "ws": "^8.18.0"
   },
   "overrides": {
     "cookie": "0.7.0"

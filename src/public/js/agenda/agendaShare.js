@@ -1,4 +1,6 @@
 import { addFlashMessages } from "../utils.js";
+import { refreshCalendar } from "./calendar.js";
+import { notifyServer } from "../websocket.js";
 
 const shareAgendaButton = document.getElementById("shareAgenda");
 const shareAgendaConfirmButton = document.getElementById("shareAgendaConfirm");
@@ -117,6 +119,7 @@ function submitShareAgenda() {
         roleError.style.display = "none";
         mailError.style.display = "none";
         otherError.style.display = "none";
+        notifyServer({ type: "update", message: "Sharing agenda" });
         window.location.reload();
       } else {
         if (isMailError) {
@@ -158,6 +161,7 @@ function applyRoleDropdownListeners() {
           if (response.ok) {
             // Suppression réussie, on supprime la ligne
             guestListItem.remove();
+            notifyServer({ type: "update", message: "Removing guest" });
           }
         })
         .catch((error) => console.error("Erreur:", error));
@@ -223,6 +227,7 @@ function applyRoleDropdownListeners() {
         .then((response) => response.json())
         .then((data) => {
           addFlashMessages(data.flashMessages);
+          notifyServer({ type: "update", message: "Updating guest" });
         })
         .catch((error) => console.error("Erreur:", error));
     });
