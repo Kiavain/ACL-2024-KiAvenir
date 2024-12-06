@@ -48,12 +48,16 @@ class KiAvenir {
       this.logger.warn("Fermeture du serveur...");
 
       // Fermer les WebSockets
-      await new Promise((resolve) => {
-        this.wss.close(() => {
-          this.logger.info("WebSocketServer fermé.");
-          resolve();
+      if (this.wss) {
+        this.wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.close(1001, "Le serveur se ferme.");
+          }
         });
-      });
+
+        this.logger.info("WebSocketServer fermé.");
+        this.wss.close();
+      }
 
       // Fermer le serveur Express
       if (this.server) {
