@@ -1,4 +1,8 @@
-import { goTo } from "../calendar.js";
+import { getCalendarInstance, getEventsUrl, goTo } from "../calendar.js";
+
+document.getElementById("filterInput").addEventListener("input", function () {
+  getCalendarInstance().setOption("events", getEventsUrl());
+});
 
 document.getElementById("eventSearch").addEventListener("input", async (e) => {
   const searchTerm = e.target.value;

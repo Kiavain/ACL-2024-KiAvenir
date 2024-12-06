@@ -193,7 +193,6 @@ export const initCalendar = () => {
 
   calendar.render();
   document.querySelector(".fc-customButton-button").innerHTML = "<i class=material-symbols-outlined>menu</i>";
-  listenFilter();
   return calendar; // Retourner l'instance du calendrier pour l'utiliser ailleurs
 };
 
@@ -342,13 +341,6 @@ function disableIfCantEdit(canEdit) {
     document.getElementById("deleteEvent").hidden = false;
   }
 }
-
-//Fonction pour écouter la barre de filtrage des évenements
-const listenFilter = () => {
-  document.getElementById("filterInput").addEventListener("input", function () {
-    refreshCalendar();
-  });
-};
 
 // Fonction pour fermer la modale d'édition
 export const closeModal = () => {
