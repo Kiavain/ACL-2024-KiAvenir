@@ -3,6 +3,7 @@
 import { addFlashMessages } from "../utils.js";
 
 const fileInput = document.getElementById("imageUpload");
+const temporaryIcon = document.getElementById("temporaryIcon");
 const fileName = document.querySelector(".file-name");
 
 const userIconPreview = document.getElementById("userIconPreview");
@@ -27,6 +28,7 @@ fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (file) {
     fileName.textContent = file.name;
+    temporaryIcon.textContent = "Ceci est un aperçu nécessitant une validation.";
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -90,6 +92,7 @@ iconForm.addEventListener("submit", async (e) => {
   })
     .then((response) => {
       if (response.ok) {
+        temporaryIcon.textContent = "";
         window.location.reload(); // Note : Notification prise en charge par le serveur
       } else {
         console.error("Erreur lors de l'envoi de l'image.");
