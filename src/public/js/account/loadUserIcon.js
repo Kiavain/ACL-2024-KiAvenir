@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const userIcon = document.getElementById("userIcon");
   const userIconPreview = document.getElementById("userIconPreview");
-  // const ctx = userIconPreview.getContext("2d");
+  const ctx = userIconPreview.getContext("2d");
 
   const userId = userIcon.dataset.userId;
   const iconPath = "/img/user_icon/" + userId + ".jpg";

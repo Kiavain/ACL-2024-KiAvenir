@@ -1,6 +1,8 @@
 // Petit script pour activer le remplacement du champ de sélection de fichier par défaut
 
-const fileInput = document.querySelector("#imageUpload");
+import { addFlashMessages } from "../utils.js";
+
+const fileInput = document.getElementById("imageUpload");
 const fileName = document.querySelector(".file-name");
 
 const userIconPreview = document.getElementById("userIconPreview");
@@ -74,7 +76,7 @@ iconForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (!resizedImageBlob) {
-    alert("Veuillez sélectionner une image.");
+    addFlashMessages(["Veuillez sélectionner une image."]);
     return;
   }
 
@@ -82,7 +84,7 @@ iconForm.addEventListener("submit", async (e) => {
   formData.append("image", resizedImageBlob, "resized-image.jpg");
 
   // Change la requête avec fetch API
-  fetch("/account/edit-icon", {
+  fetch("/api/account/edit-icon", {
     method: "POST",
     body: formData
   })
