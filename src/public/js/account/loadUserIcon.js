@@ -47,3 +47,25 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error("Erreur lors du chargement de l'image utilisateur.", err);
     });
 });
+
+export async function loadUserIcon(userId) {
+  const iconPath = '/img/user_icon/' + userId + '.jpg';
+
+  const options = {
+    method: 'HEAD',
+    headers: {
+      'Content-Type': 'image/jpeg'
+    }
+  };
+
+  let response = await fetch(iconPath, options);
+  const contentType = response.headers.get('Content-Type');
+
+  if (response.ok && contentType.startsWith('image/')) {
+    return response;
+  } else {
+    response = await fetch('/img/default_user_icon.jpg', options);
+  }
+
+  return response;
+}

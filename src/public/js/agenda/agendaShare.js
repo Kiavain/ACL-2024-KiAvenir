@@ -1,5 +1,6 @@
 import { addFlashMessages } from '../utils.js';
 import { notifyServer } from '../websocket.js';
+import { loadUserIcon } from '../account/loadUserIcon.js';
 
 const shareAgendaButton = document.getElementById('shareAgenda');
 const shareAgendaConfirmButton = document.getElementById('shareAgendaConfirm');
@@ -29,16 +30,32 @@ function shareAgenda() {
   // Faire une requête AJAX pour récupérer les invités associés à cet agenda
   fetch(`/getGuests?agendaId=${sharedAgendaId}`)
     .then((response) => response.json())
-    .then((guests) => {
+    .then(async (guests) => {
       const guestList = document.getElementById('access-shared-users');
-      guestList.innerHTML = '<li>Vous : Propriétaire</li>'; // Remettre "Propriétaire" et vider le reste
+      guestList.innerHTML = '<li>Vous : Propriétaire (<a href="">Transférer</a>)</li>'; // Remettre "Propriétaire" et vider le reste
 
       // Ajouter les invités filtrés
-      guests.forEach((guest) => {
+      for (const guest of guests) {
+        // Charger dynamiquement l'icône utilisateur
+        const imgSrc = await (async () => {
+          const response = await loadUserIcon(guest.guestId);
+          if (response.ok) {
+            return `/img/user_icon/${guest.guestId}.jpg`;
+          } else {
+            return '/img/default_user_icon.jpg';
+          }
+        })();
+
         const invited = guest.invited ? '<span class="material-symbols-outlined">mail_outline</span>' : '';
         const listItem = document.createElement('li');
         listItem.innerHTML = `
             <div class="guest-item" data-guest-id="${guest.id}">
+              <img class="profile-picture"
+                width="30"
+                src="${imgSrc}"
+                onerror="this.src='/img/default_user_icon.jpg'"
+                alt="Photo de ${guest.username}"
+              >
               <span class="username">${guest.username} ${invited}</span>
               <div>
                 <button class="icon-button role-button">
@@ -74,7 +91,7 @@ function shareAgenda() {
             </div>
           `;
         guestList.appendChild(listItem);
-      });
+      }
       applyRoleDropdownListeners();
     })
     .catch((err) => console.error('Erreur lors du chargement des invités:', err));

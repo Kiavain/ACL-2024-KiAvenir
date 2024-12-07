@@ -362,6 +362,7 @@ export class AgendaController extends Controller {
     res.json(
       agenda.getGuests().map((guest) => ({
         id: guest.id,
+        guestId: guest.guestId,
         username: guest.getGuest().username,
         role: guest.role,
         invited: guest.invited
