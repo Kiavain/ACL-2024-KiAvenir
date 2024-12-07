@@ -1,4 +1,4 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'agenda
@@ -50,7 +50,7 @@ export default class Guest extends EntityStructure {
    * @returns {Object} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get("users");
+    return this.entity.server.database.tables.get('users');
   }
 
   /**
@@ -58,7 +58,7 @@ export default class Guest extends EntityStructure {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**

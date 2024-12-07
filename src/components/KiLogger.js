@@ -1,8 +1,8 @@
-import { addColors, createLogger, format, transports } from "winston";
-import * as fs from "fs/promises";
-import path from "path";
-import jetpack from "fs-jetpack";
-import { fileURLToPath } from "url";
+import { addColors, createLogger, format, transports } from 'winston';
+import * as fs from 'fs/promises';
+import path from 'path';
+import jetpack from 'fs-jetpack';
+import { fileURLToPath } from 'url';
 
 /**
  * Typage de la configuration des niveaux
@@ -45,13 +45,13 @@ export default class KiLogger {
    * @returns {Promise<{filename: string, json: boolean}>} Les options de fichier
    */
   async loadFileSystem() {
-    const latestLogFilepath = path.resolve(__dirname, "../logs/latest.log");
+    const latestLogFilepath = path.resolve(__dirname, '../logs/latest.log');
     const latestLogExist = await existsAsync(latestLogFilepath);
 
     if (latestLogExist) {
       const stat = await fs.stat(latestLogFilepath);
       const parsedDate = parseDate(stat.ctime);
-      const pathLogs = path.join(__dirname, "../logs/", `${parsedDate.year}-${parsedDate.month}-${parsedDate.day}`);
+      const pathLogs = path.join(__dirname, '../logs/', `${parsedDate.year}-${parsedDate.month}-${parsedDate.day}`);
       const pathLogsExist = await existsAsync(pathLogs);
       if (!pathLogsExist) {
         await fs.mkdir(pathLogs, { recursive: true });
@@ -82,11 +82,11 @@ export default class KiLogger {
         debug: 4
       },
       colors: {
-        error: "red",
-        warn: "yellow",
-        success: "green",
-        info: "blue",
-        debug: "magenta"
+        error: 'red',
+        warn: 'yellow',
+        success: 'green',
+        info: 'blue',
+        debug: 'magenta'
       }
     };
 
@@ -104,15 +104,15 @@ export default class KiLogger {
 
     // Configure les transports
     const opt = await this.loadFileSystem();
-    let transportsArray = [new transports.File(opt), new transports.Console({ level: "debug" })];
-    if (process.platform === "win32" || process.platform === "win64") {
-      transportsArray = [new transports.Console({ level: "debug" })];
+    let transportsArray = [new transports.File(opt), new transports.Console({ level: 'debug' })];
+    if (process.platform === 'win32' || process.platform === 'win64') {
+      transportsArray = [new transports.Console({ level: 'debug' })];
     }
 
     this.winston = createLogger({
       levels,
       format: format.combine(
-        format.timestamp({ format: "DD/MM/YYYY à HH:mm:ss" }),
+        format.timestamp({ format: 'DD/MM/YYYY à HH:mm:ss' }),
         format.printf((info) => {
           return `${info.timestamp} | KiAvenir - ${info.level.toUpperCase()} » ${info.message}`;
         }),
@@ -155,7 +155,7 @@ export default class KiLogger {
     if (!err) {
       this.winston.error(message.stack || message);
     } else {
-      this.winston.error(message + "\n" + err.stack);
+      this.winston.error(message + '\n' + err.stack);
     }
   }
 

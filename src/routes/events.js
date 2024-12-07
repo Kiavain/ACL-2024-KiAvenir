@@ -1,5 +1,5 @@
-import Routeur from "../structures/Routeur.js";
-import moment from "moment";
+import Routeur from '../structures/Routeur.js';
+import moment from 'moment';
 
 /**
  * Les routes liées à la page des événements
@@ -13,16 +13,16 @@ export default class EventRouteur extends Routeur {
    * Construit la route
    */
   build() {
-    this.router.delete("/api/events/delete/:eventId", async (req, res) => {
+    this.router.delete('/api/events/delete/:eventId', async (req, res) => {
       // Vérifie si l'utilisateur est connecté
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: 'Vous devez être connecté pour effectuer cette action'
         });
       }
 
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
+      const event = this.server.database.tables.get('events').get(req.params.eventId);
       if (event) {
         await event.delete();
         res.json({ success: true });
@@ -31,17 +31,17 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.put("/api/events/update/:eventId", (req, res) => {
+    this.router.put('/api/events/update/:eventId', (req, res) => {
       // Vérifie si l'utilisateur est connecté
       const user = res.locals.user;
       if (!user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: 'Vous devez être connecté pour effectuer cette action'
         });
       }
 
-      const event = this.server.database.tables.get("events").get(req.params.eventId);
+      const event = this.server.database.tables.get('events').get(req.params.eventId);
       if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
         return res.json({
           success: false,
@@ -74,7 +74,7 @@ export default class EventRouteur extends Routeur {
           .then(() => {
             res.json({
               success: true,
-              message: "Événement mis à jour avec succès"
+              message: 'Événement mis à jour avec succès'
             });
           })
           .catch(() => {
@@ -92,16 +92,16 @@ export default class EventRouteur extends Routeur {
     });
 
     // Route pour créer un événement
-    this.router.post("/api/events/create", (req, res) => {
+    this.router.post('/api/events/create', (req, res) => {
       // Vérifie si l'utilisateur est connecté
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: 'Vous devez être connecté pour effectuer cette action'
         });
       }
 
-      const allEvents = this.server.database.tables.get("events");
+      const allEvents = this.server.database.tables.get('events');
       if (allEvents) {
         //Permet de rajouter un jour au jour de Fin à un event all Day
         if (req.body.allDay) {
@@ -112,7 +112,7 @@ export default class EventRouteur extends Routeur {
         allEvents
           .create(req.body)
           .then(() => {
-            res.json({ success: true, message: "Événement créé avec succès" });
+            res.json({ success: true, message: 'Événement créé avec succès' });
           })
           .catch(() => {
             res.json({
@@ -128,7 +128,7 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    this.router.get("/api/events/:agendaIds", async (req, res) => {
+    this.router.get('/api/events/:agendaIds', async (req, res) => {
       if (!res.locals.user) {
         return res.json([]);
       }
@@ -141,7 +141,7 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
-      agendaIds = agendaIds.split(",").map((id) => parseInt(id.trim()));
+      agendaIds = agendaIds.split(',').map((id) => parseInt(id.trim()));
 
       // Synchronisation avec la base de données
       await this.server.database.sync();
@@ -150,7 +150,7 @@ export default class EventRouteur extends Routeur {
 
       // Parcours chaque agendaId et récupère les événements correspondants
       for (const agendaId of agendaIds) {
-        const agenda = this.server.database.tables.get("agendas").get(agendaId);
+        const agenda = this.server.database.tables.get('agendas').get(agendaId);
         if (!agenda || !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))) {
           continue;
         }

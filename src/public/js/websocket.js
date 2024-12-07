@@ -1,5 +1,5 @@
-import { refreshCalendar } from "./agenda/calendar.js";
-import { refreshNotifications } from "./notifications/notifications.js";
+import { refreshCalendar } from './agenda/calendar.js';
+import { refreshNotifications } from './notifications/notifications.js';
 
 let socket;
 let reconnectAttempts = 0;
@@ -8,10 +8,10 @@ const reconnectInterval = 3000; // Intervalle entre les tentatives (en ms)
 
 // Connexion au serveur WebSocket
 function connectWebSocket() {
-  socket = new WebSocket("ws://localhost:8080");
+  socket = new WebSocket('ws://localhost:8080');
 
   socket.onopen = () => {
-    console.log("Connecté au serveur WebSocket.");
+    console.log('Connecté au serveur WebSocket.');
     reconnectAttempts = 0; // Réinitialiser les tentatives après une connexion réussie
   };
 
@@ -23,7 +23,7 @@ function connectWebSocket() {
       data = JSON.parse(data);
     }
 
-    if (data.type === "update") {
+    if (data.type === 'update') {
       refreshCalendar();
       refreshNotifications();
     }
@@ -31,12 +31,12 @@ function connectWebSocket() {
 
   // Gestion des erreurs
   socket.onerror = (error) => {
-    console.error("Erreur WebSocket :", error);
+    console.error('Erreur WebSocket :', error);
   };
 
   // Détection de fermeture et tentative de reconnexion
   socket.onclose = () => {
-    console.warn("Connexion WebSocket fermée.");
+    console.warn('Connexion WebSocket fermée.');
     if (reconnectAttempts < maxReconnectAttempts) {
       reconnectAttempts++;
       console.log(
@@ -44,7 +44,7 @@ function connectWebSocket() {
       );
       setTimeout(connectWebSocket, reconnectInterval);
     } else {
-      console.error("Nombre maximum de tentatives de reconnexion atteint.");
+      console.error('Nombre maximum de tentatives de reconnexion atteint.');
     }
   };
 }
@@ -54,7 +54,7 @@ export function notifyServer(update) {
   if (socket.readyState === WebSocket.OPEN) {
     socket.send(JSON.stringify(update));
   } else {
-    console.error("WebSocket non connecté.");
+    console.error('WebSocket non connecté.');
   }
 }
 

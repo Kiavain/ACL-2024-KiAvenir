@@ -1,4 +1,4 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'agenda
@@ -54,7 +54,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get("users");
+    return this.entity.server.database.tables.get('users');
   }
 
   /**
@@ -62,7 +62,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les événements
    */
   get events() {
-    return this.entity.server.database.tables.get("events");
+    return this.entity.server.database.tables.get('events');
   }
 
   /**
@@ -70,7 +70,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les invités
    */
   get guests() {
-    return this.entity.server.database.tables.get("guests");
+    return this.entity.server.database.tables.get('guests');
   }
 
   /**
@@ -106,7 +106,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyCanEdit(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur" && !x.invited);
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === 'Editeur' && !x.invited);
 
     return isOwner || isGuest;
   }

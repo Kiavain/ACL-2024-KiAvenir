@@ -1,15 +1,15 @@
-import express from "express";
-import * as fs from "node:fs";
-import Database from "./components/Database.js";
-import cookieParser from "cookie-parser";
-import path from "path";
-import session from "express-session";
-import KiLogger from "./components/KiLogger.js";
-import { getDirname, getSecret } from "./utils/index.js";
-import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import Mailer from "./components/Mailer.js";
-import { WebSocketServer } from "ws";
+import express from 'express';
+import * as fs from 'node:fs';
+import Database from './components/Database.js';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import session from 'express-session';
+import KiLogger from './components/KiLogger.js';
+import { getDirname, getSecret } from './utils/index.js';
+import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import Mailer from './components/Mailer.js';
+import { WebSocketServer } from 'ws';
 
 // Charge les variables d'environnement
 dotenv.config();
@@ -26,7 +26,7 @@ class KiAvenir {
    */
   constructor() {
     this.app = express();
-    this.ADDRESS = "localhost";
+    this.ADDRESS = 'localhost';
     this.PORT = 3000;
     this.routes = [];
     this.database = new Database(this);
@@ -36,8 +36,8 @@ class KiAvenir {
     this.server = null; // Instance du serveur Express
 
     // Libère les ressources lors des signaux d'arrêt
-    process.on("SIGINT", this.stop.bind(this));
-    process.on("SIGTERM", this.stop.bind(this));
+    process.on('SIGINT', this.stop.bind(this));
+    process.on('SIGTERM', this.stop.bind(this));
   }
 
   /**
@@ -45,17 +45,17 @@ class KiAvenir {
    */
   async stop() {
     try {
-      this.logger.warn("Fermeture du serveur...");
+      this.logger.warn('Fermeture du serveur...');
 
       // Fermer les WebSockets
       if (this.wss) {
         this.wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
-            client.close(1001, "Le serveur se ferme.");
+            client.close(1001, 'Le serveur se ferme.');
           }
         });
 
-        this.logger.info("WebSocketServer fermé.");
+        this.logger.info('WebSocketServer fermé.');
         this.wss.close();
       }
 
@@ -64,10 +64,10 @@ class KiAvenir {
         await new Promise((resolve, reject) => {
           this.server.close((err) => {
             if (err) {
-              this.logger.error("Erreur lors de la fermeture du serveur Express : ", err);
+              this.logger.error('Erreur lors de la fermeture du serveur Express : ', err);
               return reject(err);
             }
-            this.logger.info("Serveur Express fermé.");
+            this.logger.info('Serveur Express fermé.');
             resolve();
           });
         });
@@ -76,9 +76,9 @@ class KiAvenir {
       // Fermer la base de données
       await this.database.connector.close();
 
-      this.logger.info("Toutes les ressources ont été libérées. Au revoir !");
+      this.logger.info('Toutes les ressources ont été libérées. Au revoir !');
     } catch (error) {
-      this.logger.error("Erreur lors de la fermeture : ", error);
+      this.logger.error('Erreur lors de la fermeture : ', error);
     } finally {
       process.exit(0); // Quitter le processus proprement
     }
@@ -98,16 +98,16 @@ class KiAvenir {
       })
       .use(cookieParser())
       .use(this.authenticate.bind(this))
-      .use(express.static(path.join(__dirname, "public")));
+      .use(express.static(path.join(__dirname, 'public')));
 
     try {
       // Chargement en parallèle du logger et de la base de données
       await Promise.all([this.logger.load(), this.database.load()]);
-      this.logger.success("Base de données et logger chargés !");
+      this.logger.success('Base de données et logger chargés !');
 
       // Initialisation des notifications
       await this.initNotifs();
-      this.logger.success("Notifications initialisées !");
+      this.logger.success('Notifications initialisées !');
     } catch (error) {
       this.logger.error("Erreur pendant l'initialisation de l'application :", error);
     }
@@ -122,7 +122,7 @@ class KiAvenir {
     this.app
       .use(
         session({
-          secret: await getSecret(this.logger, "SESSION_SECRET"),
+          secret: await getSecret(this.logger, 'SESSION_SECRET'),
           resave: false,
           saveUninitialized: true
         })
@@ -138,7 +138,7 @@ class KiAvenir {
     await this.init();
 
     // Récupère les routes dans le dossier routes
-    for (const file of fs.readdirSync("src/routes")) {
+    for (const file of fs.readdirSync('src/routes')) {
       const route = await import(`./routes/${file}`);
       const routeInstance = new route.default(this);
       this.logger.success(`Route ${file} chargée !`);
@@ -155,8 +155,8 @@ class KiAvenir {
 
     // Dossier views avec view engine EJS
     this.app
-      .set("view engine", "ejs")
-      .set("views", this.getPath("views"))
+      .set('view engine', 'ejs')
+      .set('views', this.getPath('views'))
       // Middleware pour logger les requêtes
       .use(this.expressLog.bind(this));
 
@@ -167,7 +167,7 @@ class KiAvenir {
 
     // Middleware pour gérer les erreurs 404
     this.app.use((req, res) => {
-      res.status(404).redirect("/404");
+      res.status(404).redirect('/404');
     });
   }
 
@@ -178,11 +178,11 @@ class KiAvenir {
   async start() {
     await this.initRoutes();
 
-    this.wss.on("connection", (ws) => {
-      this.logger.success("Client connecté.");
+    this.wss.on('connection', (ws) => {
+      this.logger.success('Client connecté.');
 
       // Recevoir les messages des clients
-      ws.on("message", (data) => {
+      ws.on('message', (data) => {
         // Diffuser la mise à jour à tous les autres clients
         this.wss.clients.forEach((client) => {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -191,8 +191,8 @@ class KiAvenir {
         });
       });
 
-      ws.on("close", () => {
-        this.logger.warn("Client déconnecté.");
+      ws.on('close', () => {
+        this.logger.warn('Client déconnecté.');
       });
     });
 
@@ -214,21 +214,21 @@ class KiAvenir {
     res.locals.user = null;
 
     // Vérifie si un cookie accessToken est présent
-    const token = req.cookies["accessToken"];
+    const token = req.cookies['accessToken'];
     if (!token) {
       return next();
     }
 
     try {
       // Vérifie que le token est valide et correspond à un utilisateur valide également
-      const payload = jwt.verify(token, await getSecret(this.logger, "JWT_SECRET"));
-      const user = this.database.tables.get("users").get(payload.id);
+      const payload = jwt.verify(token, await getSecret(this.logger, 'JWT_SECRET'));
+      const user = this.database.tables.get('users').get(payload.id);
       if (user) {
         res.locals.user = payload;
       }
     } catch {
-      this.logger.error("Le token JWT de la session a expiré, la déconnexion est forcée.");
-      res.clearCookie("accessToken");
+      this.logger.error('Le token JWT de la session a expiré, la déconnexion est forcée.');
+      res.clearCookie('accessToken');
     }
 
     next();
@@ -245,7 +245,7 @@ class KiAvenir {
     const start = Date.now();
 
     // Log la requête à la fin de la réponse
-    res.on("finish", () => {
+    res.on('finish', () => {
       const duration = Date.now() - start;
       const statusCode = res.statusCode;
       const message = `${req.method} ${req.originalUrl} ${statusCode} - ${duration}ms`;

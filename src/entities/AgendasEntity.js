@@ -1,6 +1,6 @@
-import Entity from "../structures/Entity.js";
-import Agenda from "./structures/Agenda.js";
-import { DataTypes } from "sequelize";
+import Entity from '../structures/Entity.js';
+import Agenda from './structures/Agenda.js';
+import { DataTypes } from 'sequelize';
 
 /**
  * Représente l'entité des sagenda
@@ -30,7 +30,7 @@ export default class UsersEntity extends Entity {
       },
       color: {
         type: DataTypes.STRING(7),
-        defaultValue: "#2196f3"
+        defaultValue: '#2196f3'
       },
       special: {
         type: DataTypes.BOOLEAN,
@@ -52,7 +52,7 @@ export default class UsersEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return "agendas";
+    return 'agendas';
   }
 
   /**
@@ -60,6 +60,6 @@ export default class UsersEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["agendaId"];
+    return ['agendaId'];
   }
 }

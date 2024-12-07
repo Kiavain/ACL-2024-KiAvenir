@@ -1,11 +1,11 @@
-import jwt from "jsonwebtoken";
-import { encryptPassword, getSecret } from "../utils/index.js";
-import Controller from "./Controller.js";
-import { access, unlink } from "fs/promises";
-import fs from "fs";
-import path from "path";
-import * as ICAL from "ical.js";
-import { fileURLToPath } from "url";
+import jwt from 'jsonwebtoken';
+import { encryptPassword, getSecret } from '../utils/index.js';
+import Controller from './Controller.js';
+import { access, unlink } from 'fs/promises';
+import fs from 'fs';
+import path from 'path';
+import * as ICAL from 'ical.js';
+import { fileURLToPath } from 'url';
 
 /**
  * Typage des options des requêtes
@@ -53,7 +53,7 @@ export class AccountController extends Controller {
    * @returns {Promise<void>}
    */
   async renderForgetPassword(req, res) {
-    res.render("forget-password");
+    res.render('forget-password');
   }
 
   /**
@@ -68,10 +68,10 @@ export class AccountController extends Controller {
 
     // Vérifie si le token est valide
     if (!user || !user.checkResetToken(token)) {
-      return res.render("errors/bad_token");
+      return res.render('errors/bad_token');
     }
 
-    return res.render("reset-password", { token, email });
+    return res.render('reset-password', { token, email });
   }
 
   /**
@@ -85,9 +85,9 @@ export class AccountController extends Controller {
 
     // Récupère l'utilisateur par son email et met à jour le mot de passe
     const user = await this.getUser(email);
-    await user.update({ password: encryptPassword(password, user.salt), reset_token: "" });
+    await user.update({ password: encryptPassword(password, user.salt), reset_token: '' });
 
-    res.cookie("notification", "Le mot de passe a bien été réinitialisé.", { maxAge: 5000 });
+    res.cookie('notification', 'Le mot de passe a bien été réinitialisé.', { maxAge: 5000 });
     res.json({ success: true });
   }
 
@@ -103,7 +103,7 @@ export class AccountController extends Controller {
 
     // Vérifie si l'utilisateur existe
     if (user === undefined) {
-      return res.err(404, "Vous allez recevoir un courriel si un compte est lié à cette adresse.");
+      return res.err(404, 'Vous allez recevoir un courriel si un compte est lié à cette adresse.');
     }
 
     // Vérifie si l'utilisateur a déjà demandé une réinitialisation de mot de passe
@@ -121,7 +121,7 @@ export class AccountController extends Controller {
 
     // Envoi du mail de réinitialisation de mot de passe
     await this.server.mailer.sendResetPasswordEmail(user, user.reset_token);
-    return res.success("Vous allez recevoir un courriel si un compte est lié à cette adresse.");
+    return res.success('Vous allez recevoir un courriel si un compte est lié à cette adresse.');
   }
 
   /**
@@ -152,9 +152,9 @@ export class AccountController extends Controller {
     // Connecte l'utilisateur et redirige vers la page d'accueil
     const token = await this.createJWT(createdUser);
     res.locals.user = token;
-    res.cookie("accessToken", token, { httpOnly: true });
-    req.flash("Votre compte a bien été créé, bienvenue " + username + ".");
-    res.redirect("/");
+    res.cookie('accessToken', token, { httpOnly: true });
+    req.flash('Votre compte a bien été créé, bienvenue ' + username + '.');
+    res.redirect('/');
   }
 
   /**
@@ -170,8 +170,8 @@ export class AccountController extends Controller {
     // Messages d'erreur associés aux états
     const errorMessages = {
       usernameTaken: usernameAlreadyTaken ? "Ce nom d'utilisateur est déjà pris." : undefined,
-      emailTaken: emailAlreadyTaken ? "Un compte existe déjà pour cette adresse mail." : undefined,
-      passwordTooShort: passwordTooShort ? "Le mot de passe doit contenir au moins 8 caractères." : undefined
+      emailTaken: emailAlreadyTaken ? 'Un compte existe déjà pour cette adresse mail.' : undefined,
+      passwordTooShort: passwordTooShort ? 'Le mot de passe doit contenir au moins 8 caractères.' : undefined
     };
 
     // Filtrer les messages d'erreur définis et les ajouter à opt
@@ -181,7 +181,7 @@ export class AccountController extends Controller {
       }
     });
 
-    res.render("signin", opt);
+    res.render('signin', opt);
   }
 
   /**
@@ -204,11 +204,11 @@ export class AccountController extends Controller {
     if (user && user.checkPassword(password)) {
       const token = await this.createJWT(user);
       res.locals.user = token;
-      res.cookie("accessToken", token, { httpOnly: true });
-      req.flash("Bienvenue à vous " + user.username + ".");
-      res.redirect("/");
+      res.cookie('accessToken', token, { httpOnly: true });
+      req.flash('Bienvenue à vous ' + user.username + '.');
+      res.redirect('/');
     } else {
-      res.render("login", {
+      res.render('login', {
         username: username,
         errorMessage: "Nom d'utilisateur/mot de passe incorrect."
       });
@@ -223,14 +223,14 @@ export class AccountController extends Controller {
   logout(req, res) {
     // Vérifie si l'utilisateur est connecté
     if (!res.locals.user) {
-      return res.status(401).redirect("/401");
+      return res.status(401).redirect('/401');
     }
 
-    res.cookie("accessToken", null, { httpOnly: true });
-    res.clearCookie("accessToken");
+    res.cookie('accessToken', null, { httpOnly: true });
+    res.clearCookie('accessToken');
     res.locals.user = null;
-    req.flash("Déconnexion réussie.");
-    res.redirect("/");
+    req.flash('Déconnexion réussie.');
+    res.redirect('/');
   }
 
   /**
@@ -243,7 +243,7 @@ export class AccountController extends Controller {
     // Vérifie si l'utilisateur est connecté
     const localUser = res.locals.user;
     if (!localUser) {
-      return res.status(401).redirect("/401");
+      return res.status(401).redirect('/401');
     }
 
     /**
@@ -274,26 +274,26 @@ export class AccountController extends Controller {
     // Vérifie si l'utilisateur est connecté
     const localUser = res.locals.user;
     if (!localUser) {
-      return res.status(401).redirect("/401");
+      return res.status(401).redirect('/401');
     }
 
     try {
       const { file } = req;
       if (!file) {
-        return res.status(400).send("Aucune image uploadée.");
+        return res.status(400).send('Aucune image uploadée.');
       }
 
       // Fichier uploadé
       const newIconPath = file.path;
 
       // Supprime l'ancien avatar s'il existe
-      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + ".jpg";
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + localUser.id + '.jpg';
       await this.checkAndDeleteIcon(iconPath);
 
       // Importe le nouvel avatar et supprime le fichier de "uploads"
       fs.copyFileSync(newIconPath, iconPath);
       await this.checkAndDeleteIcon(newIconPath);
-      res.cookie("notification", "L'avatar a bien été modifié.", { maxAge: 5000 });
+      res.cookie('notification', "L'avatar a bien été modifié.", { maxAge: 5000 });
       res.status(200).send("L'avatar a bien été modifié.");
     } catch (error) {
       console.error(error);
@@ -312,10 +312,10 @@ export class AccountController extends Controller {
     try {
       await user.update(data);
       const updatedToken = await this.createJWT(user);
-      res.cookie("notification", "Vos modifications ont bien été enregistrées.", { maxAge: 5000 });
-      res.cookie("accessToken", updatedToken, { httpOnly: true });
+      res.cookie('notification', 'Vos modifications ont bien été enregistrées.', { maxAge: 5000 });
+      res.cookie('accessToken', updatedToken, { httpOnly: true });
       res.locals.user = updatedToken;
-      return res.redirect("/account");
+      return res.redirect('/account');
     } catch (error) {
       this.logger.error("Erreur lors de la mise à jour de l'utilisateur:", error);
       this.renderError(
@@ -337,9 +337,9 @@ export class AccountController extends Controller {
    * @returns {void} Rend la vue de compte utilisateur
    */
   renderDuplicateError(res, email, username, isUsernameTaken, isEmailTaken) {
-    return res.render("account", {
+    return res.render('account', {
       usernameTaken: isUsernameTaken ? "Ce nom d'utilisateur est déjà pris." : undefined,
-      emailTaken: isEmailTaken ? "Un compte existe déjà pour cette adresse mail." : undefined,
+      emailTaken: isEmailTaken ? 'Un compte existe déjà pour cette adresse mail.' : undefined,
       email,
       username
     });
@@ -353,7 +353,7 @@ export class AccountController extends Controller {
    * @param errorMessage {string} Le message d'erreur
    */
   renderError(res, email, username, errorMessage) {
-    return res.render("account", { errorMessage, email, username });
+    return res.render('account', { errorMessage, email, username });
   }
 
   /**
@@ -366,7 +366,7 @@ export class AccountController extends Controller {
     // Vérifie si l'utilisateur est connecté
     const localUser = res.locals.user;
     if (!localUser) {
-      return res.status(401).redirect("/401");
+      return res.status(401).redirect('/401');
     }
 
     try {
@@ -377,16 +377,16 @@ export class AccountController extends Controller {
       const user = this.users.get(localUser.id);
 
       // Supprime l'avatar s'il existe
-      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + ".jpg";
+      const iconPath = `${process.cwd()}/src/public/img/user_icon/` + user.id + '.jpg';
       await this.checkAndDeleteIcon(iconPath);
 
       // Supprime l'utilisateur
       await user.delete();
       this.logout(req, res);
     } catch (err) {
-      this.logger.error("Erreur lors de la suppression du compte :", err);
-      res.render("account", {
-        errorMessage: "Erreur: impossible de supprimer le compte."
+      this.logger.error('Erreur lors de la suppression du compte :', err);
+      res.render('account', {
+        errorMessage: 'Erreur: impossible de supprimer le compte.'
       });
     }
   }
@@ -397,7 +397,7 @@ export class AccountController extends Controller {
    * @param res {Response} La réponse
    */
   renderSignin(req, res) {
-    res.render("signin", { title: "Inscription" });
+    res.render('signin', { title: 'Inscription' });
   }
 
   /**
@@ -411,10 +411,10 @@ export class AccountController extends Controller {
     const notification = req.cookies.notification;
     if (notification) {
       req.flash(notification);
-      res.clearCookie("notification");
+      res.clearCookie('notification');
     }
 
-    res.render("login", { title: "Connexion" });
+    res.render('login', { title: 'Connexion' });
   }
 
   /**
@@ -425,16 +425,16 @@ export class AccountController extends Controller {
    */
   renderAccount(req, res) {
     if (!res.locals.user) {
-      return res.status(401).redirect("/401");
+      return res.status(401).redirect('/401');
     }
 
     const notification = req.cookies.notification;
     if (notification) {
       req.flash(notification);
-      res.clearCookie("notification");
+      res.clearCookie('notification');
     }
 
-    res.render("account");
+    res.render('account');
   }
 
   /**
@@ -443,7 +443,7 @@ export class AccountController extends Controller {
    * @returns {Promise<String>} Le token JWT
    */
   async createJWT(user) {
-    const jwtSecret = await getSecret(this.logger, "JWT_SECRET");
+    const jwtSecret = await getSecret(this.logger, 'JWT_SECRET');
     const payload = {
       id: user.id,
       email: user.email,
@@ -451,7 +451,7 @@ export class AccountController extends Controller {
     };
 
     // Signe le token avec une clé secrète
-    return jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
+    return jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
   }
 
   /**
@@ -475,10 +475,10 @@ export class AccountController extends Controller {
    */
   async createDefaultAgenda(userId) {
     await this.agendas.create({
-      name: "Mon agenda",
-      description: "Agenda par défaut",
+      name: 'Mon agenda',
+      description: 'Agenda par défaut',
       ownerId: userId,
-      color: "#2196f3"
+      color: '#2196f3'
     });
   }
   /**
@@ -489,16 +489,16 @@ export class AccountController extends Controller {
   async holidayAgenda(userId) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const filePath = path.resolve(__dirname, "../../data/holidays/Basic.ics");
-    const fileContent = fs.readFileSync(filePath, "utf8");
+    const filePath = path.resolve(__dirname, '../../data/holidays/Basic.ics');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
 
     //Traite le fichier
     const parsedCalendar = ICAL.default.parse(fileContent);
     const comp = new ICAL.default.Component(parsedCalendar);
-    const vevents = comp.getAllSubcomponents("vevent");
-    const name = comp.getFirstPropertyValue("x-wr-calname");
-    const color = "#0000FF";
-    const summary = comp.getFirstPropertyValue("x-wr-caldesc");
+    const vevents = comp.getAllSubcomponents('vevent');
+    const name = comp.getFirstPropertyValue('x-wr-calname');
+    const color = '#0000FF';
+    const summary = comp.getFirstPropertyValue('x-wr-caldesc');
     const agenda = await this.agendas.create({ name, description: summary, ownerId: userId, color, special: true });
 
     await this.importEvents(vevents, agenda.agendaId);
@@ -548,7 +548,7 @@ export class AccountController extends Controller {
       await access(path); // Vérifie si le fichier existe
       await unlink(path); // Supprime le fichier
     } catch (err) {
-      if (err.code === "ENOENT") {
+      if (err.code === 'ENOENT') {
         this.logger.warn(`Le fichier ${path} n'existe pas.`);
       } else {
         this.logger.error(`Erreur : ${err.message}`, err);

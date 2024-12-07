@@ -39,7 +39,7 @@ export default class Controller {
    * @returns {Object}
    */
   get guests() {
-    return this.database.get("guests");
+    return this.database.get('guests');
   }
 
   /**
@@ -47,7 +47,7 @@ export default class Controller {
    * @returns {Object}
    */
   get users() {
-    return this.database.get("users");
+    return this.database.get('users');
   }
 
   /**
@@ -55,7 +55,7 @@ export default class Controller {
    * @returns {Object}
    */
   get agendas() {
-    return this.database.get("agendas");
+    return this.database.get('agendas');
   }
 
   /**
@@ -63,7 +63,7 @@ export default class Controller {
    * @returns {Object}
    */
   get events() {
-    return this.database.get("events");
+    return this.database.get('events');
   }
 
   /**
@@ -73,15 +73,15 @@ export default class Controller {
    */
   async importEvents(events, agendaId) {
     for (const event of events) {
-      const eventName = event.getFirstPropertyValue("summary");
-      const dtstartProp = event.getFirstProperty("dtstart");
-      const dtendProp = event.getFirstProperty("dtend");
+      const eventName = event.getFirstPropertyValue('summary');
+      const dtstartProp = event.getFirstProperty('dtstart');
+      const dtendProp = event.getFirstProperty('dtend');
       const startDate = new Date(dtstartProp.getFirstValue().toString());
       const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
-      const eventDescription = event.getFirstPropertyValue("description") || "";
+      const eventDescription = event.getFirstPropertyValue('description') || '';
 
       const dtstartValue = dtstartProp.getFirstValue();
-      const isAllDay = dtstartValue && typeof dtstartValue === "object" && dtstartValue.isDate === true;
+      const isAllDay = dtstartValue && typeof dtstartValue === 'object' && dtstartValue.isDate === true;
 
       if (eventName && startDate && endDate) {
         await this.events.create({

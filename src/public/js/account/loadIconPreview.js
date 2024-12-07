@@ -1,34 +1,34 @@
 // Petit script pour activer le remplacement du champ de sélection de fichier par défaut
 
-import { addFlashMessages } from "../utils.js";
+import { addFlashMessages } from '../utils.js';
 
-const fileInput = document.getElementById("imageUpload");
-const temporaryIcon = document.getElementById("temporaryIcon");
-const fileName = document.querySelector(".file-name");
+const fileInput = document.getElementById('imageUpload');
+const temporaryIcon = document.getElementById('temporaryIcon');
+const fileName = document.querySelector('.file-name');
 
-const userIconPreview = document.getElementById("userIconPreview");
-const ctx = userIconPreview.getContext("2d");
+const userIconPreview = document.getElementById('userIconPreview');
+const ctx = userIconPreview.getContext('2d');
 
 let resizedImageBlob = null;
 
 const MAX_WIDTH = 400; // Largeur maximale
 const MAX_HEIGHT = 400; // Hauteur maximale
 
-userIconPreview.style.maxWidth = MAX_WIDTH + "px;";
-userIconPreview.style.maxHeight = MAX_HEIGHT + "px;";
+userIconPreview.style.maxWidth = MAX_WIDTH + 'px;';
+userIconPreview.style.maxHeight = MAX_HEIGHT + 'px;';
 
 userIconPreview.width = MAX_WIDTH;
 userIconPreview.height = MAX_HEIGHT;
 
 // Initialiser la valeur du champ du nom de fichier lors du chargement de la page
-fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : "Aucun fichier sélectionné.";
+fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'Aucun fichier sélectionné.';
 
 // Changer le champ du nom de fichier à chaque chargement de fichier
-fileInput.addEventListener("change", () => {
+fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
   if (file) {
     fileName.textContent = file.name;
-    temporaryIcon.textContent = "Ceci est un aperçu nécessitant une validation.";
+    temporaryIcon.textContent = 'Ceci est un aperçu nécessitant une validation.';
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -59,7 +59,7 @@ fileInput.addEventListener("change", () => {
           (blob) => {
             resizedImageBlob = blob; // Stocker le Blob pour l'envoi
           },
-          "image/jpeg",
+          'image/jpeg',
           0.8
         ); // Compression JPEG (80%)
       };
@@ -69,36 +69,36 @@ fileInput.addEventListener("change", () => {
 
     reader.readAsDataURL(file); // Lire le fichier comme une URL de données
   } else {
-    fileName.textContent = "Aucun fichier sélectionné";
+    fileName.textContent = 'Aucun fichier sélectionné';
   }
 });
 
-const iconForm = document.forms["iconForm"];
-iconForm.addEventListener("submit", async (e) => {
+const iconForm = document.forms['iconForm'];
+iconForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   if (!resizedImageBlob) {
-    addFlashMessages(["Veuillez sélectionner une image."]);
+    addFlashMessages(['Veuillez sélectionner une image.']);
     return;
   }
 
   const formData = new FormData();
-  formData.append("image", resizedImageBlob, "resized-image.jpg");
+  formData.append('image', resizedImageBlob, 'resized-image.jpg');
 
   // Change la requête avec fetch API
-  fetch("/api/account/edit-icon", {
-    method: "POST",
+  fetch('/api/account/edit-icon', {
+    method: 'POST',
     body: formData
   })
     .then((response) => {
       if (response.ok) {
-        temporaryIcon.textContent = "";
+        temporaryIcon.textContent = '';
         window.location.reload(); // Note : Notification prise en charge par le serveur
       } else {
         console.error("Erreur lors de l'envoi de l'image.");
       }
     })
     .catch((error) => {
-      console.error("Erreur réseau :", error);
+      console.error('Erreur réseau :', error);
     });
 });

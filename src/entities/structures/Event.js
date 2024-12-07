@@ -1,4 +1,4 @@
-import EntityStructures from "../../structures/EntityStructure.js";
+import EntityStructures from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'un événement
@@ -68,7 +68,7 @@ export default class Event extends EntityStructures {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**

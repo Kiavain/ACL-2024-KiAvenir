@@ -1,6 +1,6 @@
-import { checkEmail, checkPassword } from "../utils.js";
-const accountForm = document.forms["accountEdition"];
-accountForm.addEventListener("submit", async (e) => {
+import { checkEmail, checkPassword } from '../utils.js';
+const accountForm = document.forms['accountEdition'];
+accountForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   await validateAccountCreation(e);
 });
@@ -12,36 +12,36 @@ accountForm.addEventListener("submit", async (e) => {
  */
 async function validateAccountCreation(e) {
   // Récupère le formulaire
-  const accountForm = document.forms["accountEdition"];
+  const accountForm = document.forms['accountEdition'];
 
   // Récupère le champ de l'adresse mail
   const emailInput = accountForm.email;
 
-  emailInput.addEventListener("input", () => {
-    emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
+  emailInput.addEventListener('input', () => {
+    emailInput.setCustomValidity(''); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
   });
 
-  const emailIsEmpty = emailInput.value.trim() === "";
+  const emailIsEmpty = emailInput.value.trim() === '';
   let emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
     emailInput.setCustomValidity("L'adresse mail est obligatoire.");
     emailInput.reportValidity();
 
-    emailInput.addEventListener("input", () => {
-      emailInput.setCustomValidity("");
+    emailInput.addEventListener('input', () => {
+      emailInput.setCustomValidity('');
     });
     e.preventDefault();
     return;
   }
 
   const username = accountForm.username.value;
-  if (username.trim() === "") {
+  if (username.trim() === '') {
     accountForm.username.setCustomValidity("Le nom d'utilisateur est obligatoire.");
     accountForm.username.reportValidity();
 
-    accountForm.username.addEventListener("input", () => {
-      accountForm.username.setCustomValidity("");
+    accountForm.username.addEventListener('input', () => {
+      accountForm.username.setCustomValidity('');
     });
     e.preventDefault();
     return;
@@ -55,16 +55,16 @@ async function validateAccountCreation(e) {
     return;
   }
 
-  const passwordMessage = document.getElementById("passwordMessage");
-  const passwordRepeated = document.getElementById("passwordRepeated");
-  const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
-  passwordMessage.textContent = "";
-  passwordRepeatedMessage.textContent = "";
+  const passwordMessage = document.getElementById('passwordMessage');
+  const passwordRepeated = document.getElementById('passwordRepeated');
+  const passwordRepeatedMessage = document.getElementById('passwordRepeatedMessage');
+  passwordMessage.textContent = '';
+  passwordRepeatedMessage.textContent = '';
 
   let password = accountForm.password.value;
-  let passwordConfirmation = passwordRepeated["value"];
+  let passwordConfirmation = passwordRepeated['value'];
 
-  if (password !== "" || passwordConfirmation !== "") {
+  if (password !== '' || passwordConfirmation !== '') {
     await checkPassword(password, passwordMessage, passwordConfirmation, passwordRepeatedMessage, accountForm);
   } else {
     accountForm.submit();

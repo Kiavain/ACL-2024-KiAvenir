@@ -1,24 +1,24 @@
-import { getCalendarInstance, getEventsUrl, goTo } from "../calendar.js";
+import { getCalendarInstance, getEventsUrl, goTo } from '../calendar.js';
 
-document.getElementById("filterInput").addEventListener("input", function () {
-  getCalendarInstance().setOption("events", getEventsUrl());
+document.getElementById('filterInput').addEventListener('input', function () {
+  getCalendarInstance().setOption('events', getEventsUrl());
 });
 
-document.getElementById("eventSearch").addEventListener("input", async (e) => {
+document.getElementById('eventSearch').addEventListener('input', async (e) => {
   const searchTerm = e.target.value;
-  const searchResults = document.getElementById("searchResults");
-  const eventList = document.getElementById("eventList");
-  const noResultsMessage = document.getElementById("noResultsMessage");
+  const searchResults = document.getElementById('searchResults');
+  const eventList = document.getElementById('eventList');
+  const noResultsMessage = document.getElementById('noResultsMessage');
 
-  if (searchTerm.trim() === "") {
-    searchResults.style.display = "none";
+  if (searchTerm.trim() === '') {
+    searchResults.style.display = 'none';
     return;
   }
-  searchResults.style.display = "block";
+  searchResults.style.display = 'block';
 
-  let selectedAgendaIds = Array.from(document.querySelectorAll(".agenda-checkbox:checked"))
+  let selectedAgendaIds = Array.from(document.querySelectorAll('.agenda-checkbox:checked'))
     .map((checkbox) => checkbox.value)
-    .join(",");
+    .join(',');
 
   const startDate = new Date();
   const endDate = new Date();
@@ -31,41 +31,41 @@ document.getElementById("eventSearch").addEventListener("input", async (e) => {
 
   try {
     const response = await fetch(API_URL, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json"
+        'Content-Type': 'application/json'
       }
     });
     const data = await response.json();
 
     if (response.ok) {
-      eventList.innerHTML = ""; // Réinitialise la liste des événements
+      eventList.innerHTML = ''; // Réinitialise la liste des événements
       data.slice(0, 5).forEach((event) => {
-        const li = document.createElement("li");
-        let eventTitle = event.title.length > 10 ? event.title.substring(0, 7) + "..." : event.title;
+        const li = document.createElement('li');
+        let eventTitle = event.title.length > 10 ? event.title.substring(0, 7) + '...' : event.title;
         li.innerHTML = `
           <div class="event-color" style="background-color: ${event.color};"></div>
           <div class="event-title">${eventTitle}</div>
-          <div class="event-agenda">${moment(event.start).format("DD/MM/YYYY")}</div>
+          <div class="event-agenda">${moment(event.start).format('DD/MM/YYYY')}</div>
         `;
 
-        li.addEventListener("click", () => {
+        li.addEventListener('click', () => {
           goTo(new Date(event.start));
-          searchResults.style.display = "none";
+          searchResults.style.display = 'none';
         });
 
         eventList.appendChild(li);
       });
 
-      searchResults.style.display = "block";
-      noResultsMessage.style.display = data.length === 0 ? "block" : "none";
+      searchResults.style.display = 'block';
+      noResultsMessage.style.display = data.length === 0 ? 'block' : 'none';
     } else {
-      searchResults.style.display = "block";
-      noResultsMessage.style.display = "block";
+      searchResults.style.display = 'block';
+      noResultsMessage.style.display = 'block';
     }
   } catch (error) {
-    console.error("Erreur lors de la recherche des événements :", error);
-    searchResults.style.display = "block";
-    noResultsMessage.style.display = "block";
+    console.error('Erreur lors de la recherche des événements :', error);
+    searchResults.style.display = 'block';
+    noResultsMessage.style.display = 'block';
   }
 });

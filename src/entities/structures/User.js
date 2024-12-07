@@ -1,6 +1,6 @@
-import EntityStructures from "../../structures/EntityStructure.js";
-import { encryptPassword } from "../../utils/index.js";
-import crypto from "crypto";
+import EntityStructures from '../../structures/EntityStructure.js';
+import { encryptPassword } from '../../utils/index.js';
+import crypto from 'crypto';
 
 /**
  * Représente la structure d'un utilisateur
@@ -64,7 +64,7 @@ export default class User extends EntityStructures {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**
@@ -72,7 +72,7 @@ export default class User extends EntityStructures {
    * @returns {Object} Les invitations
    */
   get guests() {
-    return this.entity.server.database.tables.get("guests");
+    return this.entity.server.database.tables.get('guests');
   }
 
   /**
@@ -132,7 +132,7 @@ export default class User extends EntityStructures {
    * @returns {Promise<void>}
    */
   async resetPassword() {
-    this.reset_token = crypto.randomBytes(32).toString("hex");
+    this.reset_token = crypto.randomBytes(32).toString('hex');
     await this.update({ reset_token: this.reset_token });
   }
 
@@ -144,6 +144,6 @@ export default class User extends EntityStructures {
   checkResetToken(token) {
     const date = new Date();
     const isExpired = date.getTime() - this.updatedAt > 600000;
-    return this.reset_token === token && this.reset_token !== "" && !isExpired;
+    return this.reset_token === token && this.reset_token !== '' && !isExpired;
   }
 }

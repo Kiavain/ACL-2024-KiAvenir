@@ -1,4 +1,4 @@
-import Routeur from "../structures/Routeur.js";
+import Routeur from '../structures/Routeur.js';
 
 /**
  * Les routes liées aux erreurs
@@ -16,14 +16,14 @@ export default class ErrorsRouteur extends Routeur {
    */
   build() {
     this.router
-      .get("/404", (req, res) => {
-        res.render("errors/404");
+      .get('/404', (req, res) => {
+        res.render('errors/404');
       })
-      .get("/403", (req, res) => {
-        res.render("errors/403");
+      .get('/403', (req, res) => {
+        res.render('errors/403');
       })
-      .get("/401", (req, res) => {
-        res.render("errors/401");
+      .get('/401', (req, res) => {
+        res.render('errors/401');
       });
   }
 }

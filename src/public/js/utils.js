@@ -5,9 +5,9 @@
  */
 export async function hashSHA256(input) {
   const textBuffer = new TextEncoder().encode(input);
-  const hashBuffer = await window.crypto.subtle.digest("SHA-256", textBuffer);
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', textBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((item) => item.toString(16).padStart(2, "0")).join("");
+  return hashArray.map((item) => item.toString(16).padStart(2, '0')).join('');
 }
 
 /**
@@ -21,13 +21,13 @@ export async function checkEmail(emailInput) {
 
   if (!emailRegex.test(emailInput.value)) {
     // Le regex ne passe pas
-    emailInput.setCustomValidity("Veuillez entrer une adresse email valide.");
+    emailInput.setCustomValidity('Veuillez entrer une adresse email valide.');
     emailInput.reportValidity(); // Affiche le message d'erreur
     return false;
   }
 
   // Le regex passe
-  emailInput.setCustomValidity(""); // Efface le message si l'email est valide
+  emailInput.setCustomValidity(''); // Efface le message si l'email est valide
   return true;
 }
 
@@ -48,9 +48,9 @@ export async function checkPassword(
   accountForm
 ) {
   if (password.length < 8) {
-    passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+    passwordMessage.textContent = 'Le mot de passe doit contenir au moins 8 caractères.';
   } else if (password !== passwordConfirmation) {
-    passwordRepeatedMessage.textContent = "Les mots de passe ne correspondent pas.";
+    passwordRepeatedMessage.textContent = 'Les mots de passe ne correspondent pas.';
   } else {
     const rawValue = accountForm.password.value;
     accountForm.password.value = await hashSHA256(rawValue);
@@ -64,10 +64,10 @@ export async function checkPassword(
  * @param messages {string[]} Les messages à afficher
  */
 export function addFlashMessages(messages) {
-  const flashContainer = document.querySelector(".flash-container"); // Le conteneur existant
+  const flashContainer = document.querySelector('.flash-container'); // Le conteneur existant
   for (const message of messages) {
-    const flashMessage = document.createElement("div");
-    flashMessage.className = "alert-notif";
+    const flashMessage = document.createElement('div');
+    flashMessage.className = 'alert-notif';
     flashMessage.innerText = message;
 
     flashContainer.appendChild(flashMessage);

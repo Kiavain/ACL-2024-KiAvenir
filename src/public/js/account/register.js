@@ -1,15 +1,15 @@
-import { checkEmail, checkPassword } from "../utils.js";
+import { checkEmail, checkPassword } from '../utils.js';
 
 // Active l'enregistrement d'un compte lors du chargement du document
-document.addEventListener("DOMContentLoaded", () => register());
+document.addEventListener('DOMContentLoaded', () => register());
 
 /**
  * Enregistre un compte utilisateur
  * @returns {void}
  */
 function register() {
-  const accountForm = document.forms["accountCreation"];
-  accountForm.addEventListener("submit", async (e) => {
+  const accountForm = document.forms['accountCreation'];
+  accountForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     await validateAccountCreation(e);
   });
@@ -22,16 +22,16 @@ function register() {
  */
 async function validateAccountCreation(e) {
   // Récupère le formulaire
-  const accountForm = document.forms["accountCreation"];
+  const accountForm = document.forms['accountCreation'];
 
   // Récupère le champ de l'adresse mail
   const emailInput = accountForm.email;
 
-  emailInput.addEventListener("input", () => {
-    emailInput.setCustomValidity(""); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
+  emailInput.addEventListener('input', () => {
+    emailInput.setCustomValidity(''); // Efface l'erreur dès que l'utilisateur modifie le champ (nécessaire sinon le formulaire se bloque définitivement)
   });
 
-  const emailIsEmpty = emailInput.value === "";
+  const emailIsEmpty = emailInput.value === '';
   let emailIsCorrect = !emailIsEmpty;
 
   if (emailIsEmpty) {
@@ -48,13 +48,13 @@ async function validateAccountCreation(e) {
   }
 
   // Récupère les labels des messages d'erreur
-  const passwordMessage = document.getElementById("passwordMessage");
-  const passwordRepeatedMessage = document.getElementById("passwordRepeatedMessage");
-  passwordMessage.textContent = "";
-  passwordRepeatedMessage.textContent = "";
+  const passwordMessage = document.getElementById('passwordMessage');
+  const passwordRepeatedMessage = document.getElementById('passwordRepeatedMessage');
+  passwordMessage.textContent = '';
+  passwordRepeatedMessage.textContent = '';
 
   // Récupère les champs de mot de passe
-  const passwordRepeated = document.getElementById("passwordRepeated");
+  const passwordRepeated = document.getElementById('passwordRepeated');
   const password = accountForm.password.value;
   const passwordConfirmation = passwordRepeated.value;
 

@@ -1,8 +1,8 @@
-import Entity from "../structures/Entity.js";
-import User from "./structures/User.js";
-import { DataTypes } from "sequelize";
-import { encryptPassword } from "../utils/index.js";
-import crypto from "crypto";
+import Entity from '../structures/Entity.js';
+import User from './structures/User.js';
+import { DataTypes } from 'sequelize';
+import { encryptPassword } from '../utils/index.js';
+import crypto from 'crypto';
 
 /**
  * Représente l'entité des utilisateurs
@@ -35,18 +35,18 @@ export default class UsersEntity extends Entity {
         },
         salt: {
           type: DataTypes.STRING(4),
-          defaultValue: ""
+          defaultValue: ''
         },
         reset_token: {
           type: DataTypes.STRING(32),
-          defaultValue: ""
+          defaultValue: ''
         }
       },
       {
         hooks: {
           beforeCreate: (user) => {
             // Génération du sel aléatoire
-            user.salt = crypto.randomBytes(2).toString("hex"); // 4 caractères hexadécimaux
+            user.salt = crypto.randomBytes(2).toString('hex'); // 4 caractères hexadécimaux
 
             // Chiffrement du mot de passe avec le sel
             user.password = encryptPassword(user.password, user.salt);
@@ -69,7 +69,7 @@ export default class UsersEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return "users";
+    return 'users';
   }
 
   /**
@@ -77,6 +77,6 @@ export default class UsersEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["id"];
+    return ['id'];
   }
 }

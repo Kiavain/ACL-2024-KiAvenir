@@ -1,17 +1,17 @@
-import { hashSHA256 } from "../utils.js";
+import { hashSHA256 } from '../utils.js';
 
-const accountForm = document.forms["accountLogin"];
-accountForm.addEventListener("submit", async (e) => {
+const accountForm = document.forms['accountLogin'];
+accountForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   await validateAccountLogin(e);
 });
 
 async function validateAccountLogin(e) {
-  const passwordMessage = document.getElementById("passwordMessage");
-  passwordMessage.textContent = "";
+  const passwordMessage = document.getElementById('passwordMessage');
+  passwordMessage.textContent = '';
 
   if (accountForm.password.value.length < 8) {
-    passwordMessage.textContent = "Le mot de passe doit contenir au moins 8 caractères.";
+    passwordMessage.textContent = 'Le mot de passe doit contenir au moins 8 caractères.';
   } else {
     const rawValue = accountForm.password.value;
     accountForm.password.value = await hashSHA256(rawValue);
