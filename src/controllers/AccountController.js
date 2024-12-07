@@ -200,9 +200,6 @@ export class AccountController extends Controller {
     const users = this.users.getAll();
     const user = users.find((user) => user.username === username);
 
-    console.log(user);
-    console.log(username, password);
-
     // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
       const token = await this.createJWT(user);

@@ -20,7 +20,6 @@ async function validateAccountLogin() {
 
   // Préparer les données à envoyer
   const formData = { username: accountForm.username.value, password: accountForm.password.value };
-  console.log(formData);
 
   // Effectuer une requête fetch
   try {

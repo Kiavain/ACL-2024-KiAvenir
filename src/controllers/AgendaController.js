@@ -279,22 +279,32 @@ export class AgendaController extends Controller {
    * @param res
    * @returns {Promise<*>}
    */
-  updateGuest(req, res) {
+  async updateGuest(req, res) {
     const localUser = res.locals.user;
     if (!localUser) {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
     }
 
     const { guestId, role } = req.body;
+    console.log(guestId, role);
     const guest = this.guests.get(guestId);
     if (!guest) {
       return res.err(404, 'Guest non trouvé.');
     } else if (guest.getOwner().id !== localUser.id) {
       return res.err(403, "Vous n'êtes pas autorisé à modifier ce guest.");
-    } else if (role !== 'Lecteur' && role !== 'Editeur') {
+    } else if (!['Propriétaire', 'Editeur', 'Lecteur'].includes(role)) {
       return res.err(400, 'Rôle inconnu.');
     } else if (role === guest.role) {
       return res.err(400, 'Le rôle est déjà défini à ' + role);
+    }
+
+    if (role === 'Propriétaire') {
+      console.log('update');
+      await guest.getAgenda().update({ ownerId: guest.guestId });
+      await guest.update({ guestId: localUser.id, role: 'Editeur' });
+      return res.success(
+        `Le rôle de ${guest.getGuest().username} dans ${guest.getAgenda().name} a été mis à jour avec succès.`
+      );
     }
 
     const agendaTitle = guest.getAgenda().name;

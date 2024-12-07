@@ -6,6 +6,7 @@ const shareAgendaButton = document.getElementById('shareAgenda');
 const shareAgendaConfirmButton = document.getElementById('shareAgendaConfirm');
 const shareAgendaCloseButton = document.getElementById('shareAgenda-close-btn');
 const modal = document.getElementById('shareAgendaModal');
+let lastRole;
 
 // Vérifie si le document est chargé
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,7 +33,7 @@ function shareAgenda() {
     .then((response) => response.json())
     .then(async (guests) => {
       const guestList = document.getElementById('access-shared-users');
-      guestList.innerHTML = '<li>Vous : Propriétaire (<a href="">Transférer</a>)</li>'; // Remettre "Propriétaire" et vider le reste
+      guestList.innerHTML = '<li>Vous : Propriétaire</li>'; // Remettre "Propriétaire" et vider le reste
 
       // Ajouter les invités filtrés
       for (const guest of guests) {
@@ -80,6 +81,11 @@ function shareAgenda() {
                       <span class="material-symbols-outlined check-icon" style="visibility: ${guest.role === 'Editeur' ? 'visible' : 'hidden'};">
                         check
                       </span> Editeur
+                    </li>
+                    <li data-role="Propriétaire">
+                      <span class="material-symbols-outlined check-icon" style="visibility: hidden;">
+                        check
+                      </span> Propriétaire
                     </li>
                   </ul>
                 </div>
@@ -197,6 +203,8 @@ function applyRoleDropdownListeners() {
         dropdown.style.display = 'none';
       }
 
+      lastRole = event.target.closest('.guest-item').querySelector('.role-text').textContent;
+
       // Fermer la dropdown si on clique ailleurs
       document.addEventListener('click', function handleClickOutside(event) {
         if (!button.contains(event.target) && !dropdown.contains(event.target)) {
@@ -232,7 +240,55 @@ function applyRoleDropdownListeners() {
         role: role
       };
 
+      if (role === 'Propriétaire') {
+        const confirmButton = document.getElementById('confirmTransferAgendaButton');
+        const cancelButton = document.getElementById('cancelTransferAgendaButton');
+
+        // Afficher la modale de confirmation
+        const transferModal = new bootstrap.Modal(document.getElementById('confirmTransferAgenda'));
+        modal.style.display = 'none';
+        transferModal.show();
+
+        // Écouteur pour le bouton de confirmation
+        confirmButton.onclick = () => {
+          // Mise à jour de la BDD
+          fetch('/api/agenda/updateGuest', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData)
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              addFlashMessages(data.flashMessages);
+              notifyServer({ type: 'update', message: 'Updating guest' });
+              window.location.reload();
+            })
+            .catch((error) => console.error('Erreur:', error));
+
+          // Fermer la modale
+          transferModal.hide();
+          modal.style.display = 'block';
+        };
+
+        // Écouteur pour le bouton d'annulation
+        cancelButton.onclick = () => {
+          // Fermer la modale
+          transferModal.hide();
+          modal.style.display = 'block';
+
+          // Remettre le bon rôle
+          dropdown.querySelectorAll('.check-icon').forEach((icon) => {
+            icon.style.visibility = 'hidden';
+          });
+          dropdown.querySelector(`[data-role=${lastRole}] .check-icon`).style.visibility = 'visible';
+          roleText.textContent = lastRole;
+        };
+
+        return;
+      }
+
       // Fermer le dropdown après sélection
+      lastRole = role;
       dropdown.style.display = 'none';
 
       // Mise à jour de la BDD
