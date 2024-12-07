@@ -1,5 +1,4 @@
 import { addFlashMessages } from '../utils.js';
-import { refreshCalendar } from './calendar.js';
 import { notifyServer } from '../websocket.js';
 
 const shareAgendaButton = document.getElementById('shareAgenda');

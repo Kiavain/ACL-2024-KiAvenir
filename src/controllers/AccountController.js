@@ -200,18 +200,18 @@ export class AccountController extends Controller {
     const users = this.users.getAll();
     const user = users.find((user) => user.username === username);
 
+    console.log(user);
+    console.log(username, password);
+
     // On re-hash le mot de passe (avec sel cette fois) via l'entité "User" (comme à la création de compte)
     if (user && user.checkPassword(password)) {
       const token = await this.createJWT(user);
       res.locals.user = token;
       res.cookie('accessToken', token, { httpOnly: true });
-      req.flash('Bienvenue à vous ' + user.username + '.');
-      res.redirect('/');
+      res.cookie('notification', `Bienvenue à  vous ${user.username}.`, { maxAge: 5000 });
+      res.success('Connexion réussie.', { agendaId: user.getAgendas[0].agendaId });
     } else {
-      res.render('login', {
-        username: username,
-        errorMessage: "Nom d'utilisateur/mot de passe incorrect."
-      });
+      res.err(401, "Nom d'utilisateur ou mot de passe incorrect.");
     }
   }
 

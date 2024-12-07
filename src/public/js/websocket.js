@@ -58,5 +58,10 @@ export function notifyServer(update) {
   }
 }
 
+// Fermer la connexion WebSocket
+export function closeWebSocket() {
+  socket.close();
+}
+
 // Initialisation du WebSocket
 connectWebSocket();

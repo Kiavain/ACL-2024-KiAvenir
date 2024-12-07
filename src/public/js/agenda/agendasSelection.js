@@ -20,20 +20,10 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   //  Récupère les IDs des agendas sélectionnés dans le local storage
-  const selectedAgendaIds = localStorage.getItem('selectedAgendaIds');
-  let firstAgendaId = `${agenda.agendaId}`;
-  let agendaIds = [];
-  if (selectedAgendaIds) {
-    agendaIds = JSON.parse(selectedAgendaIds);
-    if (agendaIds.length === 0) {
-      agendaIds.push(firstAgendaId);
-    }
-  } else {
-    agendaIds.push(firstAgendaId);
-  }
+  const agendaIds = JSON.parse(localStorage.getItem('selectedAgendaIds')) || [];
 
   document.querySelectorAll('.agenda-checkbox').forEach((checkbox) => {
-    if (agendaIds.some((id) => id == checkbox.value)) {
+    if (agendaIds.some((id) => parseInt(id) === parseInt(checkbox.value))) {
       checkbox.checked = true;
     }
   });

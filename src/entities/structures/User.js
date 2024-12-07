@@ -106,7 +106,7 @@ export default class User extends EntityStructures {
    * Récupère les agendas de l'utilisateur
    * @returns {Agenda[]} L'aganda
    */
-  getAgendas() {
+  get getAgendas() {
     return this.agendas.filter((x) => x.ownerId === this.id);
   }
 
@@ -114,7 +114,7 @@ export default class User extends EntityStructures {
    * Récupère les invités de l'utilisateur
    * @returns {Guest[]} Les invités
    */
-  getGuests() {
+  get getGuests() {
     return this.guests.filter((x) => x.guestId === this.id);
   }
 
