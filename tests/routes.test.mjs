@@ -46,10 +46,10 @@ describe("Test - Partie Compte Utilisateur", () => {
       .post("/api/account/login")
       .send({ username: `${id}`, password: "password123" });
 
-    expect(res.statusCode).toBe(302);
+    expect(res.statusCode).toBe(200);
     expect(res.header["set-cookie"]).toBeDefined();
-    expect(res.header["content-type"]).toMatch(/text\/plain/);
-    expect(res.text).toContain("Found. Redirecting to /");
+    expect(res.header["content-type"]).toMatch(/application\/json/);
+    expect(res.body.success).toBe(true);
   });
 
   test("Connexion de l'utilisateur (invalide", async () => {
@@ -57,10 +57,10 @@ describe("Test - Partie Compte Utilisateur", () => {
       .post("/api/account/login")
       .send({ username: `${id}`, password: "password" });
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(401);
     expect(res.header["set-cookie"]).toBeDefined();
-    expect(res.header["content-type"]).toMatch(/text\/html/);
-    expect(res.text).toContain("Nom d&#39;utilisateur/mot de passe incorrect.");
+    expect(res.header["content-type"]).toMatch(/application\/json/);
+    expect(res.body.message).toEqual("Nom d'utilisateur ou mot de passe incorrect.");
   });
 
   test("Affichage - Mots de passe oublié", async () => {
