@@ -9,7 +9,7 @@ import { getDirname, getSecret } from './utils/index.js';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import Mailer from './components/Mailer.js';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 
 // Charge les variables d'environnement
 dotenv.config();
