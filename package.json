@@ -19,7 +19,6 @@
   "type": "module",
   "license": "ISC",
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "cross-env": "^7.0.3",
     "eslint": "^9.12.0",
