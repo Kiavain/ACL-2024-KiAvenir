@@ -15,6 +15,7 @@ export function refreshNotifications() {
     .then((response) => response.json())
     .then((data) => {
       notifCounter.innerHTML = data.length;
+      notifCounter.style.display = 'none';
 
       if (data.length > 0) {
         notifCounter.style.display = 'block';
@@ -27,7 +28,7 @@ export function refreshNotifications() {
 }
 
 // Fonction pour créer une notification
-function createNotificationItem(userId, notification) {
+function createNotificationItem(notification) {
   const li = document.createElement('li');
   li.classList.add('dropdown-item', 'd-flex', 'align-items-center', 'justify-content-between', 'notification-item');
 
@@ -69,7 +70,7 @@ function createNotificationItem(userId, notification) {
   refuseButton.innerHTML = '<span class="material-symbols-outlined">cancel</span>';
   refuseButton.addEventListener('click', () => {
     const updatedData = {
-      guestId: userId,
+      guestId: notification.id,
       desabonnement: true
     };
 
@@ -79,11 +80,9 @@ function createNotificationItem(userId, notification) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedData)
     })
-      .then((response) => {
-        if (response.ok) {
-          addFlashMessages(['Invitation refusée.']);
-          refreshNotifications();
-        }
+      .then((response) => response.json())
+      .then(() => {
+        refreshNotifications();
       })
       .catch((error) => console.error('Erreur:', error));
   });
@@ -104,8 +103,6 @@ function displayNotifications(notifications) {
   const notificationList = document.getElementById('notification-list');
   const notificationCount = document.getElementById('notification-count');
 
-  const userId = notificationList.dataset.userId;
-
   // Nettoie les notifications existantes
   notificationList.innerHTML = '';
 
@@ -114,7 +111,7 @@ function displayNotifications(notifications) {
 
   // Ajoute chaque notification
   notifications.forEach((notification) => {
-    const notificationItem = createNotificationItem(userId, notification);
+    const notificationItem = createNotificationItem(notification);
     notificationList.appendChild(notificationItem);
   });
 }
