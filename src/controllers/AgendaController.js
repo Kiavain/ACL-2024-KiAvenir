@@ -485,6 +485,9 @@ export class AgendaController extends Controller {
 
     //Traite le fichier
     const fileContent = fs.readFileSync(file.path, 'utf8');
+    //Nombre d'evenements importés
+    let countEvents = 0;
+    let maxCountEvents = 0;
     if (fileExtension === '.json') {
       //On traite l'import d'un agenda sous format json
       const data = JSON.parse(fileContent);
@@ -498,6 +501,7 @@ export class AgendaController extends Controller {
         return res.err(401, 'Vous possédez déjà un agenda avec le même nom.');
       }
       const agenda = await this.agendas.create({ name, description, ownerId: localUser.id, color });
+      maxCountEvents = events.length;
       for (const event of events) {
         const {
           name: eventName,
@@ -516,11 +520,18 @@ export class AgendaController extends Controller {
             description: eventDescription,
             allDay: allDay
           });
+          countEvents++;
         }
       }
     } else if (fileExtension === '.ics') {
       //On traite l'import d'un agenda sous format ics
-      const parsedCalendar = ICAL.default.parse(fileContent);
+      let parsedCalendar;
+      try {
+        parsedCalendar = ICAL.default.parse(fileContent);
+      } catch (error) {
+        return res.err(401, 'Données de fichier ICAL invalides.');
+      }
+
       const comp = new ICAL.default.Component(parsedCalendar);
       const vevents = comp.getAllSubcomponents('vevent');
       const name = comp.getFirstPropertyValue('x-wr-calname');
@@ -528,19 +539,26 @@ export class AgendaController extends Controller {
       const summary = comp.getFirstPropertyValue('x-wr-caldesc');
       // On vérifie les champs de l'agenda
       if (!name || !Array.isArray(vevents)) {
-        return res.err(401, 'Données de fichier JSON invalides.');
+        return res.err(401, 'Données de fichier ICAL invalides.');
       }
       const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
       if (alreadyExist) {
         return res.err(401, 'Vous possédez déjà un agenda avec le même nom.');
       }
       const agenda = await this.agendas.create({ name, description: summary, ownerId: localUser.id, color });
-      await this.importEvents(vevents, agenda);
+      countEvents = await this.importEvents(vevents, agenda.agendaId, countEvents);
+      maxCountEvents = vevents.length;
     } else {
       return res.err(401, 'Format de fichier non supporté. Importez un fichier JSON ou ICS.');
     }
 
-    res.cookie('notification', "L'agenda a été importé avec succès.", { maxAge: 5000 });
+    res.cookie(
+      'notification',
+      "L'agenda a été importé avec succès. " + countEvents + ' événements importés sur ' + maxCountEvents + '.',
+      {
+        maxAge: 5000
+      }
+    );
     res.success("L'agenda a été importé avec succès.");
   }
   /**

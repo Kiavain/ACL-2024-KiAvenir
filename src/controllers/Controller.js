@@ -70,29 +70,34 @@ export default class Controller {
    * Importe les événements d'un fichier iCal
    * @param events {Component[]} Les événements
    * @param agendaId {String} L'identifiant de l'agenda
+   * @param countEvents {number} Nombre d'events importés
    */
-  async importEvents(events, agendaId) {
+  async importEvents(events, agendaId, countEvents = 0) {
     for (const event of events) {
       const eventName = event.getFirstPropertyValue('summary');
       const dtstartProp = event.getFirstProperty('dtstart');
       const dtendProp = event.getFirstProperty('dtend');
-      const startDate = new Date(dtstartProp.getFirstValue().toString());
-      const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
-      const eventDescription = event.getFirstPropertyValue('description') || '';
+      if (eventName && dtstartProp && dtendProp) {
+        const startDate = new Date(dtstartProp.getFirstValue().toString());
+        const endDate = dtendProp ? new Date(dtendProp.getFirstValue().toString()) : startDate;
+        const eventDescription = event.getFirstPropertyValue('description') || '';
 
-      const dtstartValue = dtstartProp.getFirstValue();
-      const isAllDay = dtstartValue && typeof dtstartValue === 'object' && dtstartValue.isDate === true;
+        const dtstartValue = dtstartProp.getFirstValue();
+        const isAllDay = dtstartValue && typeof dtstartValue === 'object' && dtstartValue.isDate === true;
 
-      if (eventName && startDate && endDate) {
-        await this.events.create({
-          name: eventName,
-          agendaId,
-          startDate: startDate,
-          endDate: endDate,
-          description: eventDescription,
-          allDay: isAllDay
-        });
+        if (startDate && endDate) {
+          await this.events.create({
+            name: eventName,
+            agendaId,
+            startDate: startDate,
+            endDate: endDate,
+            description: eventDescription,
+            allDay: isAllDay
+          });
+          countEvents++;
+        }
       }
     }
+    return countEvents;
   }
 }
