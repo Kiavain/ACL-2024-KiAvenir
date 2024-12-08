@@ -82,7 +82,7 @@ function shareAgenda() {
                         check
                       </span> Editeur
                     </li>
-                    <li data-role="Propriétaire">
+                    <li data-role="Propriétaire" data-username="${guest.username}">
                       <span class="material-symbols-outlined check-icon" style="visibility: hidden;">
                         check
                       </span> Propriétaire
@@ -219,6 +219,7 @@ function applyRoleDropdownListeners() {
   document.querySelectorAll('.role-dropdown li').forEach((li) => {
     li.addEventListener('click', (event) => {
       const selectedRole = event.target.getAttribute('data-role');
+      const username = event.target.getAttribute('data-username');
       const guestItem = event.target.closest('.guest-item');
 
       // Met à jour le texte du rôle dans le bouton
@@ -243,6 +244,8 @@ function applyRoleDropdownListeners() {
       if (role === 'Propriétaire') {
         const confirmButton = document.getElementById('confirmTransferAgendaButton');
         const cancelButton = document.getElementById('cancelTransferAgendaButton');
+        const recipientUsername = document.getElementById('recipientUsername');
+        recipientUsername.textContent = username;
 
         // Afficher la modale de confirmation
         const transferModal = new bootstrap.Modal(document.getElementById('confirmTransferAgenda'));
