@@ -259,9 +259,21 @@ function applyRoleDropdownListeners() {
           })
             .then((response) => response.json())
             .then((data) => {
-              addFlashMessages(data.flashMessages);
-              notifyServer({ type: 'update', message: 'Updating guest' });
-              window.location.reload();
+              if (data.success) {
+                notifyServer({ type: 'update', message: 'Updating guest' });
+                window.location.reload();
+              } else {
+                const otherError = document.getElementById('other-error');
+                otherError.textContent = data.message;
+                otherError.style.display = 'block';
+
+                // Remettre le bon rôle
+                dropdown.querySelectorAll('.check-icon').forEach((icon) => {
+                  icon.style.visibility = 'hidden';
+                });
+                dropdown.querySelector(`[data-role=${lastRole}] .check-icon`).style.visibility = 'visible';
+                roleText.textContent = lastRole;
+              }
             })
             .catch((error) => console.error('Erreur:', error));
 

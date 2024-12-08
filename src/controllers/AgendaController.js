@@ -286,7 +286,6 @@ export class AgendaController extends Controller {
     }
 
     const { guestId, role } = req.body;
-    console.log(guestId, role);
     const guest = this.guests.get(guestId);
     if (!guest) {
       return res.err(404, 'Guest non trouvé.');
@@ -296,10 +295,18 @@ export class AgendaController extends Controller {
       return res.err(400, 'Rôle inconnu.');
     } else if (role === guest.role) {
       return res.err(400, 'Le rôle est déjà défini à ' + role);
+    } else if (role === 'Propriétaire' && guest.invited === true) {
+      return res.err(400, `${guest.getGuest().username} doit accepter le partage avant de devenir propriétaire.`);
     }
 
+    res.cookie(
+      'notification',
+      `Le rôle de ${guest.getGuest().username} dans ${guest.getAgenda().name} a été mis à jour avec succès.`,
+      { maxAge: 5000 }
+    );
+
+    // Si le rôle est défini à Propriétaire, on met à jour le guest et on met à jour l'agenda
     if (role === 'Propriétaire') {
-      console.log('update');
       await guest.getAgenda().update({ ownerId: guest.guestId });
       await guest.update({ guestId: localUser.id, role: 'Editeur' });
       return res.success(
