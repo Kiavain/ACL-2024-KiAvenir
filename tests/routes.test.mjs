@@ -24,13 +24,10 @@ describe("Test - Partie Compte Utilisateur", () => {
       .post("/api/account/new")
       .send({ email: `${id}@example.com`, username: `${id}`, password: "password123" });
 
-    expect(res.statusCode).toBe(302);
+    expect(res.statusCode).toBe(200);
     expect(res.header["set-cookie"]).toBeDefined();
-    expect(res.header["content-type"]).toMatch(/text\/plain/);
-    expect(res.body).toEqual({});
-
-    // Apparaît sur la page d'accueil
-    expect(res.text).toContain("Found. Redirecting to /");
+    expect(res.header["content-type"]).toMatch(/application\/json/);
+    expect(res.body.message).toEqual("Votre compte a bien été créé.");
   });
 
   test("Déconnexion de l'utilisateur", async () => {
@@ -81,13 +78,10 @@ describe("Test - Partie Compte Utilisateur", () => {
     const res = await request(server)
       .post("/api/account/new");
 
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(400);
     expect(res.header["set-cookie"]).toBeDefined();
-    expect(res.header["content-type"]).toMatch(/text\/html/);
-    expect(res.body).toEqual({});
-
-    // Reste sur la page d'inscription
-    expect(res.text).toContain("Inscription");
+    expect(res.header["content-type"]).toMatch(/application\/json/);
+    expect(res.body.message).toEqual("Veuillez vérifier les informations saisies.");
   });
 
   test("Affichage - Paramètre du compte (déconnecté)", async () => {
