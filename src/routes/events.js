@@ -169,26 +169,36 @@ export default class EventRouteur extends Routeur {
           }
         } else {
           // Si aucune occurrence à mettre à jour, on crée les occurrences
-          const debut = new Date(start);
-          const ending = new Date(end);
-          let maxOccurrences = 300;
-          let count = 0;
-          let currentDate = new Date(debut);
-          while (currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) && count < maxOccurrences) {
-            const occurrenceStart = new Date(currentDate);
-            const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
-            await occurrencesTable.create({
-              eventId: eventId,
+          if (rec !== 4) {
+            const debut = new Date(start);
+            const ending = new Date(end);
+            let maxOccurrences = 300;
+            let count = 0;
+            let currentDate = new Date(debut);
+            while (currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) && count < maxOccurrences) {
+              const occurrenceStart = new Date(currentDate);
+              const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
+              await occurrencesTable.create({
+                eventId: eventId,
+                name: title,
+                description: description,
+                allDay: allDay,
+                occurrenceStart: occurrenceStart.toISOString(),
+                occurrenceEnd: occurrenceEnd.toISOString(),
+                unit: unit,
+                interval: interval
+              });
+              handleFlexibleRecurrence(currentDate, unit, interval);
+              count++;
+            }
+          } else {
+            event.update({
               name: title,
               description: description,
-              allDay: allDay,
-              occurrenceStart: occurrenceStart.toISOString(),
-              occurrenceEnd: occurrenceEnd.toISOString(),
-              unit: unit,
-              interval: interval
+              startDate: start,
+              endDate: adjustedEnd,
+              allDay: allDay
             });
-            handleFlexibleRecurrence(currentDate, unit, interval);
-            count++;
           }
         }
         res.json({
