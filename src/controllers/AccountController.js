@@ -153,8 +153,8 @@ export class AccountController extends Controller {
     const token = await this.createJWT(createdUser);
     res.locals.user = token;
     res.cookie('accessToken', token, { httpOnly: true });
-    req.flash('Votre compte a bien été créé, bienvenue ' + username + '.');
-    res.redirect('/');
+    res.cookie('notification', `Votre compte a bien été créé, bienvenue ${username}.`, { maxAge: 5000 });
+    res.success('Votre compte a bien été créé.', { agendaId: createdUser.getAgendas[0].agendaId });
   }
 
   /**
@@ -181,7 +181,7 @@ export class AccountController extends Controller {
       }
     });
 
-    res.render('signin', opt);
+    res.err(400, 'Veuillez vérifier les informations saisies.', opt);
   }
 
   /**
