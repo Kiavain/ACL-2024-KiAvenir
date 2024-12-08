@@ -95,6 +95,8 @@ export default class EventRouteur extends Routeur {
         description: description,
         occurrenceStart: start,
         occurrenceEnd: adjustedEnd,
+        startDate: start,
+        endDate: adjustedEnd,
         allDay: allDay,
         recurrence: recurrence,
         unit: unit,

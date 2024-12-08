@@ -125,7 +125,6 @@ export const openModal = (eventData) => {
       startDate.type = "date";
       endDate.type = "date";
       startDate.value = newStartDate;
-      endDate.value = startDate.value;
     } else {
       const newStartDate = startDate.value + "T07:00";
       const newEndDate = startDate.value + "T08:00";
@@ -143,7 +142,7 @@ export const openModal = (eventData) => {
     const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
 
     // Calculer end uniquement si eventData.end est défini
-    let endDateValue = eventData.end ? moment(eventData.end).subtract(1, "days").format("YYYY-MM-DD") : startDateValue;
+    let endDateValue = eventData.end ? moment(eventData.end).format("YYYY-MM-DD") : startDateValue;
 
     startDate.value = startDateValue;
     endDate.value = endDateValue;
@@ -164,8 +163,6 @@ export const openModal = (eventData) => {
   let interval = eventData.extendedProps.interval ?? 1;
   recurrenceCustomSelect.value = unit;
   recurrenceCustomInterval.value = interval;
-
-  console.log("Event data: ", eventData);
 
   // Custom de la récurrence
   if (showRecPanel && recurrence !== 5) {
@@ -334,8 +331,6 @@ export const saveEvent = (calendar) => {
       console.error("Erreur:", error);
       errorMessages.innerText = "Une erreur est survenue lors de la mise à jour.";
     });
-
-  console.log("Data sent to the server: ", updatedData);
 };
 
 // Fonction pour supprimer un événement
