@@ -160,10 +160,12 @@ export const openModal = (eventData) => {
 
   let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
 
-  let unit = eventData.extendedProps.unit ?? 0;
-  let interval = eventData.extendedProps.interval ?? 2;
+  let unit = eventData.extendedProps.unit ?? recurrence;
+  let interval = eventData.extendedProps.interval ?? 1;
   recurrenceCustomSelect.value = unit;
   recurrenceCustomInterval.value = interval;
+
+  console.log("Event data: ", eventData);
 
   // Custom de la récurrence
   if (showRecPanel && recurrence !== 5) {
@@ -332,6 +334,8 @@ export const saveEvent = (calendar) => {
       console.error("Erreur:", error);
       errorMessages.innerText = "Une erreur est survenue lors de la mise à jour.";
     });
+
+  console.log("Data sent to the server: ", updatedData);
 };
 
 // Fonction pour supprimer un événement

@@ -93,8 +93,8 @@ export default class EventRouteur extends Routeur {
       const fieldsToUpdate = {
         name: title,
         description: description,
-        startDate: start,
-        endDate: adjustedEnd,
+        occurrenceStart: start,
+        occurrenceEnd: adjustedEnd,
         allDay: allDay,
         recurrence: recurrence,
         unit: unit,
@@ -245,6 +245,12 @@ export default class EventRouteur extends Routeur {
               const occurrenceStart = new Date(currentDate);
               const occurrenceEnd = new Date(currentDate.getTime() + (end - start));
 
+              // Gestion des récurrences flexibles ou non
+              if (req.body.recurrence !== 5) {
+                req.body.interval = 1;
+                req.body.unit = req.body.recurrence;
+              }
+
               occurrences.push({
                 eventId: newEvent.eventId,
                 name: newEvent.name,
@@ -255,12 +261,6 @@ export default class EventRouteur extends Routeur {
                 unit: req.body.unit,
                 interval: req.body.interval
               });
-
-              // Gestion des récurrences flexibles ou non
-              if (req.body.recurrence !== 5) {
-                req.body.interval = 1;
-                req.body.unit = req.body.recurrence;
-              }
               handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
             }
 
