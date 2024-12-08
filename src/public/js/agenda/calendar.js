@@ -264,13 +264,15 @@ export const saveEvent = (calendar) => {
   };
 
   // Vérifie si une récurrence personnalisée est activée
-  let rec = updatedData.recurrence;
-  if (rec === "5") {
+  let rec = Number(updatedData.recurrence);
+  if (rec === 5) {
     const unit = document.getElementById("eventRecurrenceCustom").value;
     const interval = document.getElementById("eventRecurrenceInterval").value;
 
-    eventId = saveButton.dataset.occurrenceId;
-    updatedData.sentId = eventId;
+    if (Number(oldRecurrence) !== 4) {
+      eventId = saveButton.dataset.occurrenceId;
+      updatedData.sentId = eventId;
+    }
     updatedData.unit = parseInt(unit, 10);
     updatedData.interval = parseInt(interval, 10);
     updatedData.occurrence = 1; // Marque comme une occurrence
@@ -284,9 +286,11 @@ export const saveEvent = (calendar) => {
       errorMessages.innerText = "Les champs doivent être des nombres entiers positifs.";
       return;
     }
-  } else if ((rec === "0" || rec === "1" || rec === "2" || rec === "3") && oldRecurrence !== "4") {
-    eventId = saveButton.dataset.occurrenceId;
-    updatedData.sentId = eventId;
+  } else if (rec === 0 || rec === 1 || rec === 2 || rec === 3) {
+    if (Number(oldRecurrence) !== 4) {
+      eventId = saveButton.dataset.occurrenceId;
+      updatedData.sentId = eventId;
+    }
     updatedData.occurrence = 1; // Marque comme une occurrence
     updatedData.unit = rec;
     updatedData.interval = 1;
@@ -308,8 +312,6 @@ export const saveEvent = (calendar) => {
     errorMessages.innerText = "La date de fin doit être supérieure à la date de début.";
     return;
   }
-
-  console.log("Données envoyées :", updatedData);
 
   fetch(`/api/events/update/${eventId}`, {
     method: "PUT",

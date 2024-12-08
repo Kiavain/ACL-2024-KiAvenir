@@ -107,11 +107,9 @@ export default class EventRouteur extends Routeur {
         // Distinction entre événement et occurrence => ajout des champs unit et interval
         table = "event_occurrences";
       }
-      console.log("Table : ", table);
 
       try {
         let eventId = Number(sentId);
-        console.log("Event ID : ", sentId);
         const event = this.server.database.tables.get(table).get(eventId);
 
         if (!event) {
@@ -171,8 +169,6 @@ export default class EventRouteur extends Routeur {
           }
         } else {
           // Si aucune occurrence à mettre à jour, on crée les occurrences
-          const test = "Here";
-          console.log(test);
           const debut = new Date(start);
           const ending = new Date(end);
           let maxOccurrences = 300;
