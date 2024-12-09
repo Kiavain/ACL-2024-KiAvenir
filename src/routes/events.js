@@ -268,7 +268,6 @@ export default class EventRouteur extends Routeur {
           if (req.body.recurrence !== 4) {
             const start = new Date(req.body.startDate);
             const end = new Date(req.body.endDate);
-            const occurrences = [];
             let currentDate = new Date(start);
 
             // Limitation à 2 ans (2 * 365 * 24 * 60 * 60 * 1000 = 2 ans en millisecondes)
@@ -282,7 +281,7 @@ export default class EventRouteur extends Routeur {
                 req.body.unit = req.body.recurrence;
               }
 
-              occurrences.push({
+              occurrencesTable.create({
                 eventId: newEvent.eventId,
                 name: newEvent.name,
                 description: newEvent.description,
@@ -293,11 +292,6 @@ export default class EventRouteur extends Routeur {
                 interval: req.body.interval
               });
               handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
-            }
-
-            // Création des occurrences en lot
-            for (const occurrence of occurrences) {
-              occurrencesTable.create(occurrence);
             }
           }
           res.json({ success: true, message: 'Événement créé avec succès' });
