@@ -14,7 +14,7 @@ export default class Entity {
   constructor(server, definition = {}, options = {}) {
     /**
      * Le cache de la table
-     * @type {Map<String, Object>}
+     * @type {Map<String, EntityStructure>}
      */
     this.cache = new Map();
 
@@ -62,11 +62,19 @@ export default class Entity {
   }
 
   /**
+   * Récupère la base de données
+   * @returns {Database} La base de données
+   */
+  get database() {
+    return this.server.database;
+  }
+
+  /**
    * Récupère la table dans la base de données
    * @return {Object} La table
    */
   get table() {
-    return this.server.database.models[this.tableName];
+    return this.database.models[this.tableName];
   }
 
   /**

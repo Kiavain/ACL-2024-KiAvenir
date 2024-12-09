@@ -8,7 +8,6 @@
  * @typedef {import("../entities/EventOccurrencesEntity.js").default} EventOccurrencesEntity
  * @typedef {import("../entities/GuestsEntity.js").default} GuestsEntity
  * @typedef {import("../entities/UsersEntity.js").default} UsersEntity
- *
  */
 
 /**
@@ -23,6 +22,10 @@ export default class Controller {
    * @constructor
    */
   constructor(server) {
+    /**
+     * Le serveur
+     * @type {KiAvenir}
+     */
     this.server = server;
   }
 
