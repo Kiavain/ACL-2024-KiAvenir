@@ -75,7 +75,6 @@ export default class EventRouteur extends Routeur {
       const sentId = req.body.sentId;
 
       const occurrencesTable = this.server.database.tables.get('event_occurrences');
-
       if (!title || !start || !end) {
         return res.json({
           success: false,
@@ -83,7 +82,7 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const event = this.server.database.tables.get('events').get(req.params.eventId);
+      const event = this.server.database.tables.get('events').get(sentId);
       if (!event.getAgenda().verifyCanEdit(parseInt(res.locals.user.id))) {
         return res.json({
           success: false,
@@ -410,7 +409,8 @@ export default class EventRouteur extends Routeur {
           isCancelled: o.isCancelled,
           unit: o.unit,
           interval: o.interval,
-          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id)),
+          recurrence: 5
         }));
 
         // Ajoute les événements de cet agenda au tableau global

@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
       let endDate = document.getElementById('endEventTime').value;
 
       // Convertir les dates en objet Date
-      startDate = moment(startDate).toISOString().substring(0, 16);
-      endDate = moment(endDate).toISOString().substring(0, 16);
+      startDate = moment(startDate).add(1, 'h').toISOString().substring(0, 16);
+      endDate = moment(endDate).add(1, 'h').toISOString().substring(0, 16);
 
       saveEvent(startDate, endDate);
     };
