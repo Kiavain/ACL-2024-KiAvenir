@@ -341,6 +341,8 @@ export class AgendaController extends Controller {
       return res.err(404, 'Guest non trouvé.');
     } else if (guest.getOwner().id !== localUser.id && !desabonnement) {
       return res.err(403, "Vous n'êtes pas autorisé à supprimer ce guest.");
+    } else if (guest.getOwner().id === localUser.id && desabonnement) {
+      return res.err(403, "Vous n'êtes pas autorisé à vous désabonner de votre propre agenda.");
     }
 
     const agendaTitle = guest.getAgenda().name;

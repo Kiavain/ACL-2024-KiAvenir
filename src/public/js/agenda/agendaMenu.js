@@ -1,3 +1,5 @@
+import { addFlashMessages } from '../utils.js';
+
 const shareOrExport = document.getElementById('shareOrExport');
 
 const agendaItems = document.getElementById('agenda-list').children;
@@ -33,9 +35,12 @@ if (shareAgendaList && shareAgendaList.children.length > 0) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedData)
         })
-          .then((response) => {
-            if (response.ok) {
-              window.location.reload(); // Note : Notification prise en charge par le serveur
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              window.location.reload(); // Rechargement de la page
+            } else {
+              addFlashMessages([data.message]);
             }
           })
           .catch((error) => console.error('Erreur:', error));
