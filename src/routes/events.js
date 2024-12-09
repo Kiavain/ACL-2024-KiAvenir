@@ -73,6 +73,7 @@ export default class EventRouteur extends Routeur {
       let { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
       const oldRecurrence = req.body.oldRecurrence;
       const sentId = Number(req.body.sentId);
+      const occurrencesTable = this.server.database.tables.get('event_occurrences');
 
       if (allDay) {
         let endDate = new Date(req.body.end);

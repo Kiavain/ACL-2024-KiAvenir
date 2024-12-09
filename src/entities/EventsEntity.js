@@ -22,7 +22,8 @@ export default class EventsEntity extends Entity {
         type: DataTypes.INTEGER
       },
       description: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        defaultValue: 'Pas de détails disponibles.'
       },
       name: {
         type: DataTypes.STRING(32)
