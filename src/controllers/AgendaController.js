@@ -434,7 +434,10 @@ export class AgendaController extends Controller {
           }))
       });
       const filename = `agenda_${agenda.name}.json`;
-      const downloadsPath = path.join(os.homedir(), 'Downloads', filename);
+      let downloadsPath = path.join(os.homedir(), 'Downloads', filename);
+      if (!fs.existsSync(downloadsPath)) {
+        downloadsPath = path.join(os.homedir(), 'Téléchargements', filename);
+      }
 
       fs.writeFileSync(downloadsPath, data, 'utf8');
       res.download(downloadsPath, filename, () => {});
