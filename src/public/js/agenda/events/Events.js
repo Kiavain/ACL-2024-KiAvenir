@@ -127,6 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     errAgenda.style.display = agendaValue ? 'none' : 'block';
     errorElement.style.display = startDateObj <= endDateObj ? 'none' : 'block';
 
+    if (isNaN(endDateObj.getTime()) || isNaN(startDateObj.getTime())) {
+      errorElement.style.display = 'block';
+      errorElement.textContent = 'Il y a une erreur dans la date de début ou de fin.';
+      return;
+    }
+
     if (!name.trim()) {
       errName.style.display = 'block';
       return;

@@ -1,4 +1,5 @@
 import { initCalendar, saveEvent, deleteEvent, closeModal, handleOutsideClick } from './calendar.js';
+import { addFlashMessages } from '../utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const closeButton = document.querySelector('.close');
@@ -18,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Récupère les dates de début et de fin
       let startDate = document.getElementById('startEventTime').value;
       let endDate = document.getElementById('endEventTime').value;
+
+      if (startDate === '' || endDate === '') {
+        addFlashMessages(['Veuillez renseigner les dates de début et de fin.']);
+        return;
+      }
 
       // Convertir les dates en objet Date
       startDate = moment(startDate).add(1, 'h').toISOString().substring(0, 16);

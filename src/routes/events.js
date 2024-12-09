@@ -243,8 +243,6 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const events = this.server.database.tables.get('events');
-
       /// Vérifie si l'utilisateur a accès à l'agenda
       const agenda = this.server.database.tables.get('agendas').get(req.body.agendaId);
       if (!agenda || !agenda.verifyCanEdit(parseInt(res.locals.user.id))) {
