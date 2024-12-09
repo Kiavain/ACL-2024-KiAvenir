@@ -38,7 +38,7 @@ export default class EventsEntity extends Entity {
       },
       recurrence: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        defaultValue: 4
       }
     });
   }
