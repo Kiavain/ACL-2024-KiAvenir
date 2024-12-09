@@ -316,6 +316,11 @@ export const openModal = (eventData) => {
   const recurrenceCustomSelect = document.getElementById('eventRecurrenceCustom');
   const recurrenceCustomInterval = document.getElementById('eventRecurrenceInterval');
 
+  recurrenceCustomInterval.addEventListener('input', () => {
+    if (recurrenceCustomInterval.value === '' || recurrenceCustomInterval.value === '0') {
+      recurrenceCustomInterval.value = 1;
+    }
+  });
   let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
 
   let unit = eventData.extendedProps.unit ?? recurrence;
