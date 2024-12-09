@@ -101,31 +101,35 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const allEvents = this.server.database.tables.get('events');
-      if (allEvents) {
-        //Permet de rajouter un jour au jour de Fin à un event all Day
-        if (req.body.allDay) {
-          let endDate = new Date(req.body.endDate);
-          endDate.setUTCDate(endDate.getUTCDate() + 1);
-          req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
-        }
-        allEvents
-          .create(req.body)
-          .then(() => {
-            res.json({ success: true, message: 'Événement créé avec succès' });
-          })
-          .catch(() => {
-            res.json({
-              success: false,
-              message: "Erreur lors de la création de l'événement"
-            });
-          });
-      } else {
-        res.json({
+      const events = this.server.database.tables.get('events');
+
+      // Permet de rajouter un jour au jour de Fin à un event all Day
+      if (req.body.allDay) {
+        let endDate = new Date(req.body.endDate);
+        endDate.setUTCDate(endDate.getUTCDate() + 1);
+        req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+      }
+
+      /// Vérifie si l'utilisateur a accès à l'agenda
+      const agenda = this.server.database.tables.get('agendas').get(req.body.agendaId);
+      if (!agenda || !agenda.verifyCanEdit(parseInt(res.locals.user.id))) {
+        return res.json({
           success: false,
-          message: "Erreur lors de la création de l'événement"
+          message: "Vous n'avez pas la permission de créer un événement dans cet agenda"
         });
       }
+
+      events
+        .create(req.body)
+        .then(() => {
+          res.json({ success: true, message: 'Événement créé avec succès' });
+        })
+        .catch(() => {
+          res.json({
+            success: false,
+            message: "Erreur lors de la création de l'événement"
+          });
+        });
     });
 
     this.router.get('/api/events/:agendaIds', async (req, res) => {
