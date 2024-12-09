@@ -27,7 +27,7 @@ npm install && npm test
 - Filtrer les rendez-vous par nom avec une barre de recherche
 - Exporter et importer des agendas au format souhaité (JSON ou iCal)
 - Partager un agenda entre utilisateurs avec une gestion de permission
-- Mots de passe oublié
+- Mot de passe oublié
 - Modifier son avatar
 - Drag'n'drop des événements
 - Etirement des événements
