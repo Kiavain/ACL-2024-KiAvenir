@@ -93,6 +93,22 @@ export default class EventOccurrence extends EntityStructure {
   }
 
   /**
+   * Récupère les évènements
+   * @returns {Object} Les évènements
+   */
+  get events() {
+    return this.entity.server.database.tables.get('events');
+  }
+
+  /**
+   * Retourne l'agenda de l'événement
+   * @returns {Agenda} L'agenda
+   */
+  getAgenda() {
+    return this.events.get(this.eventId).getAgenda();
+  }
+
+  /**
    * Retourne les données de l'occurrence
    * @returns {Object} Les données de l'occurrence
    */

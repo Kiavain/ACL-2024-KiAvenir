@@ -469,6 +469,8 @@ export const saveEvent = (startDate, endDate) => {
     return;
   }
 
+  console.log('updatedData', updatedData);
+
   // Vérifie si la date de fin est supérieure à la date de début
   if (
     (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||

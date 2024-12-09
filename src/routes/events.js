@@ -72,23 +72,7 @@ export default class EventRouteur extends Routeur {
 
       let { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
       const oldRecurrence = req.body.oldRecurrence;
-      const sentId = req.body.sentId;
-
-      const occurrencesTable = this.server.database.tables.get('event_occurrences');
-      if (!title || !start || !end) {
-        return res.json({
-          success: false,
-          message: 'Les champs titre, date de début et date de fin sont obligatoires.'
-        });
-      }
-
-      const event = this.server.database.tables.get('events').get(sentId);
-      if (!event.getAgenda().verifyCanEdit(parseInt(res.locals.user.id))) {
-        return res.json({
-          success: false,
-          message: "Vous n'avez pas la permission de modifier cet événement"
-        });
-      }
+      const sentId = Number(req.body.sentId);
 
       if (allDay) {
         let endDate = new Date(req.body.end);
@@ -122,6 +106,12 @@ export default class EventRouteur extends Routeur {
       try {
         let eventId = Number(sentId);
         const event = this.server.database.tables.get(table).get(eventId);
+        if (!event.getAgenda().verifyCanEdit(parseInt(res.locals.user.id))) {
+          return res.json({
+            success: false,
+            message: "Vous n'avez pas la permission de modifier cet événement"
+          });
+        }
 
         if (!event) {
           return res.json({
