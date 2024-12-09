@@ -90,14 +90,11 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      let adjustedEnd = end;
       if (allDay) {
         let endDate = new Date(req.body.end);
         let startDate = new Date(req.body.start);
         endDate.setUTCHours(endDate.getUTCHours() + 1);
         startDate.setUTCHours(startDate.getUTCHours() + 1);
-
-        adjustedEnd = endDate.toISOString();
         end = endDate.toISOString();
         start = startDate.toISOString();
       }
@@ -106,7 +103,7 @@ export default class EventRouteur extends Routeur {
         name: title,
         description: description,
         occurrenceStart: start,
-        occurrenceEnd: adjustedEnd,
+        occurrenceEnd: end,
         startDate: start,
         endDate: end,
         allDay: allDay,
@@ -256,13 +253,6 @@ export default class EventRouteur extends Routeur {
       }
 
       const events = this.server.database.tables.get('events');
-
-      // Permet de rajouter un jour au jour de Fin à un event all Day
-      if (req.body.allDay) {
-        let endDate = new Date(req.body.endDate);
-        endDate.setUTCDate(endDate.getUTCDate() + 1);
-        req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
-      }
 
       /// Vérifie si l'utilisateur a accès à l'agenda
       const agenda = this.server.database.tables.get('agendas').get(req.body.agendaId);

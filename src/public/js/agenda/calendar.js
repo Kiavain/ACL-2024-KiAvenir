@@ -108,8 +108,6 @@ export const initCalendar = () => {
       const startDate = moment(info.event.start).toISOString().substring(0, 16);
       let endDate;
 
-      console.log(info.event.extendedProps);
-
       document.getElementById('eventTitle').value = info.event.title;
       document.getElementById('eventDetails').value = info.event.extendedProps.description;
       document.getElementById('eventAllDay').checked = info.event.allDay;
@@ -120,7 +118,6 @@ export const initCalendar = () => {
       saveButton.dataset.oldRecurrence = info.event.extendedProps.recurrence;
 
       // Si on passe de allDay à non allDay, on ajuste la date de fin
-
       if (!info.event.allDay && info.oldEvent.allDay) {
         endDate = moment(info.event.start).add(1, 'hour').toISOString().substring(0, 16);
       } else if (info.event.allDay && !info.oldEvent.allDay) {
