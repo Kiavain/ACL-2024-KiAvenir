@@ -18,7 +18,9 @@ import { fileURLToPath } from 'url';
  *
  *
  * Type de données pour les entités
- * @typedef {import("../structures/Agenda.js").default} Agenda
+ * @typedef {import("../entities/structures/Agenda.js").default} Agenda
+ * @typedef {import("../entities/structures/Guest.js").default} Guest
+ * @typedef {import("../entities/structures/User.js").default} User
  */
 
 /**
@@ -123,8 +125,6 @@ export class AgendaController extends Controller {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
     } else if (!name) {
       return res.err(400, "Le nom de l'agenda est requis.");
-    } else if (this.agendas.find((a) => a.name === name && a.ownerId === user.id)) {
-      return res.err(400, 'Un agenda avec le même nom existe déjà.');
     }
 
     res.cookie('notification', "L'agenda a été créé avec succès.", { maxAge: 5000 });
@@ -147,22 +147,20 @@ export class AgendaController extends Controller {
 
   /**
    * Met à jour un agenda
-   * @param req
-   * @param res
-   * @returns {Promise<*>}
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<void>}
    */
   async updateAgenda(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
+    const user = res.locals.user;
+    if (!user) {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
     }
 
+    // Vérifie les champs de l'agenda
     const { name, color, description } = req.body;
-    const agenda = this.agendas.get(req.params.agendaId);
     if (!agenda) {
       return res.err(404, 'Agenda non trouvé.');
-    } else if (!agenda.verifyCanEdit(localUser.id)) {
-      return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
     } else if (!name || name.trim() === '') {
       return res.err(400, "Le nom de l'agenda est requis.");
     } else if (color === '#FFFFFF') {
@@ -171,22 +169,41 @@ export class AgendaController extends Controller {
       return res.err(400, "La description de l'agenda ne peut pas dépasser 255 caractères.");
     }
 
+    /**
+     * L'agenda à mettre à jour
+     * @type {Agenda}
+     */
+    const agenda = this.agendas.get(req.params.agendaId);
+    if (!agenda.verifyCanEdit(user.id)) {
+      return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
+    }
+
     res.cookie('notification', "L'agenda a été mis à jour avec succès.", { maxAge: 5000 });
     await agenda.update({ name, description, color });
     return res.success(`L'agenda ${agenda.name} a été mis à jour avec succès.`);
   }
 
+  /**
+   * Accepte un partage d'agenda
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {void}
+   */
   acceptShare(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
+    const user = res.locals.user;
+    const { id } = req.params;
+    if (!user) {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
     }
 
-    const { id } = req.params;
+    /**
+     * L'invité
+     * @type {Guest}
+     */
     const guest = this.guests.get(id);
     if (!guest) {
       return res.err(404, 'Guest non trouvé.');
-    } else if (guest.guestId !== localUser.id) {
+    } else if (guest.guestId !== user.id) {
       return res.err(403, "Vous n'êtes pas autorisé à accepter ce partage.");
     }
 
@@ -199,37 +216,44 @@ export class AgendaController extends Controller {
   }
   /**
    * Partage un agenda
-   * @param req
-   * @param res
-   * @returns {Promise<*>}
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {void}
    */
   shareAgenda(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
+    const user = res.locals.user;
+    const { mail, role } = req.body;
+    const agendaId = req.params.agendaId;
+
+    if (!user) {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
     }
 
-    const { mail, role } = req.body;
+    /**
+     * L'utilisateur partagé
+     * @type {User}
+     */
     const sharedUser = this.users.find((user) => user.email === mail);
     if (!sharedUser) {
       return res.err(400, 'Utilisateur non trouvé.');
-    }
-
-    // Vérifie si le guest n'a pas déjà accès à l'agenda
-    const agendaId = parseInt(req.params.agendaId);
-    const agenda = this.agendas.get(agendaId);
-    const alreadyShared = this.guests.find((g) => g.agendaId === agendaId && g.guestId === sharedUser.id);
-    if (alreadyShared) {
+    } else if (this.guests.find((g) => g.agendaId === agendaId && g.guestId === sharedUser.id)) {
       return res.err(400, "L'utilisateur a déjà accès à cet agenda.");
-    } else if (!agenda) {
+    }
+    /**
+     * L'agenda à partager
+     * @type {Agenda}
+     */
+    const agenda = this.agendas.get(agendaId);
+
+    if (!agenda) {
       return res.err(404, 'Agenda non trouvé.');
     } else if (!mail || mail.trim() === '') {
       return res.err(400, "L'email de l'utilisateur est requis.");
     } else if (role !== 'Lecteur' && role !== 'Editeur') {
       return res.err(400, 'Rôle inconnu.');
-    } else if (agenda.ownerId !== localUser.id) {
+    } else if (agenda.ownerId !== user.id) {
       return res.err(403, "Vous n'êtes pas autorisé à partager cet agenda.");
-    } else if (sharedUser.id === localUser.id) {
+    } else if (sharedUser.id === user.id) {
       return res.err(400, 'Vous ne pouvez pas partager un agenda avec vous-même.');
     }
 
@@ -468,7 +492,10 @@ export class AgendaController extends Controller {
       // Convertit le calendrier en chaîne ICAL
       const icsContent = calendar.toString();
       const filename = `agenda_${agenda.name}.ics`;
-      const downloadsPath = path.join(os.homedir(), 'Downloads', filename);
+      let downloadsPath = path.join(os.homedir(), 'Downloads', filename);
+      if (!fs.existsSync(downloadsPath)) {
+        downloadsPath = path.join(os.homedir(), 'Téléchargements', filename);
+      }
 
       // Enregistre la chaîne ICS dans un fichier
       fs.writeFileSync(downloadsPath, icsContent, 'utf8');
