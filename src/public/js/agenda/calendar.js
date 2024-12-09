@@ -412,7 +412,7 @@ export const saveEvent = (startDate, endDate) => {
 
   const stringAppend = document.getElementById('eventAllDay').checked ? '' : '+00:00';
   const applyToAll = document.getElementById('applyToAllOccurrences').checked;
-  const oldRecurrence = saveButton.dataset.oldRecurrence;
+  const oldRecurrence = Number(saveButton.dataset.oldRecurrence);
 
   const updatedData = {
     title: document.getElementById('eventTitle').value.trim(),
@@ -435,7 +435,7 @@ export const saveEvent = (startDate, endDate) => {
     const unit = document.getElementById('eventRecurrenceCustom').value;
     const interval = document.getElementById('eventRecurrenceInterval').value;
 
-    if (Number(oldRecurrence) !== 4) {
+    if (oldRecurrence !== 4) {
       eventId = saveButton.dataset.occurrenceId;
       updatedData.sentId = eventId;
     }
@@ -453,7 +453,7 @@ export const saveEvent = (startDate, endDate) => {
       return;
     }
   } else if (rec === 0 || rec === 1 || rec === 2 || rec === 3) {
-    if (Number(oldRecurrence) !== 4) {
+    if (oldRecurrence !== 4) {
       eventId = saveButton.dataset.occurrenceId;
       updatedData.sentId = eventId;
     }
