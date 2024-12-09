@@ -258,9 +258,14 @@ export default class EventRouteur extends Routeur {
         req.body.endDate = endDate.toISOString();
       }
 
+      let data = req.body;
+      if (!data.description.trim()) {
+        delete data.description;
+      }
+
       // Création de l'événement
       eventsTable
-        .create(req.body)
+        .create(data)
         .then((newEvent) => {
           // Si l'événement est récurrent, créer les occurrences
           if (req.body.recurrence !== 4) {

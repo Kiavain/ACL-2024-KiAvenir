@@ -273,8 +273,11 @@ export const openModal = (eventData) => {
     return;
   }
   const allDay = document.getElementById('eventAllDay');
+  allDay.checked = eventData.allDay;
   const startDate = document.getElementById('startEventTime');
   const endDate = document.getElementById('endEventTime');
+  endDate.type = allDay.checked ? 'date' : 'datetime-local';
+  startDate.type = endDate.type;
 
   allDay.addEventListener('click', () => {
     if (allDay.checked) {
