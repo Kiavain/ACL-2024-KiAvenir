@@ -6,7 +6,7 @@ import { DataTypes } from 'sequelize';
  * Représente l'entité des sagenda
  */
 // noinspection JSUnusedGlobalSymbols // Utilisé par la base de données
-export default class UsersEntity extends Entity {
+export default class AgendasEntity extends Entity {
   /**
    * Construit l'entité des agendas
    * @param server {KiAvenir} Le serveur de l'application

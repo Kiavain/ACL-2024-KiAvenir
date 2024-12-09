@@ -423,8 +423,7 @@ export class AgendaController extends Controller {
           allDay: event.allDay,
           recurrence: event.recurrence
         })),
-        occurrences: this.database
-          .get('event_occurrences')
+        occurrences: this.eventOccurrences
           .filter((occurrence) => occurrence.getAgenda().agendaId === agenda.agendaId)
           .map((occurrence) => ({
             eventId: occurrence.eventId,
@@ -541,7 +540,7 @@ export class AgendaController extends Controller {
           });
 
           for (const occurrence of occurrences.filter((o) => o.eventId === event.eventId)) {
-            await this.database.get('event_occurrences').create({
+            await this.eventOccurrences.create({
               eventId: newEvent.eventId,
               name: occurrence.name,
               occurrenceStart: occurrence.startDate,

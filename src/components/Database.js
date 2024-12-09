@@ -45,7 +45,7 @@ export default class Database {
 
     /**
      * Les tables de la base de données
-     * @type {Map<String, Object>}
+     * @type {Map<String, Entity>}
      */
     this.tables = new Map();
   }
