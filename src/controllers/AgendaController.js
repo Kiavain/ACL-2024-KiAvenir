@@ -539,10 +539,7 @@ export class AgendaController extends Controller {
       if (!name || !color || !Array.isArray(events)) {
         return res.err(401, 'Données de fichier JSON invalides.');
       }
-      const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
-      if (alreadyExist) {
-        return res.err(401, 'Vous possédez déjà un agenda avec le même nom.');
-      }
+
       const agenda = await this.agendas.create({ name, description, ownerId: localUser.id, color });
       maxCountEvents = events.length;
       for (const event of events) {
