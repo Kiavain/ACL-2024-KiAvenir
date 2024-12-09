@@ -262,8 +262,10 @@ export const openEventDetailsModal = (eventData) => {
     openModal(eventData);
   });
   if (!eventData.extendedProps.canEdit) {
+    editModal.hidden = true;
     document.getElementById('deleteEventPreview').hidden = true;
   } else {
+    editModal.hidden = false;
     document.getElementById('deleteEventPreview').removeAttribute('hidden');
   }
   modal.style.display = 'flex';
