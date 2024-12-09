@@ -125,19 +125,19 @@ export default class EventRouteur extends Routeur {
           .get('event_occurrences')
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
         let rec = Number(recurrence);
+        if (applyToAll) {
+          for (const occurrence of occurrences_to_update) {
+            await occurrence.update({
+              name: title,
+              description: description
+            });
+          }
+        }
         if (oldRecurrence === rec && unit === event.unit && interval === event.interval) {
           // Aucun changement à apporter pour les occurrences
           event.update(fieldsToUpdate);
         } else {
           if (occurrences_to_update.length > 0) {
-            if (applyToAll) {
-              for (const occurrence of occurrences_to_update) {
-                await occurrence.update({
-                  name: title,
-                  description: description
-                });
-              }
-            }
             if (rec === 5) {
               let startDate = new Date(event.occurrenceStart);
               let endDate = new Date(event.occurrenceEnd);
