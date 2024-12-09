@@ -2,9 +2,9 @@ import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Type de données pour les entités
- * @typedef {import("../entities/EventsEntity.js").default} EventsEntity
- * @typedef {import("../entities/GuestsEntity.js").default} GuestsEntity
- * @typedef {import("../entities/UsersEntity.js").default} UsersEntity
+ * @typedef {import("../EventsEntity.js").default} EventsEntity
+ * @typedef {import("../GuestsEntity.js").default} GuestsEntity
+ * @typedef {import("../UsersEntity.js").default} UsersEntity
  *
  * Type de données pour les structures
  * @typedef {import("../structures/User.js").default} User

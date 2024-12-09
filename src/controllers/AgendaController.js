@@ -7,6 +7,17 @@ import * as ICAL from 'ical.js';
 import { fileURLToPath } from 'url';
 
 /**
+ * Typage des options des requêtes
+ * @typedef {import("express").Request & {flash: (message: string) => void}} Request
+ *
+ * Typage des options des réponses
+ * @typedef {import("express").Response & {
+ * success: (message: String, opt: Object = {}) => void,
+ * err: (statusCode: int, message: String, opt: Object = {}) => void}
+ * } Response
+ */
+
+/**
  * Contrôleur pour les actions liées aux agendas
  */
 export class AgendaController extends Controller {
@@ -33,18 +44,28 @@ export class AgendaController extends Controller {
     this.acceptShare = this.acceptShare.bind(this);
   }
 
+  /**
+   * Récupère les notifications
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {Promise<{message: string, id: int}>}
+   */
   getNotifications(req, res) {
     const user = res.locals.user;
     if (!user) {
       req.flash('Vous devez être connecté pour accéder à cette page.');
-      return res.redirect('/login');
+      return res.json([]);
     }
 
-    // Récupère les notifications
+    // Récupère les notifications pour l'utilisateur
     const notifications = this.guests
-      .getAll()
       .filter((guest) => guest.guestId === user.id && guest.invited)
-      .map((guest) => {
+      .map((g) => {
+        /**
+         * L'invité
+         * @type {Guest} guest
+         */
+        const guest = g;
         const agenda = guest.getAgenda();
         const owner = guest.getOwner();
 
