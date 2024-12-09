@@ -97,7 +97,7 @@ export default class Entity {
         );
       }
     } catch (e) {
-      console.error('Synchronisation : ', e);
+      this.server.logger.error('Erreur lors du chargement de la table : ', e);
     }
   }
 
@@ -234,7 +234,7 @@ export default class Entity {
 
       await this.cache.set(`${this.tableName}:${key}`, structure);
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
     return structure;
   }
@@ -274,7 +274,7 @@ export default class Entity {
         await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
       }
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
 
     return updatedRows.map((u) => new this.entityStructure(this, u.dataValues));
@@ -309,7 +309,7 @@ export default class Entity {
       // Suppression de la ligne dans la base de données
       await this.table.destroy({ where: { [Op.or]: where } });
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
   }
 }

@@ -74,7 +74,7 @@ export default class Guest extends EntityStructure {
   /**
    * Met à jour les données de l'agenda
    * @param data {Object} Les données à mettre à jour
-   * @returns {Promise<Agenda>} Une promesse de l'agenda
+   * @returns {Promise<Guest>} Une promesse de l'agenda
    */
   async update(data) {
     this.role = data.role;
