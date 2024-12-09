@@ -393,7 +393,8 @@ export default class EventRouteur extends Routeur {
           color: agenda.color,
           allDay: e.allDay,
           recurrence: e.recurrence,
-          agendaId
+          agendaId,
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
         }));
 
         // Mappe les occurrences dans le bon format
@@ -408,7 +409,8 @@ export default class EventRouteur extends Routeur {
           allDay: o.allDay,
           isCancelled: o.isCancelled,
           unit: o.unit,
-          interval: o.interval
+          interval: o.interval,
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
         }));
 
         // Ajoute les événements de cet agenda au tableau global
