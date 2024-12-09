@@ -526,6 +526,7 @@ export const deleteEvent = () => {
     eventId = saveButton.dataset.occurrenceId;
   }
 
+  closeModal();
   fetch(`/api/events/delete/${eventId}`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
@@ -534,7 +535,6 @@ export const deleteEvent = () => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        closeModal();
         closeEventDetailsModal();
         notifyServer({ type: 'update', message: 'Event deletion' });
         refreshCalendar();
