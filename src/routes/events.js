@@ -402,7 +402,6 @@ export default class EventRouteur extends Routeur {
         allEvents = allEvents.concat(formattedEvents, formattedOccurrences);
       }
 
-      console.log(allEvents.length);
       // Envoie tous les événements associés aux agendas spécifiés
       res.json(allEvents);
     });

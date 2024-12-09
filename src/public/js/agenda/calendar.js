@@ -239,8 +239,7 @@ export const openEventDetailsModal = (eventData) => {
   }
   if (eventData.allDay) {
     const startDate = new Date(eventData.start);
-    const endDate = new Date(eventData.end);
-    endDate.setUTCDate(endDate.getUTCDate() - 1);
+    const endDate = eventData.end === null ? startDate : new Date(eventData.end);
 
     if (startDate.getUTCDate() === endDate.getUTCDate()) {
       date.innerText = moment(startDate)
@@ -257,7 +256,6 @@ export const openEventDetailsModal = (eventData) => {
   const editModal = document.getElementById('editEvent');
   editModal.addEventListener('click', () => {
     modal.style.display = 'none';
-    console.log('eventData', eventData);
     openModal(eventData);
   });
   if (!eventData.extendedProps.canEdit) {
@@ -302,7 +300,7 @@ export const openModal = (eventData) => {
     const startDateValue = moment(eventData.start).format('YYYY-MM-DD');
 
     // Calculer end uniquement si eventData.end est défini
-    let endDateValue = eventData.end ? moment(eventData.end).format('YYYY-MM-DD') : startDateValue;
+    let endDateValue = eventData.end ? moment(eventData.end).add(-1, 'd').format('YYYY-MM-DD') : startDateValue;
     startDate.value = startDateValue;
     endDate.value = endDateValue;
   } else {
@@ -374,7 +372,6 @@ export const openModal = (eventData) => {
   }
 
   const saveButton = document.getElementById('updateEvent');
-  console.log('eventData (bis)', eventData);
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
   saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
   saveButton.dataset.oldRecurrence = eventData.extendedProps.recurrence;
@@ -412,7 +409,6 @@ export const saveEvent = (startDate, endDate) => {
   const errorMessages = document.getElementById('error-update-event');
   let eventId = saveButton.dataset.eventId;
   let sentId = eventId;
-  console.log('eventId', eventId);
 
   const stringAppend = document.getElementById('eventAllDay').checked ? '' : '+00:00';
   const applyToAll = document.getElementById('applyToAllOccurrences').checked;
@@ -430,8 +426,6 @@ export const saveEvent = (startDate, endDate) => {
     sentId: sentId,
     oldRecurrence: oldRecurrence
   };
-
-  console.log('updatedData', updatedData);
 
   // Vérifie si une récurrence personnalisée est activée
   let rec = Number(updatedData.recurrence);
