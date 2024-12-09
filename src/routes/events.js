@@ -70,7 +70,7 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
+      let { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
       const oldRecurrence = req.body.oldRecurrence;
       const sentId = req.body.sentId;
 
@@ -93,9 +93,14 @@ export default class EventRouteur extends Routeur {
 
       let adjustedEnd = end;
       if (allDay) {
-        const endDate = new Date(end);
-        endDate.setUTCDate(endDate.getUTCDate() + 1);
+        let endDate = new Date(req.body.end);
+        let startDate = new Date(req.body.start);
+        endDate.setUTCHours(endDate.getUTCHours() + 1);
+        startDate.setUTCHours(startDate.getUTCHours() + 1);
+
         adjustedEnd = endDate.toISOString();
+        end = endDate.toISOString();
+        start = startDate.toISOString();
       }
 
       const fieldsToUpdate = {
@@ -104,7 +109,7 @@ export default class EventRouteur extends Routeur {
         occurrenceStart: start,
         occurrenceEnd: adjustedEnd,
         startDate: start,
-        endDate: adjustedEnd,
+        endDate: end,
         allDay: allDay,
         recurrence: recurrence,
         unit: unit,

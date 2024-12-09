@@ -368,28 +368,6 @@ export const openModal = (eventData) => {
   modal.style.display = 'block';
 };
 
-function disableIfCantEdit(canEdit) {
-  if (!canEdit) {
-    document.getElementById('eventTitle').disabled = true;
-    document.getElementById('eventDetails').disabled = true;
-    document.getElementById('startEventTime').disabled = true;
-    document.getElementById('eventAllDay').disabled = true;
-    document.getElementById('eventRecurrence').disabled = true;
-    document.getElementById('endEventTime').disabled = true;
-    document.getElementById('updateEvent').hidden = true;
-    document.getElementById('deleteEvent').hidden = true;
-  } else {
-    document.getElementById('eventTitle').disabled = false;
-    document.getElementById('eventDetails').disabled = false;
-    document.getElementById('startEventTime').disabled = false;
-    document.getElementById('eventAllDay').disabled = false;
-    document.getElementById('eventRecurrence').disabled = false;
-    document.getElementById('endEventTime').disabled = false;
-    document.getElementById('updateEvent').hidden = false;
-    document.getElementById('deleteEvent').hidden = false;
-  }
-}
-
 // Fonction pour fermer la modale d'édition
 export const closeModal = () => {
   const modal = document.getElementById('eventModal');
@@ -415,7 +393,7 @@ export const handleOutsideClick = (event) => {
   }
 };
 
-export const saveEvent = (calendar) => {
+export const saveEvent = (startDate, endDate) => {
   const saveButton = document.getElementById('updateEvent');
   const errorMessages = document.getElementById('error-update-event');
   let eventId = saveButton.dataset.eventId;
@@ -428,8 +406,8 @@ export const saveEvent = (calendar) => {
   const updatedData = {
     title: document.getElementById('eventTitle').value.trim(),
     description: document.getElementById('eventDetails').value.trim(),
-    start: document.getElementById('startEventTime').value + stringAppend,
-    end: document.getElementById('endEventTime').value + stringAppend,
+    start: startDate + stringAppend,
+    end: endDate + stringAppend,
     allDay: document.getElementById('eventAllDay').checked,
     recurrence: document.getElementById('eventRecurrence').value,
     occurrence: 0, // Par défaut, c'est un événement principal
