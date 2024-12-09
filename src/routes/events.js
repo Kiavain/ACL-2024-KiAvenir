@@ -84,7 +84,7 @@ export default class EventRouteur extends Routeur {
       }
 
       const event = this.server.database.tables.get('events').get(req.params.eventId);
-      if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
+      if (!event.getAgenda().verifyCanEdit(parseInt(res.locals.user.id))) {
         return res.json({
           success: false,
           message: "Vous n'avez pas la permission de modifier cet événement"
@@ -360,8 +360,7 @@ export default class EventRouteur extends Routeur {
         // Récupère les événements non récurrents
         const events = agenda.getEvents().filter((e) => {
           const isWithinDateRange = new Date(e.startDate) <= new Date(end) && new Date(e.endDate) >= new Date(start);
-          const matchesSearch = search ? e.name.toLowerCase().includes(search.toLowerCase()) : true;
-
+          const matchesSearch = filter ? e.name.toLowerCase().includes(filter.toLowerCase()) : true;
           return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 4;
         });
 
@@ -369,7 +368,7 @@ export default class EventRouteur extends Routeur {
         const recurringEvents = this.server.database.tables.get('event_occurrences').filter((o) => {
           const isWithinDateRange =
             new Date(o.occurrenceStart) <= new Date(end) && new Date(o.occurrenceEnd) >= new Date(start);
-          const matchesSearch = search ? o.name.toLowerCase().includes(search.toLowerCase()) : true;
+          const matchesSearch = filter ? o.name.toLowerCase().includes(filter.toLowerCase()) : true;
           const parentEventInAgenda = agenda
             .getEvents()
             .map((e) => e.eventId)
@@ -411,6 +410,7 @@ export default class EventRouteur extends Routeur {
         allEvents = allEvents.concat(formattedEvents, formattedOccurrences);
       }
 
+      console.log(allEvents.length);
       // Envoie tous les événements associés aux agendas spécifiés
       res.json(allEvents);
     });

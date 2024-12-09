@@ -22,7 +22,8 @@ document.getElementById('eventSearch').addEventListener('input', async (e) => {
 
   const startDate = new Date();
   const endDate = new Date();
-  endDate.setFullYear(endDate.getFullYear() + 1); // Exemple pour 1 an dans le futur
+  startDate.setFullYear(startDate.getFullYear() - 1);
+  endDate.setFullYear(endDate.getFullYear() + 1);
 
   const startParam = encodeURIComponent(startDate.toISOString());
   const endParam = encodeURIComponent(endDate.toISOString());
