@@ -415,12 +415,27 @@ export class AgendaController extends Controller {
         description: agenda.description,
         color: agenda.color,
         events: agenda.getEvents().map((event) => ({
+          eventId: event.eventId,
           name: event.name,
           startDate: event.startDate,
           endDate: event.endDate,
           description: event.description,
-          allDay: event.allDay
-        }))
+          allDay: event.allDay,
+          recurrence: event.recurrence
+        })),
+        occurrences: this.database
+          .get('event_occurrences')
+          .filter((occurrence) => occurrence.getAgenda().agendaId === agenda.agendaId)
+          .map((occurrence) => ({
+            eventId: occurrence.eventId,
+            name: occurrence.name,
+            startDate: occurrence.occurrenceStart,
+            endDate: occurrence.occurrenceEnd,
+            description: occurrence.description,
+            allDay: occurrence.allDay,
+            unit: occurrence.unit,
+            interval: occurrence.interval
+          }))
       });
       const filename = `agenda_${agenda.name}.json`;
       const downloadsPath = path.join(os.homedir(), 'Downloads', filename);
@@ -493,7 +508,7 @@ export class AgendaController extends Controller {
     if (fileExtension === '.json') {
       //On traite l'import d'un agenda sous format json
       const data = JSON.parse(fileContent);
-      const { name, color, events, description } = data;
+      const { name, color, events, occurrences, description } = data;
       // On vérifie les champs de l'agenda
       if (!name || !color || !Array.isArray(events)) {
         return res.err(401, 'Données de fichier JSON invalides.');
@@ -510,18 +525,33 @@ export class AgendaController extends Controller {
           startDate: startDate,
           endDate: endDate,
           description: eventDescription,
-          allDay: allDay
+          allDay: allDay,
+          recurrence
         } = event;
         // On vérifie les champs de chaque événement
         if (eventName && startDate && endDate && eventDescription) {
-          await this.events.create({
+          const newEvent = await this.events.create({
             name: eventName,
             agendaId: agenda.agendaId,
             startDate: startDate,
             endDate: endDate,
             description: eventDescription,
+            recurrence: recurrence,
             allDay: allDay
           });
+
+          for (const occurrence of occurrences.filter((o) => o.eventId === event.eventId)) {
+            await this.database.get('event_occurrences').create({
+              eventId: newEvent.eventId,
+              name: occurrence.name,
+              occurrenceStart: occurrence.startDate,
+              occurrenceEnd: occurrence.endDate,
+              description: occurrence.description,
+              allDay: occurrence.allDay,
+              unit: occurrence.unit,
+              interval: occurrence.interval
+            });
+          }
           countEvents++;
         }
       }
