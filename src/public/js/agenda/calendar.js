@@ -291,10 +291,10 @@ export const openModal = (eventData) => {
   allDay.checked = false;
   if (eventData.allDay) {
     allDay.click();
-    const startDateValue = moment(eventData.start).format("YYYY-MM-DD");
+    const startDateValue = moment(eventData.start).format('YYYY-MM-DD');
 
     // Calculer end uniquement si eventData.end est défini
-    let endDateValue = eventData.end ? moment(eventData.end).format("YYYY-MM-DD") : startDateValue;
+    let endDateValue = eventData.end ? moment(eventData.end).format('YYYY-MM-DD') : startDateValue;
     startDate.value = startDateValue;
     endDate.value = endDateValue;
   } else {
@@ -303,10 +303,10 @@ export const openModal = (eventData) => {
   }
 
   // Définit la récurrence de l'event
-  let recurrenceSelect = document.getElementById("eventRecurrence");
-  const showRecPanel = document.getElementById("showRecurrenceOptionsEdit");
-  const recurrenceCustomSelect = document.getElementById("eventRecurrenceCustom");
-  const recurrenceCustomInterval = document.getElementById("eventRecurrenceInterval");
+  let recurrenceSelect = document.getElementById('eventRecurrence');
+  const showRecPanel = document.getElementById('showRecurrenceOptionsEdit');
+  const recurrenceCustomSelect = document.getElementById('eventRecurrenceCustom');
+  const recurrenceCustomInterval = document.getElementById('eventRecurrenceInterval');
 
   let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
 
@@ -317,25 +317,25 @@ export const openModal = (eventData) => {
 
   // Custom de la récurrence
   if (showRecPanel && recurrence !== 5) {
-    showRecPanel.style.display = "none";
+    showRecPanel.style.display = 'none';
   } else {
-    showRecPanel.style.display = "flex";
+    showRecPanel.style.display = 'flex';
   }
 
   if (recurrenceSelect) {
-    recurrenceSelect.addEventListener("change", () => {
+    recurrenceSelect.addEventListener('change', () => {
       if (parseInt(recurrenceSelect.value) === 5) {
-        showRecPanel.style.display = "flex";
+        showRecPanel.style.display = 'flex';
 
-        recurrenceCustomSelect.addEventListener("change", () => {
+        recurrenceCustomSelect.addEventListener('change', () => {
           handleCustomRecurrence();
         });
 
-        recurrenceCustomInterval.addEventListener("input", () => {
+        recurrenceCustomInterval.addEventListener('input', () => {
           handleCustomRecurrence();
         });
       } else {
-        showRecPanel.style.display = "none";
+        showRecPanel.style.display = 'none';
       }
     });
   }
@@ -347,25 +347,25 @@ export const openModal = (eventData) => {
     if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
       return [unit, interval];
     } else {
-      console.warn("Les champs de récurrence personnalisée doivent être des nombres entiers positifs.");
+      console.warn('Les champs de récurrence personnalisée doivent être des nombres entiers positifs.');
     }
   }
 
   recurrenceSelect.value = recurrence;
 
-  const optionApplyToAll = document.getElementById("optionApplyToAll");
+  const optionApplyToAll = document.getElementById('optionApplyToAll');
   if (recurrence !== 4) {
-    optionApplyToAll.style.display = "flex";
+    optionApplyToAll.style.display = 'flex';
   } else {
-    optionApplyToAll.style.display = "none";
+    optionApplyToAll.style.display = 'none';
   }
 
-  const saveButton = document.getElementById("updateEvent");
+  const saveButton = document.getElementById('updateEvent');
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
   saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
   saveButton.dataset.oldRecurrence = eventData.extendedProps.recurrence;
 
-  modal.style.display = "block";
+  modal.style.display = 'block';
 };
 
 function disableIfCantEdit(canEdit) {
@@ -416,22 +416,22 @@ export const handleOutsideClick = (event) => {
 };
 
 export const saveEvent = (calendar) => {
-  const saveButton = document.getElementById("updateEvent");
-  const errorMessages = document.getElementById("error-update-event");
+  const saveButton = document.getElementById('updateEvent');
+  const errorMessages = document.getElementById('error-update-event');
   let eventId = saveButton.dataset.eventId;
   let sentId = eventId;
 
-  const stringAppend = document.getElementById("eventAllDay").checked ? "" : "+00:00";
-  const applyToAll = document.getElementById("applyToAllOccurrences").checked;
+  const stringAppend = document.getElementById('eventAllDay').checked ? '' : '+00:00';
+  const applyToAll = document.getElementById('applyToAllOccurrences').checked;
   const oldRecurrence = saveButton.dataset.oldRecurrence;
 
   const updatedData = {
-    title: document.getElementById("eventTitle").value.trim(),
-    description: document.getElementById("eventDetails").value.trim(),
-    start: document.getElementById("startEventTime").value + stringAppend,
-    end: document.getElementById("endEventTime").value + stringAppend,
-    allDay: document.getElementById("eventAllDay").checked,
-    recurrence: document.getElementById("eventRecurrence").value,
+    title: document.getElementById('eventTitle').value.trim(),
+    description: document.getElementById('eventDetails').value.trim(),
+    start: document.getElementById('startEventTime').value + stringAppend,
+    end: document.getElementById('endEventTime').value + stringAppend,
+    allDay: document.getElementById('eventAllDay').checked,
+    recurrence: document.getElementById('eventRecurrence').value,
     occurrence: 0, // Par défaut, c'est un événement principal
     applyToAll: applyToAll,
     sentId: sentId,
@@ -441,8 +441,8 @@ export const saveEvent = (calendar) => {
   // Vérifie si une récurrence personnalisée est activée
   let rec = Number(updatedData.recurrence);
   if (rec === 5) {
-    const unit = document.getElementById("eventRecurrenceCustom").value;
-    const interval = document.getElementById("eventRecurrenceInterval").value;
+    const unit = document.getElementById('eventRecurrenceCustom').value;
+    const interval = document.getElementById('eventRecurrenceInterval').value;
 
     if (Number(oldRecurrence) !== 4) {
       eventId = saveButton.dataset.occurrenceId;
@@ -458,7 +458,7 @@ export const saveEvent = (calendar) => {
       updatedData.interval < 1 ||
       updatedData.interval > 30
     ) {
-      errorMessages.innerText = "Les champs doivent être des nombres entiers positifs.";
+      errorMessages.innerText = 'Les champs doivent être des nombres entiers positifs.';
       return;
     }
   } else if (rec === 0 || rec === 1 || rec === 2 || rec === 3) {
@@ -472,7 +472,7 @@ export const saveEvent = (calendar) => {
   }
 
   if (!updatedData.title) {
-    errorMessages.innerText = "Le champ titre est obligatoire.";
+    errorMessages.innerText = 'Le champ titre est obligatoire.';
     return;
   }
   if (!updatedData.start || !updatedData.end) {
@@ -506,17 +506,17 @@ export const saveEvent = (calendar) => {
       }
     })
     .catch((error) => {
-      console.error("Erreur:", error);
-      errorMessages.innerText = "Une erreur est survenue lors de la mise à jour.";
+      console.error('Erreur:', error);
+      errorMessages.innerText = 'Une erreur est survenue lors de la mise à jour.';
     });
 };
 
 // Fonction pour supprimer un événement
 export const deleteEvent = (calendar) => {
-  const saveButton = document.getElementById("updateEvent");
+  const saveButton = document.getElementById('updateEvent');
   let eventId = saveButton.dataset.eventId;
-  const recurrence = document.getElementById("eventRecurrence").value;
-  const applyToAll = document.getElementById("applyToAllOccurrences").checked;
+  const recurrence = document.getElementById('eventRecurrence').value;
+  const applyToAll = document.getElementById('applyToAllOccurrences').checked;
 
   const deleteNature = {
     recurrence: recurrence,
@@ -528,8 +528,8 @@ export const deleteEvent = (calendar) => {
   }
 
   fetch(`/api/events/delete/${eventId}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(deleteNature)
   })
     .then((response) => response.json())

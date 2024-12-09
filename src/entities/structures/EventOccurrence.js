@@ -1,4 +1,4 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'une occurrence d'événement

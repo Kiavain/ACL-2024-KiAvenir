@@ -26,7 +26,7 @@ export default class EventRouteur extends Routeur {
 
       if (Number(recurrence) === 4) {
         // Suppression d'un seul événement qui ne se répète pas
-        const event = this.server.database.tables.get("events").get(req.params.eventId);
+        const event = this.server.database.tables.get('events').get(req.params.eventId);
         if (event) {
           await event.delete();
           res.json({ success: true });
@@ -35,13 +35,13 @@ export default class EventRouteur extends Routeur {
         }
       } else if (applyToAll) {
         // Suppression de toutes les récurrences d'un événement
-        const occ = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
+        const occ = this.server.database.tables.get('event_occurrences').get(req.params.eventId);
         let parentEventId = occ.eventId;
-        const event = this.server.database.tables.get("events").get(parentEventId);
+        const event = this.server.database.tables.get('events').get(parentEventId);
         if (event) {
           await event.delete();
           const occurrences = this.server.database.tables
-            .get("event_occurrences")
+            .get('event_occurrences')
             .filter((o) => o.eventId === event.eventId);
           for (const occurrence of occurrences) {
             await occurrence.delete();
@@ -52,7 +52,7 @@ export default class EventRouteur extends Routeur {
         }
       } else {
         // Suppression d'une seule occurrence
-        const event = this.server.database.tables.get("event_occurrences").get(req.params.eventId);
+        const event = this.server.database.tables.get('event_occurrences').get(req.params.eventId);
         if (event) {
           await event.update({ isCancelled: true });
           res.json({ success: true });
@@ -62,12 +62,11 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-
-    this.router.put("/api/events/update/:eventId", async (req, res) => {
+    this.router.put('/api/events/update/:eventId', async (req, res) => {
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action."
+          message: 'Vous devez être connecté pour effectuer cette action.'
         });
       }
 
@@ -75,15 +74,15 @@ export default class EventRouteur extends Routeur {
       const oldRecurrence = req.body.oldRecurrence;
       const sentId = req.body.sentId;
 
-      const occurrencesTable = this.server.database.tables.get("event_occurrences");
+      const occurrencesTable = this.server.database.tables.get('event_occurrences');
 
       if (!title || !start || !end) {
         return res.json({
           success: false,
-          message: "Les champs titre, date de début et date de fin sont obligatoires."
+          message: 'Les champs titre, date de début et date de fin sont obligatoires.'
         });
       }
-      
+
       const event = this.server.database.tables.get('events').get(req.params.eventId);
       if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
         return res.json({
@@ -112,11 +111,11 @@ export default class EventRouteur extends Routeur {
         interval: interval
       };
 
-      let table = "events";
+      let table = 'events';
       let oldRec = Number(oldRecurrence);
       if (occurrence === 1 && oldRec !== 4) {
         // Distinction entre événement et occurrence => ajout des champs unit et interval
-        table = "event_occurrences";
+        table = 'event_occurrences';
       }
 
       try {
@@ -126,12 +125,12 @@ export default class EventRouteur extends Routeur {
         if (!event) {
           return res.json({
             success: false,
-            message: "Événement ou occurrence introuvable."
+            message: 'Événement ou occurrence introuvable.'
           });
         }
         await event.update(fieldsToUpdate);
         const occurrences_to_update = this.server.database.tables
-          .get("event_occurrences")
+          .get('event_occurrences')
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
         let rec = Number(recurrence);
         if (occurrences_to_update.length > 0) {
@@ -214,13 +213,13 @@ export default class EventRouteur extends Routeur {
         }
         res.json({
           success: true,
-          message: "Mise à jour effectuée avec succès."
+          message: 'Mise à jour effectuée avec succès.'
         });
       } catch (error) {
-        console.error("Erreur lors de la mise à jour :", error);
+        console.error('Erreur lors de la mise à jour :', error);
         res.json({
           success: false,
-          message: "Une erreur est survenue lors de la mise à jour."
+          message: 'Une erreur est survenue lors de la mise à jour.'
         });
       }
     });
@@ -234,9 +233,8 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-
-      const eventsTable = this.server.database.tables.get("events");
-      const occurrencesTable = this.server.database.tables.get("event_occurrences");
+      const eventsTable = this.server.database.tables.get('events');
+      const occurrencesTable = this.server.database.tables.get('event_occurrences');
 
       if (!eventsTable) {
         return res.json({
@@ -244,7 +242,7 @@ export default class EventRouteur extends Routeur {
           message: "Vous n'avez pas la permission de créer un événement dans cet agenda"
         });
       }
-      
+
       const events = this.server.database.tables.get('events');
 
       // Permet de rajouter un jour au jour de Fin à un event all Day
@@ -309,7 +307,7 @@ export default class EventRouteur extends Routeur {
               occurrencesTable.create(occurrence);
             }
           }
-          res.json({ success: true, message: "Événement créé avec succès" });
+          res.json({ success: true, message: 'Événement créé avec succès' });
         })
         .catch((error) => console.error("Erreur lors de la création de l'événement :", error));
     });
@@ -333,7 +331,7 @@ export default class EventRouteur extends Routeur {
       }
     }
 
-    this.router.get("/api/events/:agendaIds", async (req, res) => {
+    this.router.get('/api/events/:agendaIds', async (req, res) => {
       if (!res.locals.user) {
         return res.json([]);
       }
@@ -354,7 +352,7 @@ export default class EventRouteur extends Routeur {
 
       // Parcours chaque agendaId
       for (const agendaId of agendaIds) {
-        let agenda = this.server.database.tables.get("agendas").get(agendaId);
+        let agenda = this.server.database.tables.get('agendas').get(agendaId);
         if (!agenda) {
           continue;
         }
@@ -367,9 +365,8 @@ export default class EventRouteur extends Routeur {
           return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 4;
         });
 
-
         // Récupère les occurrences d'événements récurrents
-        const recurringEvents = this.server.database.tables.get("event_occurrences").filter((o) => {
+        const recurringEvents = this.server.database.tables.get('event_occurrences').filter((o) => {
           const isWithinDateRange =
             new Date(o.occurrenceStart) <= new Date(end) && new Date(o.occurrenceEnd) >= new Date(start);
           const matchesSearch = search ? o.name.toLowerCase().includes(search.toLowerCase()) : true;

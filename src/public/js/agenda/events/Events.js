@@ -69,29 +69,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const recurrenceSelect = document.getElementById("event-recurrence");
-  const showRecurrencePanel = document.getElementById("show-recurrence-options");
-  const recurrenceCustomSelect = document.getElementById("event-recurrence-custom");
-  const recurrenceCustomInterval = document.getElementById("event-recurrence-interval");
+  const recurrenceSelect = document.getElementById('event-recurrence');
+  const showRecurrencePanel = document.getElementById('show-recurrence-options');
+  const recurrenceCustomSelect = document.getElementById('event-recurrence-custom');
+  const recurrenceCustomInterval = document.getElementById('event-recurrence-interval');
 
   if (showRecurrencePanel) {
-    showRecurrencePanel.style.display = "none";
+    showRecurrencePanel.style.display = 'none';
   }
 
   if (recurrenceSelect) {
-    recurrenceSelect.addEventListener("change", () => {
+    recurrenceSelect.addEventListener('change', () => {
       if (parseInt(recurrenceSelect.value) === 5) {
-        showRecurrencePanel.style.display = "flex";
+        showRecurrencePanel.style.display = 'flex';
 
-        recurrenceCustomSelect.addEventListener("change", () => {
+        recurrenceCustomSelect.addEventListener('change', () => {
           handleCustomRecurrence();
         });
 
-        recurrenceCustomInterval.addEventListener("input", () => {
+        recurrenceCustomInterval.addEventListener('input', () => {
           handleCustomRecurrence();
         });
       } else {
-        showRecurrencePanel.style.display = "none";
+        showRecurrencePanel.style.display = 'none';
       }
     });
   }
@@ -103,29 +103,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
       return [unit, interval];
     } else {
-      console.warn("Unité ou intervalle invalide.");
+      console.warn('Unité ou intervalle invalide.');
     }
   }
 
   createButton.onclick = (e) => {
-    const stringAppend = getElement("event-all-day").checked ? "" : "+00:00";
-    const name = getInputValue("event-name");
-    const dateDebut = getInputValue("event-date") + stringAppend;
-    const dateFin = getInputValue("event-date-end") + stringAppend;
-    const description = getInputValue("event-description") || " ";
-    const agendaValue = getInputValue("event-agenda");
-    const errorElement = getElement("date-error");
-    const errAgenda = getElement("agenda-error");
-    const errName = getElement("name-error");
-    const allDay = getElement("event-all-day");
+    const stringAppend = getElement('event-all-day').checked ? '' : '+00:00';
+    const name = getInputValue('event-name');
+    const dateDebut = getInputValue('event-date') + stringAppend;
+    const dateFin = getInputValue('event-date-end') + stringAppend;
+    const description = getInputValue('event-description') || ' ';
+    const agendaValue = getInputValue('event-agenda');
+    const errorElement = getElement('date-error');
+    const errAgenda = getElement('agenda-error');
+    const errName = getElement('name-error');
+    const allDay = getElement('event-all-day');
     e.preventDefault();
 
     const startDateObj = new Date(dateDebut);
     const endDateObj = new Date(dateFin);
 
-    errName.style.display = name.trim() ? "none" : "block";
-    errAgenda.style.display = agendaValue ? "none" : "block";
-    errorElement.style.display = startDateObj <= endDateObj ? "none" : "block";
+    errName.style.display = name.trim() ? 'none' : 'block';
+    errAgenda.style.display = agendaValue ? 'none' : 'block';
+    errorElement.style.display = startDateObj <= endDateObj ? 'none' : 'block';
 
     if (!name.trim()) {
       errName.style.display = 'block';
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dateDebut || !dateFin || !agendaValue || startDateObj > endDateObj) {
       return;
     }
-  
+
     const recurrenceValue = parseInt(recurrenceSelect.value, 10);
     if (![0, 1, 2, 3, 4, 5].includes(recurrenceValue)) {
       return;
@@ -154,12 +154,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const valRecurrences = handleCustomRecurrence();
     if (valRecurrences) {
-      data["unit"] = valRecurrences[0];
-      data["interval"] = valRecurrences[1];
+      data['unit'] = valRecurrences[0];
+      data['interval'] = valRecurrences[1];
     }
 
-    modal.style.display = "none";
-    popup.classList.toggle("show");
+    modal.style.display = 'none';
+    popup.classList.toggle('show');
 
     fetch('/api/events/create', {
       method: 'POST',

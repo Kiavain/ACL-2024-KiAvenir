@@ -1,6 +1,6 @@
-import Entity from "../structures/Entity.js";
-import EventOccurrence from "./structures/EventOccurrence.js";
-import { DataTypes } from "sequelize";
+import Entity from '../structures/Entity.js';
+import EventOccurrence from './structures/EventOccurrence.js';
+import { DataTypes } from 'sequelize';
 
 /**
  * Représente l'entité des occurrences d'événements
@@ -62,7 +62,7 @@ export default class EventOccurrencesEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return "event_occurrences";
+    return 'event_occurrences';
   }
 
   /**
@@ -70,6 +70,6 @@ export default class EventOccurrencesEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["occurrenceId"];
+    return ['occurrenceId'];
   }
 }
