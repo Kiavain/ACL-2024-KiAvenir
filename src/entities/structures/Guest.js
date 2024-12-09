@@ -25,7 +25,7 @@ export default class Guest extends EntityStructure {
     super(entity, data);
 
     /**
-     * L'identifiant du tuple agenda,guest
+     * L'identifiant du tuple agenda, guest
      * @type {int}
      */
     this.id = data.id;
@@ -57,7 +57,7 @@ export default class Guest extends EntityStructure {
 
   /**
    * Récupère les utilisateurs
-   * @returns {Object} Les utilisateurs
+   * @returns {UsersEntity} Les utilisateurs
    */
   get users() {
     return this.database.get('users');
@@ -65,7 +65,7 @@ export default class Guest extends EntityStructure {
 
   /**
    * Récupère les agendas
-   * @returns {Agenda} Les agendas
+   * @returns {AgendasEntity} Les agendas
    */
   get agendas() {
     return this.database.get('agendas');

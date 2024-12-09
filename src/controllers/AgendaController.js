@@ -15,6 +15,10 @@ import { fileURLToPath } from 'url';
  * success: (message: String, opt: Object = {}) => void,
  * err: (statusCode: int, message: String, opt: Object = {}) => void}
  * } Response
+ *
+ *
+ * Type de données pour les entités
+ * @typedef {import("../structures/Agenda.js").default} Agenda
  */
 
 /**
@@ -36,7 +40,6 @@ export class AgendaController extends Controller {
     this.removeGuest = this.removeGuest.bind(this);
     this.getGuests = this.getGuests.bind(this);
     this.renderAgenda = this.renderAgenda.bind(this);
-    this.renderAgendaId = this.renderAgendaId.bind(this);
     this.deleteAgenda = this.deleteAgenda.bind(this);
     this.importHolidayAgenda = this.importHolidayAgenda.bind(this);
     this.deleteHolidayAgenda = this.deleteHolidayAgenda.bind(this);
@@ -77,94 +80,67 @@ export class AgendaController extends Controller {
 
   /**
    * Redirige vers l'agenda par défaut : le premier de la liste
-   * @param req La requête
-   * @param res La réponse
-   * @returns {*}
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {void}
    */
   renderAgenda(req, res) {
-    if (!res.locals.user) {
+    const user = res.locals.user;
+    if (!user) {
       req.flash('Vous devez être connecté pour accéder à cette page.');
       return res.redirect('/login');
     }
 
     // Récupère les notifications
-    const notification = req.cookies.notification;
+    const { notification } = req.cookies;
     if (notification) {
       req.flash(notification);
       res.clearCookie('notification');
     }
 
     // Récupère tous les agendas dont les IDs correspondent à ceux passés dans l'URL
-    const agendas = this.server.database.tables
-      .get('agendas')
-      .filter((agenda) => agenda.verifyAgendaAccess(res.locals.user.id));
-
-    // Récupère les agendas où l'utilisateur est invité
-    const guests = this.server.database.tables.get('guests');
-    const guestsShared = guests.filter((guest) => guest.guestId === res.locals.user.id);
+    const agendas = this.agendas.filter((agenda) => agenda.verifyAgendaAccess(user.id));
+    const guestsShared = this.guests.filter((guest) => guest.guestId === user.id);
 
     if (agendas.length > 0) {
-      const agenda = agendas[0];
-      res.render('agenda', { agenda, agendas, guestsShared });
+      res.render('agenda', { agenda: agendas[0], agendas, guestsShared });
     } else {
       res.redirect('/404');
     }
   }
 
   /**
-   * Rend la page de l'agenda
-   * @param req La requête
-   * @param res La réponse
-   * @returns {Promise<*>}
-   */
-  async renderAgendaId(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
-      req.flash('Vous devez être connecté pour accéder à cette page.');
-      return res.redirect('/login');
-    }
-
-    // Récupère les éléments nécessaires
-    const agenda = this.agendas.get(req.params.agendaId);
-    const guestsShared = this.guests.filter((guest) => guest.guestId === localUser.id);
-
-    if (!agenda) {
-      return res.status(404).redirect('/404');
-    } else if (!agenda.verifyAgendaAccess(localUser.id)) {
-      return res.status(403).redirect('/403');
-    }
-    res.render('agenda', { agenda, agendas: this.agendas, guests: this.guests, guestsShared });
-  }
-
-  /**
    * Crée un agenda
-   * @param req
-   * @param res
-   * @returns {Promise<*>}
+   * @param req {Request} La requête
+   * @param res {Response} La réponse
+   * @returns {void}
    */
   createAgenda(req, res) {
-    const localUser = res.locals.user;
-    if (!localUser) {
-      return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
-    }
-
+    const user = res.locals.user;
     const { name, description, color } = req.body;
-    if (!name) {
-      return res.err(400, "Le nom de l'agenda est requis.");
-    }
 
-    const alreadyExist = this.agendas.find((a) => a.name === name && a.ownerId === localUser.id);
-    if (alreadyExist) {
+    if (!user) {
+      return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
+    } else if (!name) {
+      return res.err(400, "Le nom de l'agenda est requis.");
+    } else if (this.agendas.find((a) => a.name === name && a.ownerId === user.id)) {
       return res.err(400, 'Un agenda avec le même nom existe déjà.');
     }
 
     res.cookie('notification', "L'agenda a été créé avec succès.", { maxAge: 5000 });
 
     this.agendas
-      .create({ name, description, ownerId: localUser.id, color })
-      .then((agenda) => res.success(`L'agenda ${agenda.name} a été créé avec succès.`, { agendaId: agenda.agendaId }))
+      .create({ name, description, ownerId: user.id, color })
+      .then((a) => {
+        /**
+         * L'agenda créé
+         * @type {Agenda}
+         */
+        const agenda = a;
+        res.success(`L'agenda ${agenda.name} a été créé avec succès.`, { agendaId: agenda.agendaId });
+      })
       .catch((error) => {
-        console.error(error);
+        this.logger.error(error);
         res.err(500, error);
       });
   }
