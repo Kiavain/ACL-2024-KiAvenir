@@ -1,27 +1,28 @@
 
 <link rel="stylesheet" href="/css/calendar.css">
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
 <script type="module" src="/js/agenda/agenda.js"></script>
+<script type="module" src="js/websocket.js"></script>
 
-<!-- Modale pour afficher les informations de l'événement -->
+<!-- Modale pour les details de l'evenement -->
+<%- include('partials/modals/eventDetails') %>
+
+<!-- Modale pour modifier les informations de l'événement -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
         <span class="close close-btn">&times;</span>
         <h2>Modifier l'événement</h2>
         <label for="eventTitle">Titre : <span class="requis">*</span></label>
-        <input type="text" id="eventTitle" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="text" id="eventTitle" class="input-field" />
 
         <label for="eventDetails">Détails :</label>
-        <textarea id="eventDetails" class="input-field" <% if(cantEdit) {%> disabled <%}%>></textarea>
+        <textarea id="eventDetails" class="input-field"></textarea>
 
         <label for="startEventTime">Date de début : <span class="requis">*</span></label>
-        <input type="datetime-local" id="startEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="datetime-local" id="startEventTime" class="input-field" />
 
         <div style="display: flex; align-items: center;">
             <label for="eventAllDay">Toute la journée :</label>
-            <input type="checkbox" id="eventAllDay" style="margin-top: 12px; margin-left: 5px;" name="eventAllDay" <% if(cantEdit) {%> disabled <%}%> />
+            <input type="checkbox" id="eventAllDay" style="margin-top: 12px; margin-left: 5px;" name="eventAllDay" />
         </div>
 
         <div style="display: flex; align-items: center;">
@@ -42,12 +43,11 @@
                 <option value="0" selected>Jours</option>
                 <option value="1">Semaines</option>
                 <option value="2">Mois</option>
-                <option value="3">Ans</option>
-            </select>
+                <option value="3">Ans</option>lect>
         </div>
 
         <label for="endEventTime">Date de fin : <span class="requis">*</span></label>
-        <input type="datetime-local" id="endEventTime" class="input-field" <% if(cantEdit) {%> disabled <%}%> />
+        <input type="datetime-local" id="endEventTime" class="input-field" />
         <label id="error-update-event" class="form-label text-danger"></label>
 
         <div id="optionApplyToAll" style="display: none; align-items: center;">
@@ -56,12 +56,13 @@
         </div>
 
         <!-- Boutons pour enregistrer ou annuler -->
-        <button id="updateEvent" <% if(cantEdit) {%> hidden <%}%>>Enregistrer les modifications</button>
-        <button id="deleteEvent" <% if(cantEdit) {%> hidden <%}%>>Supprimer l'événement</button>
+        <button id="updateEvent">Enregistrer les modifications</button>
+        <button id="deleteEvent">Supprimer l'événement</button>
     </div>
 </div>
 
+<%- include('partials/modals/newEvent') %>
+
 <!-- Met l'agendaId dans les data -->
-<div id="calendar" data-agendaid="<%= agenda.agendaId %>">
-</div>
+<%- include('partials/slidingPanel') %>
 

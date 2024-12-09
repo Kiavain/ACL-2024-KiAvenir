@@ -1,4 +1,4 @@
-import EntityStructures from "../../structures/EntityStructure.js";
+import EntityStructures from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'un événement
@@ -68,7 +68,7 @@ export default class Event extends EntityStructures {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**
@@ -77,6 +77,13 @@ export default class Event extends EntityStructures {
    * @returns {Promise<Event>} Une promesse de l'événement
    */
   async update(data) {
+    this.name = data.name;
+    this.description = data.description;
+    this.startDate = data.startDate;
+    this.endDate = data.endDate;
+    this.allDay = data.allDay;
+    this.recurrence = data.recurrence;
+
     return this.entity.update((x) => x.eventId === this.eventId, data);
   }
 

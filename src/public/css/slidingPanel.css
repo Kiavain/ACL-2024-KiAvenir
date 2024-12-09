@@ -1,0 +1,48 @@
+#calendar-container {
+  display: flex;
+  position: relative;
+}
+
+#sliding-panel {
+  width: 300px;
+  max-width: 300px;
+  background-color: #f7f7f7;
+  border-right: 1px solid #ddd;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: -300px; /* Caché par défaut */
+  transition: all 0.3s ease-in-out;
+  z-index: 10;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+#calendar {
+  flex: 1;
+}
+
+#sliding-panel.open {
+  left: 0;
+}
+
+/* Supprime les puces des listes */
+#access-shared-users {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#access-shared-users li {
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+}
+
+/* Ajuste l'image de profil */
+.profile-picture {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%; /* Image ronde */
+  object-fit: cover;
+}

@@ -1,6 +1,6 @@
-import Entity from "../structures/Entity.js";
-import Event from "./structures/Event.js";
-import { DataTypes } from "sequelize";
+import Entity from '../structures/Entity.js';
+import Event from './structures/Event.js';
+import { DataTypes } from 'sequelize';
 
 /**
  * Représente l'entité des sagenda
@@ -56,7 +56,7 @@ export default class EventsEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return "events";
+    return 'events';
   }
 
   /**
@@ -64,6 +64,6 @@ export default class EventsEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["eventId"];
+    return ['eventId'];
   }
 }

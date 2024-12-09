@@ -1,6 +1,6 @@
-import { Router } from "express";
-import path from "path";
-import { getDirname } from "../utils/index.js";
+import { Router } from 'express';
+import path from 'path';
+import { getDirname } from '../utils/index.js';
 
 /**
  * Représente la structure d'un routeur.
@@ -27,7 +27,7 @@ class Routeur {
    */
   getPathInHTML(file) {
     const __dirname = getDirname(import.meta.url);
-    return path.join(__dirname, "../public/html/", file);
+    return path.join(__dirname, '../public/html/', file);
   }
 
   /**

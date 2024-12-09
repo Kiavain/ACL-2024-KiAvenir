@@ -2,103 +2,182 @@
 <html lang="fr">
 <head>
     <title>KiAvenir - Mon compte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* Responsive adjustments */
+      canvas#userIconPreview {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .custom-file {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+      }
+
+      /* Modale responsive */
+      .modal-content {
+        top: 20vh !important;
+        margin: auto;
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          top: 10vh !important;
+          width: 90%; /* Adaptation pour mobiles */
+        }
+
+        /* Ajustement de la hauteur de la modale */
+        .modal-content {
+          position: relative;
+          margin: 0 auto;
+          top: 10vh; /* Assure une bonne apparence sur mobile */
+        }
+
+        /* Pour s'assurer que le footer ne chevauche pas le contenu */
+        .vh-100 {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          overflow-y: auto; /* Ajoute un défilement si nécessaire */
+        }
+
+        #deleteAccount button {
+          margin: 0; /* Centrer le bouton si nécessaire */
+          width: 100%;
+        }
+
+        #accountDiv { /* ajoute du padding en haut */
+            padding-top: 550px;
+        }
+      }
+
+      /* Input "browse" style */
+      .custom-file input[type="file"] {
+        display: none;
+      }
+
+      .custom-file label {
+        cursor: pointer;
+      }
+    </style>
 </head>
 <body>
 <%- include('partials/header') %>
 <% /* global locals */ %>
 
-<div class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
-    <% if (!locals.user) { %>
-        <h1 class="text-center mt-4 mb-4 fw-bold text-primary">Vous n'êtes pas connecté !</h1>
-        <div>
-            Vous pouvez <a href="/signin" class="link-underline link-underline-opacity-0">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0">vous connecter</a> pour accéder à cette page.
-        </div>
-    <% } else { %>
-        <div class="container d-flex justify-content-center align-items-center h-75">
-            <div class="" style="width: 600px;">
-                <div class="">
-                    <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h2>
-                    <form name="accountEdition" action="/account/edit" method="POST">
-                        <div class="row">
-                            <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Votre adresse mail</label>
-                            <div class="col-md-7">
-                                <input type="email" class="form-control" id="email" name="email" value="<%= locals.user.email ?? '' %>" placeholder="Adresse mail">
-                                <label class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
-                            </div>
+<div id="accountDiv" class="vh-100 d-flex flex-column align-items-center"> <!-- justify-content-center -->
+<% if (!locals.user) { %>
+    <h1 class="text-center mt-4 mb-4 fw-bold text-primary">Vous n'êtes pas connecté !</h1>
+    <div>
+        Vous pouvez <a href="/signin" class="link-underline link-underline-opacity-0">créer un compte</a> ou <a href="/login" class="link-underline link-underline-opacity-0">vous connecter</a> pour accéder à cette page.
+    </div>
+<% } else { %>
+    <div class="container-fluid d-flex justify-content-center align-items-center h-100">
+        <div class="row w-100">
+            <div class="col-md-4">
+                <!-- Formulaire pour l'avatar -->
+                <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mon avatar</h2>
+                <form name="iconForm" action="/api/account/edit-icon" method="POST" enctype="multipart/form-data">
+                    <div class="text-center">
+                        <canvas id="userIconPreview" class="figure-img img-fluid rounded border border-dark"></canvas>
+                    </div>
+                    <!-- Champ pour sélectionner un fichier (on override le champ par défaut pour traduire) -->
+                    <div class="mb-3 d-flex flex-column align-items-center">
+                        <label for="imageUpload" class="form-label fw-bold">Choisissez une image :</label>
+                        <div class="custom-file w-100 border rounded bg-white">
+                            <input type="file" class="form-control" id="imageUpload" name="image" accept="image/*" style="display: none;">
+                            <label for="imageUpload" class="btn btn-light m-0 mr-3 border">Parcourir...</label>
+                            <span class="file-name text-muted">Aucun fichier sélectionné.</span>
                         </div>
-                        <div class="row">
-                            <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Votre nom d'utilisateur</label>
-                            <div class="col-md-7">
-                                <input type="text" class="form-control" id="username" name="username" value="<%= locals.user.username ?? '' %>" placeholder="Nom d'utilisateur">
-                                <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
-                            </div>
+                    </div>
+                    <!-- Bouton de soumission -->
+                    <p class="text-center text-danger" id="temporaryIcon"><i></i></p>
+                    <div class="d-grid">
+                        <button type="submit" id="uploadIcon" class="btn btn-primary fw-bold">Changer mon avatar</button>
+                    </div>
+                </form>
+            </div>
+            <!-- <div class="col-md-1 vr"></div> -->
+            <div class="col-md-8">
+                <!-- Formulaire pour les infos du compte -->
+                <h2 class="text-center mt-4 mb-4 fw-bold text-primary">Mes informations</h2>
+                <form name="accountEdition" action="/api/account/edit" method="POST">
+                    <div class="row">
+                        <label for="email" class="col-md-5 col-form-label text-md-end text-start ">Votre adresse mail</label>
+                        <div class="col-md-7">
+                            <input type="email" class="form-control" id="email" name="email" value="<%= locals.user.email ?? '' %>" placeholder="Adresse mail">
+                            <label class="form-label text-danger"><%= locals.emailTaken ?? '' %></label>
                         </div>
-                        <div class="row">
-                            <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Nouveau mot de passe</label>
-                            <div class="col-md-7">
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe">
-                                <label class="form-label text-danger" id="passwordMessage"></label>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <label for="username" class="col-md-5 col-form-label text-md-end text-start ">Votre nom d'utilisateur</label>
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" id="username" name="username" value="<%= locals.user.username ?? '' %>" placeholder="Nom d'utilisateur">
+                            <label class="form-label text-danger"><%= locals.usernameTaken ?? '' %></label>
                         </div>
-                        <div class="row">
-                            <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
-                            <div class="col-md-7">
-                                <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe">
-                                <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
-                            </div>
+                    </div>
+                    <div class="row">
+                        <label for="password" class="col-md-5 col-form-label text-md-end text-start ">Nouveau mot de passe</label>
+                        <div class="col-md-7">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Mot de passe">
+                            <label class="form-label text-danger" id="passwordMessage"></label>
                         </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary fw-bold">Enregistrer les modifications</button>
+                    </div>
+                    <div class="row">
+                        <label for="passwordRepeated" class="col-md-5 col-form-label text-md-end text-start ">Confirmez le mot de passe</label>
+                        <div class="col-md-7">
+                            <input type="password" class="form-control" id="passwordRepeated" placeholder="Confirmation du mot de passe">
+                            <label class="form-label text-danger" id="passwordRepeatedMessage"></label>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="d-grid w-100 mx-auto mt-3">
+                        <button type="submit" class="btn btn-primary fw-bold w-100">Enregistrer mes modifications</button>
+                    </div>
+
+                    <div id="deleteAccount" class="d-grid gap-2 d-md-block m-3 p-3 text-end">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteAccount">
+                            Supprimer mon compte
+                        </button>
+                    </div>
+
+
+                </form>
             </div>
         </div>
+    </div>
 
-        <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
+    <span class="text-center fw-bold text-danger mt-1"><%= locals.errorMessage ?? '' %></span>
 </div>
 
-
-        <div class="d-grid gap-2 d-md-block m-3 p-3 text-end">
-            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccount">
-                Supprimer mon compte
-            </button>
+<div class="modal fade" id="confirmDeleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="top: 20vh !important;">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-danger">
+                Cette action est définitive !
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="/api/account/delete" method="post">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
         </div>
+    </div>
+</div>
 
-
-        <style>
-            .modal-backdrop {
-                z-index: 2 !important;
-            }
-        </style>
-
-        <div class="modal fade" id="deleteAccount" tabindex="-1" aria-labelledby="deleteAccountLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content" style="top: 20vh !important;">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="deleteAccountLabel">Voulez-vous vraiment supprimer votre compte ?</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-danger">
-                        Cette action est définitive !
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <form action="/account/delete" method="post">
-                            <button type="submit" class="btn btn-danger">Supprimer</button>
-                        </form>
-                    </div>
-                </div>
-             </div>
-         </div>
-       <% } %>
-
-
-<% if (locals.user) { %>
-    <script type="module" src="/js/account/accountEdition.js"></script>
+<script type="module" src="/js/account/accountEdition.js"></script>
+<script type="module" src="/js/account/loadIconPreview.js"></script>
 <% } %>
+
 
 <%- include('partials/footer') %>
 </body>
-
 </html>

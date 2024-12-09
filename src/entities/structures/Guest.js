@@ -1,4 +1,4 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'agenda
@@ -37,6 +37,12 @@ export default class Guest extends EntityStructure {
      * @type {string}
      */
     this.role = data.role;
+
+    /**
+     * Si le guest est invité sans validation
+     * @type {boolean}
+     */
+    this.invited = data.invited;
   }
 
   /**
@@ -44,7 +50,7 @@ export default class Guest extends EntityStructure {
    * @returns {Object} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get("users");
+    return this.entity.server.database.tables.get('users');
   }
 
   /**
@@ -52,7 +58,7 @@ export default class Guest extends EntityStructure {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**
@@ -61,6 +67,9 @@ export default class Guest extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
+    this.role = data.role;
+    this.invited = data.invited;
+
     return this.entity.update((x) => x.id === this.id, data);
   }
 

@@ -180,7 +180,7 @@ body {
   width: 200px;
   position: relative;
 }
-#searchInput {
+#filterInput {
   width: 100%;
   padding: 5px;
   border-radius: 5px;
@@ -193,6 +193,7 @@ body {
 }
 
 .agenda-item {
+  position: relative;
   padding: 10px 15px;
   border-bottom: 1px solid #ddd;
   display: flex;
@@ -307,3 +308,24 @@ body {
 }
 
 .requis {color: red;}
+
+#mobile-menu {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: scale(0.95);
+  opacity: 0;
+  display: none;
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 999;
+}
+
+#mobile-menu[style*="display: block"] {
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: scale(0.95);
+}

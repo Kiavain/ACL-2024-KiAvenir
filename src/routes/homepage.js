@@ -1,4 +1,4 @@
-import Routeur from "../structures/Routeur.js";
+import Routeur from '../structures/Routeur.js';
 
 /**
  * Les routes liées à la page d'accueil
@@ -12,8 +12,8 @@ export default class HomepageRouteur extends Routeur {
    * Implémentation de la construction des routes
    */
   build() {
-    this.router.get("/", (req, res) => {
-      res.render("homepage");
+    this.router.get('/', (req, res) => {
+      res.render('homepage');
     });
   }
 }

@@ -1,64 +1,71 @@
-import { refreshCalendar } from "../calendar.js";
-import { addFlashMessages } from "../../utils.js";
+import { refreshCalendar } from '../calendar.js';
+import { addFlashMessages } from '../../utils.js';
+import { notifyServer } from '../../websocket.js';
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   // Utilitaires pour sélectionner les éléments
   const getElement = (id) => document.getElementById(id);
   const getInputValue = (id) => getElement(id).value;
   const setElementValue = (id, value) => (getElement(id).value = value);
 
-  const popup = document.getElementById("agendaEventWindow");
-  const createAgendaOrEvent = getElement("createAgendaOrEvent");
-  createAgendaOrEvent.addEventListener("click", function () {
-    popup.classList.toggle("show");
+  const popup = document.getElementById('agendaEventWindow');
+  const createAgendaOrEvent = getElement('createAgendaOrEvent');
+  createAgendaOrEvent.addEventListener('click', function () {
+    popup.classList.toggle('show');
   });
 
-  const createEvent = document.getElementById("createEvent");
-  const modal = document.getElementById("modal");
-  const closeModalBtn = document.getElementById("close-btn");
-  const createButton = document.getElementById("saveEvent");
-  const allDay = getElement("event-all-day");
-  allDay.checked = false;
+  const createEvent = document.getElementById('createEvent');
+  const modal = document.getElementById('modal');
+  const closeModalBtn = document.getElementById('close-btn');
+  const createButton = document.getElementById('saveEvent');
+  const allDay = getElement('event-all-day');
 
   //Change le format de la date en all day, sans heures
-  allDay.addEventListener("click", () => {
-    const startDate = getElement("event-date");
-    const endDate = getElement("event-date-end");
+  allDay.addEventListener('click', () => {
+    const startDate = getElement('event-date');
+    const endDate = getElement('event-date-end');
     if (allDay.checked) {
-      const newStartDate = startDate.value.split("T")[0];
-      startDate.type = "date";
-      endDate.type = "date";
+      const newStartDate = startDate.value.split('T')[0];
+      startDate.type = 'date';
+      endDate.type = 'date';
       startDate.value = newStartDate;
       endDate.value = startDate.value;
     } else {
-      const newStartDate = startDate.value + "T07:00";
-      const newEndDate = startDate.value + "T08:00";
-      startDate.type = "datetime-local";
-      endDate.type = "datetime-local";
+      const newStartDate = startDate.value + 'T07:00';
+      const newEndDate = startDate.value + 'T08:00';
+      startDate.type = 'datetime-local';
+      endDate.type = 'datetime-local';
       startDate.value = newStartDate;
       endDate.value = newEndDate;
     }
   });
   createEvent.onclick = () => {
-    modal.style.display = "block";
+    modal.style.display = 'block';
+
+    const errorElement = getElement('date-error');
+    const errAgenda = getElement('agenda-error');
+    const errName = getElement('name-error');
+    errName.style.display = 'none';
+    errorElement.style.display = 'none';
+    errAgenda.style.display = 'none';
   };
 
   // Fermer la fenêtre modale
-  closeModalBtn.addEventListener("click", () => {
-    modal.style.display = "none";
+  closeModalBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
   });
 
   // Fermer la fenêtre en cliquant en dehors de celle-ci
-  window.addEventListener("click", (event) => {
+  window.addEventListener('click', (event) => {
     if (event.target === modal) {
-      modal.style.display = "none";
+      modal.style.display = 'none';
     }
     if (
       !createAgendaOrEvent.contains(event.target) &&
       !popup.contains(event.target) &&
-      popup.classList.contains("show")
+      popup.classList.contains('show')
     ) {
-      popup.classList.toggle("show");
+      popup.classList.toggle('show');
     }
   });
 
@@ -121,13 +128,15 @@ document.addEventListener("DOMContentLoaded", () => {
     errorElement.style.display = startDateObj <= endDateObj ? "none" : "block";
 
     if (!name.trim()) {
-      errName.style.display = "block";
+      errName.style.display = 'block';
       return;
     }
+
     // Vérifie la validité des dates
     if (!dateDebut || !dateFin || !agendaValue || startDateObj > endDateObj) {
       return;
     }
+  
     const recurrenceValue = parseInt(recurrenceSelect.value, 10);
     if (![0, 1, 2, 3, 4, 5].includes(recurrenceValue)) {
       return;
@@ -152,9 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.style.display = "none";
     popup.classList.toggle("show");
 
-    fetch("/api/events/create", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('/api/events/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     })
       .then((response) => {
@@ -165,18 +174,21 @@ document.addEventListener("DOMContentLoaded", () => {
       })
       .then((data) => {
         // Réinitialise le formulaire
-        setElementValue("event-name", "");
-        setElementValue("event-description", "");
-        errName.style.display = "none";
-        errorElement.style.display = "none";
-        errAgenda.style.display = "none";
+        setElementValue('event-name', '');
+        setElementValue('event-date', '');
+        setElementValue('event-date-end', '');
+        setElementValue('event-description', '');
+        errName.style.display = 'none';
+        errorElement.style.display = 'none';
+        errAgenda.style.display = 'none';
         allDay.checked = false;
 
+        notifyServer({ type: 'update', message: 'Event creation' });
         refreshCalendar();
         addFlashMessages([data.message]);
       })
       .catch((error) => {
-        console.error("Erreur lors de la requête:", error);
+        console.error('Erreur lors de la requête:', error);
       });
   };
 });

@@ -1,19 +1,10 @@
-<% /* global locals,currentPath,agendas,cantEdit, err */ %>
-<%
-if (currentPath.includes("/agenda")) {
+<% /* global locals,currentPath,agendas, err */ %>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
 
-    cantEdit = true;
-    if (agenda.ownerId === locals.user.id) {
-        cantEdit = false;
-    } else {
-        let matchingGuests = guests.filter(guest => guest.agendaId === agenda.agendaId && guest.guestId === locals.user.id);
-        if (matchingGuests.length > 0 && matchingGuests[0].role === "Editeur") {
-            cantEdit = false;
-        }
-    }
-}
-%>
-<nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-body-secondary sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center" href="/">
             <img src="/img/favicon.ico" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
@@ -25,20 +16,7 @@ if (currentPath.includes("/agenda")) {
         </button>
 
         <!-- Conteneur centré pour le nom de l'agenda -->
-        <% if (currentPath.includes("/agenda")) { %>
-            <div style="position: absolute; left: 50%; transform: translateX(-50%); display: flex; justify-content: center; align-items: center;">
-                <% if (agenda.ownerId === locals.user.id) {%>
-                    <button class="icon-button" id="deleteAgenda">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                <% } %>
 
-                <span id="agendaNameDisplay" style="font-size: 24px; font-weight: bold; color: <%= agenda.color %>; margin-right: 10px;"><%= agenda.name %></span>
-                <% if (agenda.ownerId === locals.user.id && agenda.special === false) {%>
-                    <span class="material-symbols-outlined icon-button" id="editAgenda" title="Modifier l'agenda">edit</span>
-                <% } %>
-            </div>
-        <% } %>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
@@ -53,78 +31,22 @@ if (currentPath.includes("/agenda")) {
                 <% if (locals.user) { %>
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
-                        <div class = "search-bar" id="searchBar">
-                            <input type="text" id="searchInput" placeholder="Rechercher un événement">
-                        </div>
-                        <div id="menuAgendas" class="buttons-nav">
-                            <script type="module" src="/js/agenda/agendaMenu.js"></script>
-                            <button class="icon-button" id="menu-button">
-                                <span class="material-symbols-outlined">menu</span>
-                            </button>
-
-                            <!-- Menu déroulant - liste de tous les agendas de l'utilisateur -->
-                            <div id="dropdown-menu" class="dropdown-menu" style="display: none; width:200px; left:-5vw;">
-                                <h3 class="agenda-title">Mes agendas</h3>
-                                <ul class="agenda-list" id="agenda-list">
-
-                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === false).forEach(agenda => { %>
-                                        <li class="agenda-item" data-description="<%= agenda.description %>" style="<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
-                                            <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                                            <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
-                                                <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
-                                            </a>
-                                            <button value="<%= agenda.agendaId %>" class="icon-button" style="padding: 5px" onclick="event.stopPropagation()">
-                                                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
-                                            </button>
-                                        </li>
-                                    <% }) %>
-                                </ul>
-
-
-                                <!-- S'il y a au moins un partage qui le concerne -->
-                                <% if (guestsShared.length > 0) { %>
-                                    <h3 class="agenda-title">Agendas partagés</h3>
-                                    <ul class="agenda-list" id="share-agenda-list">
-                                        <% guestsShared.forEach(guest => {
-                                            const agenda = agendas.find(agenda => agenda.agendaId === guest.agendaId);
-                                        if (agenda) { %>
-                                            <li class="agenda-item" style="<%= currentPath === '/agenda/' + agenda.agendaId ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
-                                                <a href="/agenda/<%= agenda.agendaId %>">
-                                                    <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                                                    <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
-                                                </a>
-                                            </li>
-                                        <% }
-                                        }) %>
-                                    </ul>
-                                <% }%>
-
-                                <!-- Autres agendas -->
-                                <div style="display: inline-flex;">
-                                <h3 class="agenda-title">Autres agendas</h3>
-                                <button id="otherAgenda" class="icon-button" style="padding: 5px">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
-                                </button>
+                        <!-- Barre de recherche -->
+                        <div class="search-container search-bar">
+                            <input  type="text" id="eventSearch" class="form-control search-container search-bar" placeholder="Chercher un événement">
+                            <div id="searchResults" class="modal-container" style="display: none">
+                                <div class="searc-result-content">
+                                    <ul id="eventList"></ul>
+                                    <p id="noResultsMessage" style="display: none;">Aucun événement trouvé.</p>
                                 </div>
-                                <ul class="agenda-list" id="other-agenda-list">
-                                    <% agendas.filter(agenda => agenda.ownerId === locals.user.id && agenda.special === true).forEach(agenda => { %>
-                                        <li class="agenda-item" data-agenda-name="<%= agenda.name%>" style= "justify-content: unset;<%= currentPath.includes(agenda.agendaId) ? 'background-color: rgba(0, 123, 255, 0.2); color: white !important;' : '' %>">
-                                            <input type="checkbox" class="agenda-checkbox" value="<%= agenda.agendaId %>" onclick="event.stopPropagation()" style="margin-right: 10px; font-size: 20px; color:<%= agenda.color %>"/>
-                                            <a href="/agenda/<%= agenda.agendaId %>" data-agenda-name="<%= agenda.name %>" onclick="event.stopPropagation()">
-                                                <span style="color:<%= agenda.color %>"><%= agenda.name %></span>
-                                            </a>
-                                        </li>
-                                    <% }) %>
-                                </ul>
                             </div>
+                            <script type="module" src="/js/agenda/events/eventSearch.js"></script>
                         </div>
-                        <div id="shareOrExport" class="popUpWindow">
-                            <span id="agendaName" style="text-align: center;">Agenda name</span>
-                            <button id="shareAgenda">Partager l'agenda</button>
-                            <button id="exportAgenda" style="background-color: green;">Exporter agenda</button>
+
+                        <div class="search-bar">
+                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrer par nom">
                         </div>
-                        <script type="module" src="/js/agenda/events/Events.js"></script>
-                        <script type="module" src="/js/agenda/agendaImport.js"></script>
+
                         <button class="icon-button" id="createAgendaOrEvent">
                         <span class="material-symbols-outlined">
                             add
@@ -136,36 +58,42 @@ if (currentPath.includes("/agenda")) {
                             <button id="importAgenda">Importer un agenda</button>
                         </div>
                     <% } %>
+
+                    <!-- Dropdown pour les notifications -->
+                    <script type="module" src="/js/notifications/notifications.js"></script>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <!-- Badge pour le nombre de notifications -->
+                            <span class="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger" id="notification-count" style="display: none">
+                                0
+                            </span>
+                        </a>
+                        <!-- Liste des notifications  avec le dataset-user-id pour les requêtes -->
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" id="notification-list">
+                            <!-- Liste des notifications -->
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown pour le compte utilisateur -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="/img/account.jpg" alt="Logo" style="width: 30px; height: 30px" class="d-inline-block align-text-top">
+                            <img class="d-inline-block align-text-top img-fluid rounded-circle" id="userIcon" width="30" src="/img/default_user_icon.jpg" alt="Logo" data-user-id="<%= locals.user.id %>">
+                            <!-- style="width: 30px; height: 30px"  -->
                             <span class="ms-2"><%= locals.user.username %></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item <%= currentPath === '/account' ? 'active' : '' %>" href="/account">Mon compte</a></li>
-                            <li><a class="dropdown-item <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Mes agendas</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <script type="module" src="/js/account/logout.js"></script>
                                 <a id="logout_link" class="dropdown-item"  href="#">Déconnexion</a>
-                                <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
+                                <form id="logoutForm" action="/api/account/logout" method="POST" style="display: none;">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 </form>
                             </li>
                         </ul>
                     </li>
-                    <% if(currentPath.includes("/agenda")) { %>
-                        <!-- Fenêtre modale ajout événement -->
-                        <%- include('modals/newEvent') %>
-                        <!-- Fenêtre modale partager un agenda -->
-                        <%- include('modals/shareAgenda') %>
-                        <!-- Fenêtre modale exporter un agenda -->
-                        <%- include('modals/exportAgenda') %>
-                        <!-- Fenêtre modale importer un agenda -->
-                        <%- include('modals/importAgenda') %>
-                        <!-- Fenêtre modale autres agendas -->
-                        <%- include('modals/otherAgenda') %>
-                    <% } %>
                 <% } else { %>
                     <li class="nav-item">
                         <a class="nav-link" href="/login">Connexion</a>

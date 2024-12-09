@@ -1,4 +1,4 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'agenda
@@ -54,7 +54,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get("users");
+    return this.entity.server.database.tables.get('users');
   }
 
   /**
@@ -62,7 +62,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les événements
    */
   get events() {
-    return this.entity.server.database.tables.get("events");
+    return this.entity.server.database.tables.get('events');
   }
 
   /**
@@ -70,7 +70,7 @@ export default class Agenda extends EntityStructure {
    * @returns {Object} Les invités
    */
   get guests() {
-    return this.entity.server.database.tables.get("guests");
+    return this.entity.server.database.tables.get('guests');
   }
 
   /**
@@ -79,6 +79,11 @@ export default class Agenda extends EntityStructure {
    * @returns {Promise<Agenda>} Une promesse de l'agenda
    */
   async update(data) {
+    this.name = data.name;
+    this.color = data.color;
+    this.description = data.description;
+    this.special = data.special;
+
     return this.entity.update((x) => x.agendaId === this.agendaId, data);
   }
 
@@ -101,7 +106,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyCanEdit(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur");
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === 'Editeur' && !x.invited);
 
     return isOwner || isGuest;
   }
@@ -112,7 +117,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyAgendaAccess(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId);
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && !x.invited);
 
     return isOwner || isGuest;
   }
@@ -138,5 +143,16 @@ export default class Agenda extends EntityStructure {
    */
   getGuests() {
     return this.guests.filter((x) => x.agendaId === this.agendaId);
+  }
+
+  toJSON() {
+    return {
+      agendaId: this.agendaId,
+      ownerId: this.ownerId,
+      name: this.name,
+      color: this.color,
+      description: this.description,
+      special: this.special
+    };
   }
 }

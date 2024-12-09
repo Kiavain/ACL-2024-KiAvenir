@@ -1,5 +1,5 @@
-import Routeur from "../structures/Routeur.js";
-import moment from "moment";
+import Routeur from '../structures/Routeur.js';
+import moment from 'moment';
 
 /**
  * Les routes liées à la page des événements
@@ -13,12 +13,12 @@ export default class EventRouteur extends Routeur {
    * Construit la route
    */
   build() {
-    this.router.delete("/api/events/delete/:eventId", async (req, res) => {
+    this.router.delete('/api/events/delete/:eventId', async (req, res) => {
       // Vérifie si l'utilisateur est connecté
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: 'Vous devez être connecté pour effectuer cette action'
         });
       }
 
@@ -62,6 +62,7 @@ export default class EventRouteur extends Routeur {
       }
     });
 
+
     this.router.put("/api/events/update/:eventId", async (req, res) => {
       if (!res.locals.user) {
         return res.json({
@@ -80,6 +81,14 @@ export default class EventRouteur extends Routeur {
         return res.json({
           success: false,
           message: "Les champs titre, date de début et date de fin sont obligatoires."
+        });
+      }
+      
+      const event = this.server.database.tables.get('events').get(req.params.eventId);
+      if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
+        return res.json({
+          success: false,
+          message: "Vous n'avez pas la permission de modifier cet événement"
         });
       }
 
@@ -216,14 +225,15 @@ export default class EventRouteur extends Routeur {
       }
     });
 
-    // Route pour créer un événement lambda ou avec une récurrence simple
-    this.router.post("/api/events/create", async (req, res) => {
+    // Route pour créer un événement
+    this.router.post('/api/events/create', (req, res) => {
       if (!res.locals.user) {
         return res.json({
           success: false,
-          message: "Vous devez être connecté pour effectuer cette action"
+          message: 'Vous devez être connecté pour effectuer cette action'
         });
       }
+
 
       const eventsTable = this.server.database.tables.get("events");
       const occurrencesTable = this.server.database.tables.get("event_occurrences");
@@ -231,7 +241,25 @@ export default class EventRouteur extends Routeur {
       if (!eventsTable) {
         return res.json({
           success: false,
-          message: "Erreur lors de la création de l'événement"
+          message: "Vous n'avez pas la permission de créer un événement dans cet agenda"
+        });
+      }
+      
+      const events = this.server.database.tables.get('events');
+
+      // Permet de rajouter un jour au jour de Fin à un event all Day
+      if (req.body.allDay) {
+        let endDate = new Date(req.body.endDate);
+        endDate.setUTCDate(endDate.getUTCDate() + 1);
+        req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+      }
+
+      /// Vérifie si l'utilisateur a accès à l'agenda
+      const agenda = this.server.database.tables.get('agendas').get(req.body.agendaId);
+      if (!agenda || !agenda.verifyCanEdit(parseInt(res.locals.user.id))) {
+        return res.json({
+          success: false,
+          message: "Vous n'avez pas la permission de créer un événement dans cet agenda"
         });
       }
 
@@ -310,14 +338,14 @@ export default class EventRouteur extends Routeur {
         return res.json([]);
       }
 
-      const { search, start, end } = req.query;
+      const { filter, start, end } = req.query;
       let { agendaIds } = req.params;
 
       if (!start || !end) {
         return res.json([]);
       }
 
-      agendaIds = agendaIds.split(",").map((id) => parseInt(id.trim()));
+      agendaIds = agendaIds.split(',').map((id) => parseInt(id.trim()));
 
       // Synchronisation avec la base de données
       await this.server.database.sync();
@@ -338,6 +366,7 @@ export default class EventRouteur extends Routeur {
 
           return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 4;
         });
+
 
         // Récupère les occurrences d'événements récurrents
         const recurringEvents = this.server.database.tables.get("event_occurrences").filter((o) => {

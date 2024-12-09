@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation du partage d'agenda</title>
+  <style>
+    /* Styles intégrés */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .email-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border: 1px solid #dddddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: #007bff;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .content {
+      padding: 20px;
+      color: #333333;
+      text-align: center;
+    }
+
+    .content p {
+      font-size: 16px;
+      margin: 15px 0;
+    }
+
+    .content a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .content a:hover {
+      background-color: #0056b3;
+    }
+
+    .footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 12px;
+      color: #888888;
+    }
+
+    .footer p {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="email-container">
+  <!-- En-tête -->
+  <div class="header">
+    <h1>Validation du partage d'agenda</h1>
+  </div>
+
+  <!-- Contenu -->
+  <div class="content">
+    <p>Bonjour {{username}},</p>
+    <p>{{inviterUsername}} souhaite partager l'agenda "{{agendaName}}" avec vous.</p>
+    <p>Pour accepter ce partage, veuillez cliquer sur le bouton ci-dessous :</p>
+    <a href="http://{{address}}:{{port}}/accept-share?token={{token}}&agendaId={{agendaId}}" target="_blank">Accepter le partage</a>
+    <p>Si vous ne souhaitez pas accéder à cet agenda, vous pouvez ignorer cet email.</p>
+  </div>
+
+  <!-- Pied de page -->
+  <div class="footer">
+    <p>&copy; 2024 KiAvenir.</p>
+  </div>
+</div>
+</body>
+</html>

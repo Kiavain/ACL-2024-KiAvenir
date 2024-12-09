@@ -1,9 +1,10 @@
-import { initCalendar, saveEvent, deleteEvent, closeModal, handleOutsideClick } from "./calendar.js";
+import { initCalendar, saveEvent, deleteEvent, closeModal, handleOutsideClick } from './calendar.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const closeButton = document.querySelector(".close");
-  const saveButton = document.getElementById("updateEvent");
-  const deleteButton = document.getElementById("deleteEvent");
+document.addEventListener('DOMContentLoaded', () => {
+  const closeButton = document.querySelector('.close');
+  const saveButton = document.getElementById('updateEvent');
+  const deleteButton = document.getElementById('deleteEvent');
+  const deletePreviewButton = document.getElementById('deleteEventPreview');
 
   // Initialisation du calendrier
   const calendar = initCalendar();
@@ -13,11 +14,22 @@ document.addEventListener("DOMContentLoaded", () => {
     closeButton.onclick = closeModal;
     window.onclick = handleOutsideClick;
 
-    saveButton.onclick = () => saveEvent(calendar);
+    saveButton.onclick = () => {
+      // Récupère les dates de début et de fin
+      let startDate = document.getElementById('startEventTime').value;
+      let endDate = document.getElementById('endEventTime').value;
+
+      // Convertir les dates en objet Date
+      startDate = moment(startDate).toISOString().substring(0, 16);
+      endDate = moment(endDate).toISOString().substring(0, 16);
+
+      saveEvent(startDate, endDate);
+    };
     deleteButton.onclick = () => deleteEvent(calendar);
+    deletePreviewButton.onclick = () => deleteEvent(calendar);
 
     // Rendre le calendrier responsive lors du redimensionnement
-    window.addEventListener("resize", () => {
+    window.addEventListener('resize', () => {
       calendar.updateSize();
     });
   }
