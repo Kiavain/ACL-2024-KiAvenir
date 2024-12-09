@@ -390,6 +390,8 @@ export default class EventRouteur extends Routeur {
           color: agenda.color,
           allDay: e.allDay,
           recurrence: e.recurrence,
+          interval: 1,
+          unit: e.recurrence,
           agendaId,
           canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
         }));

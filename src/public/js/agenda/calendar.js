@@ -112,6 +112,7 @@ export const initCalendar = () => {
       document.getElementById('eventDetails').value = info.event.extendedProps.description;
       document.getElementById('eventAllDay').checked = info.event.allDay;
       document.getElementById('eventRecurrence').value = info.event.extendedProps.recurrence;
+      document.getElementById('eventRecurrenceInterval').value = info.event.extendedProps.interval;
       const saveButton = document.getElementById('updateEvent');
       saveButton.dataset.eventId = info.event.extendedProps.eventId;
       saveButton.dataset.occurrenceId = info.event.extendedProps.occurrenceId;
