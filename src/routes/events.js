@@ -376,7 +376,8 @@ export default class EventRouteur extends Routeur {
           interval: 1,
           unit: e.recurrence,
           agendaId,
-          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id)),
+          owner: res.locals.user.username
         }));
 
         // Mappe les occurrences dans le bon format
@@ -393,7 +394,8 @@ export default class EventRouteur extends Routeur {
           unit: o.unit,
           interval: o.interval,
           canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id)),
-          recurrence: 5
+          recurrence: 5,
+          owner: res.locals.user.username
         }));
 
         // Ajoute les événements de cet agenda au tableau global
