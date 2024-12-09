@@ -137,82 +137,90 @@ export default class EventRouteur extends Routeur {
           .get('event_occurrences')
           .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
         let rec = Number(recurrence);
-        if (occurrences_to_update.length > 0) {
-          if (applyToAll) {
-            for (const occurrence of occurrences_to_update) {
-              await occurrence.update({
-                name: title,
-                description: description
-              });
+        if (oldRecurrence === rec && unit === event.unit && interval === event.interval) {
+          // Aucun changement à apporter pour les occurrences
+          event.update(fieldsToUpdate);
+        } else {
+          if (occurrences_to_update.length > 0) {
+            if (applyToAll) {
+              for (const occurrence of occurrences_to_update) {
+                await occurrence.update({
+                  name: title,
+                  description: description
+                });
+              }
             }
-          }
-          if (rec === 5) {
-            let startDate = new Date(event.occurrenceStart);
-            let endDate = new Date(event.occurrenceEnd);
-            for (const occurrence of occurrences_to_update) {
-              handleFlexibleRecurrence(startDate, unit, interval);
-              handleFlexibleRecurrence(endDate, unit, interval);
+            if (rec === 5) {
+              let startDate = new Date(event.occurrenceStart);
+              let endDate = new Date(event.occurrenceEnd);
+              for (const occurrence of occurrences_to_update) {
+                handleFlexibleRecurrence(startDate, unit, interval);
+                handleFlexibleRecurrence(endDate, unit, interval);
 
-              await occurrence.update({
-                occurrenceStart: startDate.toISOString(),
-                occurrenceEnd: endDate.toISOString(),
-                unit: unit,
-                interval: interval
-              });
-            }
-          } else if (rec === 4) {
-            for (const occurrence of occurrences_to_update) {
-              await occurrence.update({
-                isCancelled: true
-              });
+                await occurrence.update({
+                  occurrenceStart: startDate.toISOString(),
+                  occurrenceEnd: endDate.toISOString(),
+                  unit: unit,
+                  interval: interval
+                });
+              }
+            } else if (rec === 4) {
+              for (const occurrence of occurrences_to_update) {
+                await occurrence.update({
+                  isCancelled: true
+                });
+              }
+            } else {
+              let startDate = new Date(event.occurrenceStart);
+              let endDate = new Date(event.occurrenceEnd);
+              for (const occurrence of occurrences_to_update) {
+                handleFlexibleRecurrence(startDate, rec, 1);
+                handleFlexibleRecurrence(endDate, rec, 1);
+
+                await occurrence.update({
+                  occurrenceStart: startDate.toISOString(),
+                  occurrenceEnd: endDate.toISOString(),
+                  unit: rec,
+                  interval: 1
+                });
+              }
             }
           } else {
-            let startDate = new Date(event.occurrenceStart);
-            let endDate = new Date(event.occurrenceEnd);
-            for (const occurrence of occurrences_to_update) {
-              handleFlexibleRecurrence(startDate, rec, 1);
-              handleFlexibleRecurrence(endDate, rec, 1);
-
-              await occurrence.update({
-                occurrenceStart: startDate.toISOString(),
-                occurrenceEnd: endDate.toISOString(),
-                unit: rec,
-                interval: 1
-              });
-            }
-          }
-        } else {
-          // Si aucune occurrence à mettre à jour, on crée les occurrences
-          if (rec !== 4) {
-            const debut = new Date(start);
-            const ending = new Date(end);
-            let maxOccurrences = 300;
-            let count = 0;
-            let currentDate = new Date(debut);
-            while (currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) && count < maxOccurrences) {
-              const occurrenceStart = new Date(currentDate);
-              const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
-              await occurrencesTable.create({
-                eventId: eventId,
+            // Si aucune occurrence à mettre à jour, on crée les occurrences
+            if (rec !== 4) {
+              const debut = new Date(start);
+              const ending = new Date(end);
+              let maxOccurrences = 300;
+              let count = 0;
+              let currentDate = new Date(debut);
+              while (
+                currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) &&
+                count < maxOccurrences
+              ) {
+                const occurrenceStart = new Date(currentDate);
+                const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
+                await occurrencesTable.create({
+                  eventId: eventId,
+                  name: title,
+                  description: description,
+                  allDay: allDay,
+                  occurrenceStart: occurrenceStart.toISOString(),
+                  occurrenceEnd: occurrenceEnd.toISOString(),
+                  unit: unit,
+                  interval: interval
+                });
+                handleFlexibleRecurrence(currentDate, unit, interval);
+                count++;
+              }
+            } else {
+              event.update({
                 name: title,
                 description: description,
-                allDay: allDay,
-                occurrenceStart: occurrenceStart.toISOString(),
-                occurrenceEnd: occurrenceEnd.toISOString(),
-                unit: unit,
-                interval: interval
+                startDate: start,
+                endDate: adjustedEnd,
+                allDay: allDay
               });
-              handleFlexibleRecurrence(currentDate, unit, interval);
-              count++;
             }
-          } else {
-            event.update({
-              name: title,
-              description: description,
-              startDate: start,
-              endDate: adjustedEnd,
-              allDay: allDay
-            });
           }
         }
         res.json({
