@@ -223,6 +223,9 @@ export const openEventDetailsModal = (eventData) => {
   //Pour la suppression d'event
   const saveButton = document.getElementById('updateEvent');
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
+  saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
+  saveButton.dataset.eventRecurrence = eventData.extendedProps.recurrence;
+  saveButton.dataset.applyToAllOccurrences = eventData.extendedProps.applyToAll;
   const title = document.getElementById('event-title');
   const date = document.getElementById('event-date-preview');
   const color = document.getElementById('event-color-preview');
@@ -506,11 +509,11 @@ export const saveEvent = (startDate, endDate) => {
 };
 
 // Fonction pour supprimer un événement
-export const deleteEvent = (calendar) => {
+export const deleteEvent = () => {
   const saveButton = document.getElementById('updateEvent');
   let eventId = saveButton.dataset.eventId;
-  const recurrence = document.getElementById('eventRecurrence').value;
-  const applyToAll = document.getElementById('applyToAllOccurrences').checked;
+  let recurrence = saveButton.dataset.eventRecurrence || document.getElementById('eventRecurrence').value;
+  let applyToAll = document.getElementById('applyToAllOccurrences').checked;
 
   const deleteNature = {
     recurrence: recurrence,
