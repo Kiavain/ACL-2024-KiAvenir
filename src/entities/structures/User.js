@@ -101,7 +101,7 @@ export default class User extends EntityStructures {
   
       await Promise.all([...agendaDelationPromises, ...guestDeletionPromises]);
     } catch (e) {
-      console.error("Erreur lors de la suppression du compte:", e.toString());
+      console.error("Erreur lors de la suppression du compte:\n\t", e.toString());
     }
     return this.entity.delete((x) => x.id === this.id);
   }
