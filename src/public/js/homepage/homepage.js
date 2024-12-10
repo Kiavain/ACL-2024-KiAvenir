@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.length > 0) {
+          data.sort((a, b) => {
+            return new Date(a.start) > new Date(b.start);
+          });
           data.forEach((event) => {
             if (event.allDay) {
               previewPanel.innerHTML += `<div><span class="fw-bold">${event.title}</span> toute la journée<br/></div>`;
@@ -21,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           previewPanel.innerHTML = "<div>Vous n'avez aucun événement aujourd'hui.<br/></div>";
         }
+        previewPanel.innerHTML += "<div><a href='/agenda?today=1'>Voir plus</a></div>";
       });
   }
 });

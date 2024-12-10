@@ -35,12 +35,12 @@ export default class HomepageRouteur extends Routeur {
       for (const agenda of agendas) {
         // Récupère les événements non récurrents
         const events = agenda.getEvents().filter((e) => {
-          const isToday = moment(e.startDate).isSame(new Date(), 'day');
+          const isToday = moment(new Date()).isBetween(e.startDate, e.endDate, 'day', '[]');
           return agenda.agendaId === e.agendaId && isToday && e.recurrence === 4;
         });
         // Récupère les occurrences d'événements récurrents
         const recurringEvents = this.server.database.tables.get('event_occurrences').filter((o) => {
-          const isToday = moment(o.occurrenceStart).isSame(new Date(), 'day');
+          const isToday = moment(new Date()).isBetween(o.occurrenceStart, o.occurrenceEnd, 'day');
           const parentEventInAgenda = agenda
             .getEvents()
             .map((e) => e.eventId)
