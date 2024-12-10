@@ -95,10 +95,14 @@ export default class User extends EntityStructures {
    * @returns {Promise<void>} L'utilisateur
    */
   async delete() {
-    const agendaDelationPromises = this.getAgendas().map((agenda) => agenda.delete());
-    const guestDeletionPromises = this.getGuests().map((guest) => guest.delete());
-
-    await Promise.all([...agendaDelationPromises, ...guestDeletionPromises]);
+    try {
+      const agendaDelationPromises = this.getAgendas().map((agenda) => agenda.delete());
+      const guestDeletionPromises = this.getGuests().map((guest) => guest.delete());
+  
+      await Promise.all([...agendaDelationPromises, ...guestDeletionPromises]);
+    } catch (e) {
+      console.error("Erreur lors de la suppression du compte:", e.toString());
+    }
     return this.entity.delete((x) => x.id === this.id);
   }
 
