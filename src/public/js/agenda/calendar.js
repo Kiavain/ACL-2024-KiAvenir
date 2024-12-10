@@ -242,7 +242,8 @@ export const openEventDetailsModal = (eventData) => {
   }
   if (eventData.allDay) {
     const startDate = new Date(eventData.start);
-    const endDate = eventData.end === null ? startDate : new Date(eventData.end);
+    const endDate = new Date(eventData.end);
+    endDate.setUTCDate(endDate.getUTCDate() - 1);
 
     if (startDate.getUTCDate() === endDate.getUTCDate()) {
       date.innerText = moment(startDate)
