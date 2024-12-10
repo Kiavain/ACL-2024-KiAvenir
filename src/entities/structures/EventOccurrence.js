@@ -97,7 +97,7 @@ export default class EventOccurrence extends EntityStructure {
    * @returns {Object} Les évènements
    */
   get events() {
-    return this.entity.server.database.tables.get('events');
+    return this.database.get('events');
   }
 
   /**
@@ -105,7 +105,7 @@ export default class EventOccurrence extends EntityStructure {
    * @returns {Agenda} L'agenda
    */
   getAgenda() {
-    return this.events.get(this.eventId).getAgenda();
+    return this.events.get(this.eventId)?.getAgenda();
   }
 
   /**

@@ -453,7 +453,7 @@ export class AgendaController extends Controller {
         recurrence: event.recurrence
       })),
       occurrences: this.eventOccurrences
-        .filter((occurrence) => occurrence.getAgenda().agendaId === agenda.agendaId)
+        .filter((occurrence) => occurrence.getAgenda()?.agendaId === agenda.agendaId)
         .map((o) => {
           /**
            * L'occurrence
