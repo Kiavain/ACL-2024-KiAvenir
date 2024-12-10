@@ -1,6 +1,16 @@
 import EntityStructure from '../../structures/EntityStructure.js';
 
 /**
+ * Type de données pour les entités
+ * @typedef {import("../AgendasEntity.js").default} AgendasEntity
+ * @typedef {import("../UsersEntity.js").default} UsersEntity
+ *
+ * Type de données pour les structures
+ * @typedef {import("../structures/User.js").default} User
+ * @typedef {import("../structures/Agenda.js").default} Agenda
+ */
+
+/**
  * Représente une structure d'agenda
  * @extends {EntityStructure} Les structures d'entité
  */
@@ -15,7 +25,7 @@ export default class Guest extends EntityStructure {
     super(entity, data);
 
     /**
-     * L'identifiant du tuple agenda,guest
+     * L'identifiant du tuple agenda, guest
      * @type {int}
      */
     this.id = data.id;
@@ -47,24 +57,24 @@ export default class Guest extends EntityStructure {
 
   /**
    * Récupère les utilisateurs
-   * @returns {Object} Les utilisateurs
+   * @returns {UsersEntity} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get('users');
+    return this.database.get('users');
   }
 
   /**
    * Récupère les agendas
-   * @returns {Object} Les agendas
+   * @returns {AgendasEntity} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get('agendas');
+    return this.database.get('agendas');
   }
 
   /**
    * Met à jour les données de l'agenda
    * @param data {Object} Les données à mettre à jour
-   * @returns {Promise<Agenda>} Une promesse de l'agenda
+   * @returns {Promise<Guest>} Une promesse de l'agenda
    */
   async update(data) {
     this.role = data.role;
@@ -86,7 +96,7 @@ export default class Guest extends EntityStructure {
    * @returns {User} L'utilisateur
    */
   getGuest() {
-    return this.users.get(this.guestId);
+    return this.users.get(this.guestId.toString());
   }
 
   /**
@@ -94,7 +104,7 @@ export default class Guest extends EntityStructure {
    * @returns {Agenda} L'agenda
    */
   getAgenda() {
-    return this.agendas.get(this.agendaId);
+    return this.agendas.get(this.agendaId.toString());
   }
 
   /**

@@ -60,7 +60,7 @@ describe("Test - Partie Compte Utilisateur", () => {
     expect(res.body.message).toEqual("Nom d'utilisateur ou mot de passe incorrect.");
   });
 
-  test("Affichage - Mots de passe oublié", async () => {
+  test("Affichage - Mot de passe oublié", async () => {
     const res = await request(server).get("/forget-password");
     expect(res.statusCode).toBe(200);
     expect(res.header['content-type']).toMatch(/text\/html/);

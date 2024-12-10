@@ -68,23 +68,70 @@ document.addEventListener('DOMContentLoaded', () => {
       popup.classList.toggle('show');
     }
   });
+
+  const recurrenceSelect = document.getElementById('event-recurrence');
+  const showRecurrencePanel = document.getElementById('show-recurrence-options');
+  const recurrenceCustomSelect = document.getElementById('event-recurrence-custom');
+  const recurrenceCustomInterval = document.getElementById('event-recurrence-interval');
+
+  if (showRecurrencePanel) {
+    showRecurrencePanel.style.display = 'none';
+  }
+
+  if (recurrenceSelect) {
+    recurrenceSelect.addEventListener('change', () => {
+      if (parseInt(recurrenceSelect.value) === 5) {
+        showRecurrencePanel.style.display = 'flex';
+
+        recurrenceCustomSelect.addEventListener('change', () => {
+          handleCustomRecurrence();
+        });
+
+        recurrenceCustomInterval.addEventListener('input', () => {
+          handleCustomRecurrence();
+        });
+      } else {
+        showRecurrencePanel.style.display = 'none';
+      }
+    });
+  }
+
+  function handleCustomRecurrence() {
+    const unit = parseInt(recurrenceCustomSelect.value);
+    const interval = parseInt(recurrenceCustomInterval.value);
+
+    if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
+      return [unit, interval];
+    } else {
+      console.warn('Unité ou intervalle invalide.');
+    }
+  }
+
   createButton.onclick = (e) => {
     const stringAppend = getElement('event-all-day').checked ? '' : '+00:00';
     const name = getInputValue('event-name');
-    // ajouter +00 parce que la date est en utc et sinon Date() pense que c'est en local
     const dateDebut = getInputValue('event-date') + stringAppend;
-    const description = getInputValue('event-description') || ' ';
     const dateFin = getInputValue('event-date-end') + stringAppend;
+    const description = getInputValue('event-description') || ' ';
     const agendaValue = getInputValue('event-agenda');
     const errorElement = getElement('date-error');
     const errAgenda = getElement('agenda-error');
     const errName = getElement('name-error');
     const allDay = getElement('event-all-day');
-    const recurrenceValue = parseInt(getInputValue('event-recurrence'));
     e.preventDefault();
 
-    errorElement.style.display = dateDebut < dateFin || (dateDebut === dateFin && allDay.checked) ? 'none' : 'block';
+    const startDateObj = new Date(dateDebut);
+    const endDateObj = new Date(dateFin);
+
+    errName.style.display = name.trim() ? 'none' : 'block';
     errAgenda.style.display = agendaValue ? 'none' : 'block';
+    errorElement.style.display = startDateObj <= endDateObj ? 'none' : 'block';
+
+    if (isNaN(endDateObj.getTime()) || isNaN(startDateObj.getTime())) {
+      errorElement.style.display = 'block';
+      errorElement.textContent = 'Il y a une erreur dans la date de début ou de fin.';
+      return;
+    }
 
     if (!name.trim()) {
       errName.style.display = 'block';
@@ -92,12 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Vérifie la validité des dates
-    if (!dateDebut || !dateFin || !agendaValue || dateDebut > dateFin || (dateDebut === dateFin && !allDay.checked)) {
+    if (!dateDebut || !dateFin || !agendaValue || startDateObj > endDateObj) {
       return;
     }
 
-    // Vérifie la valeur de l'entier recurrence (il ne peut valoir qu'un entier de 0 à 4)
-    if (recurrenceValue < 0 || recurrenceValue > 4) {
+    const recurrenceValue = parseInt(recurrenceSelect.value, 10);
+    if (![0, 1, 2, 3, 4, 5].includes(recurrenceValue)) {
       return;
     }
 
@@ -110,6 +157,12 @@ document.addEventListener('DOMContentLoaded', () => {
       allDay: allDay.checked,
       recurrence: recurrenceValue
     };
+
+    const valRecurrences = handleCustomRecurrence();
+    if (valRecurrences) {
+      data['unit'] = valRecurrences[0];
+      data['interval'] = valRecurrences[1];
+    }
 
     modal.style.display = 'none';
     popup.classList.toggle('show');
@@ -134,6 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
         errName.style.display = 'none';
         errorElement.style.display = 'none';
         errAgenda.style.display = 'none';
+        allDay.checked = false;
 
         notifyServer({ type: 'update', message: 'Event creation' });
         refreshCalendar();

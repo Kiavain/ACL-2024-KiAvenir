@@ -112,10 +112,14 @@ export const initCalendar = () => {
       document.getElementById('eventDetails').value = info.event.extendedProps.description;
       document.getElementById('eventAllDay').checked = info.event.allDay;
       document.getElementById('eventRecurrence').value = info.event.extendedProps.recurrence;
-      document.getElementById('updateEvent').dataset.eventId = info.event.extendedProps.eventId;
+      document.getElementById('eventRecurrenceInterval').value = info.event.extendedProps.interval;
+      document.getElementById('eventRecurrenceCustom').value = info.event.extendedProps.unit;
+      const saveButton = document.getElementById('updateEvent');
+      saveButton.dataset.eventId = info.event.extendedProps.eventId;
+      saveButton.dataset.occurrenceId = info.event.extendedProps.occurrenceId;
+      saveButton.dataset.oldRecurrence = info.event.extendedProps.recurrence;
 
       // Si on passe de allDay à non allDay, on ajuste la date de fin
-
       if (!info.event.allDay && info.oldEvent.allDay) {
         endDate = moment(info.event.start).add(1, 'hour').toISOString().substring(0, 16);
       } else if (info.event.allDay && !info.oldEvent.allDay) {
@@ -135,7 +139,10 @@ export const initCalendar = () => {
         document.getElementById('eventDetails').value = info.event.extendedProps.description;
         document.getElementById('eventAllDay').checked = info.event.allDay;
         document.getElementById('eventRecurrence').value = info.event.extendedProps.recurrence;
-        document.getElementById('updateEvent').dataset.eventId = info.event.extendedProps.eventId;
+        const saveButton = document.getElementById('updateEvent');
+        saveButton.dataset.eventId = info.event.extendedProps.eventId;
+        saveButton.dataset.occurrenceId = info.event.extendedProps.occurrenceId;
+        saveButton.dataset.oldRecurrence = info.event.extendedProps.recurrence;
         saveEvent(startDate, endDate);
       }
     },
@@ -216,6 +223,9 @@ export const openEventDetailsModal = (eventData) => {
   //Pour la suppression d'event
   const saveButton = document.getElementById('updateEvent');
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
+  saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
+  saveButton.dataset.eventRecurrence = eventData.extendedProps.recurrence;
+  saveButton.dataset.applyToAllOccurrences = eventData.extendedProps.applyToAll;
   const title = document.getElementById('event-title');
   const date = document.getElementById('event-date-preview');
   const color = document.getElementById('event-color-preview');
@@ -232,8 +242,7 @@ export const openEventDetailsModal = (eventData) => {
   }
   if (eventData.allDay) {
     const startDate = new Date(eventData.start);
-    const endDate = new Date(eventData.end);
-    endDate.setUTCDate(endDate.getUTCDate() - 1);
+    const endDate = eventData.end === null ? startDate : new Date(eventData.end);
 
     if (startDate.getUTCDate() === endDate.getUTCDate()) {
       date.innerText = moment(startDate)
@@ -253,8 +262,10 @@ export const openEventDetailsModal = (eventData) => {
     openModal(eventData);
   });
   if (!eventData.extendedProps.canEdit) {
+    editModal.hidden = true;
     document.getElementById('deleteEventPreview').hidden = true;
   } else {
+    editModal.hidden = false;
     document.getElementById('deleteEventPreview').removeAttribute('hidden');
   }
   modal.style.display = 'flex';
@@ -267,8 +278,11 @@ export const openModal = (eventData) => {
     return;
   }
   const allDay = document.getElementById('eventAllDay');
+  allDay.checked = eventData.allDay;
   const startDate = document.getElementById('startEventTime');
   const endDate = document.getElementById('endEventTime');
+  endDate.type = allDay.checked ? 'date' : 'datetime-local';
+  startDate.type = endDate.type;
 
   allDay.addEventListener('click', () => {
     if (allDay.checked) {
@@ -289,58 +303,89 @@ export const openModal = (eventData) => {
   document.getElementById('eventTitle').value = eventData.title;
   document.getElementById('eventDetails').value = eventData.extendedProps.description || 'Pas de détails disponibles.';
   allDay.checked = false;
-  if (!eventData.allDay) {
-    allDay.checked = false;
-    startDate.type = 'datetime-local';
-    endDate.type = 'datetime-local';
-    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
-    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
-  } else {
+  if (eventData.allDay) {
     allDay.click();
     const startDateValue = moment(eventData.start).format('YYYY-MM-DD');
-    let endDateValue = new Date(moment(eventData.end).format('YYYY-MM-DD'));
-    // Soustraire un jour à la date de fin
-    endDateValue.setUTCDate(endDateValue.getUTCDate() - 1);
-    endDate.value = endDateValue.toISOString().split('T')[0];
+
+    // Calculer end uniquement si eventData.end est défini
+    let endDateValue = eventData.end ? moment(eventData.end).add(-1, 'd').format('YYYY-MM-DD') : startDateValue;
     startDate.value = startDateValue;
+    endDate.value = endDateValue;
+  } else {
+    startDate.value = moment(eventData.start).toISOString().substring(0, 16);
+    endDate.value = moment(eventData.end).toISOString().substring(0, 16);
   }
 
   // Définit la récurrence de l'event
   let recurrenceSelect = document.getElementById('eventRecurrence');
-  let recurrence = eventData.extendedProps.recurrence;
-  let recurrenceOptions = recurrenceSelect.children;
+  const showRecPanel = document.getElementById('showRecurrenceOptionsEdit');
+  const recurrenceCustomSelect = document.getElementById('eventRecurrenceCustom');
+  const recurrenceCustomInterval = document.getElementById('eventRecurrenceInterval');
 
-  for (let i = 0; i <= 4; i++) {
-    recurrenceOptions[i].selected = false;
+  recurrenceCustomInterval.addEventListener('input', () => {
+    if (recurrenceCustomInterval.value === '' || recurrenceCustomInterval.value === '0') {
+      recurrenceCustomInterval.value = 1;
+    }
+  });
+  let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
+
+  let unit = eventData.extendedProps.unit ?? recurrence;
+  let interval = eventData.extendedProps.interval ?? 1;
+  recurrenceCustomSelect.value = unit;
+  recurrenceCustomInterval.value = interval;
+
+  // Custom de la récurrence
+  if (showRecPanel && recurrence !== 5) {
+    showRecPanel.style.display = 'none';
+  } else {
+    showRecPanel.style.display = 'flex';
   }
-  recurrenceOptions[recurrence].selected = true;
+
+  if (recurrenceSelect) {
+    recurrenceSelect.addEventListener('change', () => {
+      if (parseInt(recurrenceSelect.value) === 5) {
+        showRecPanel.style.display = 'flex';
+
+        recurrenceCustomSelect.addEventListener('change', () => {
+          handleCustomRecurrence();
+        });
+
+        recurrenceCustomInterval.addEventListener('input', () => {
+          handleCustomRecurrence();
+        });
+      } else {
+        showRecPanel.style.display = 'none';
+      }
+    });
+  }
+
+  function handleCustomRecurrence() {
+    const unit = parseInt(recurrenceCustomSelect.value);
+    const interval = recurrenceCustomInterval.value;
+
+    if (!isNaN(unit) && !isNaN(interval) && interval > 0) {
+      return [unit, interval];
+    } else {
+      console.warn('Les champs de récurrence personnalisée doivent être des nombres entiers positifs.');
+    }
+  }
+
+  recurrenceSelect.value = recurrence;
+
+  const optionApplyToAll = document.getElementById('optionApplyToAll');
+  if (recurrence !== 4) {
+    optionApplyToAll.style.display = 'flex';
+  } else {
+    optionApplyToAll.style.display = 'none';
+  }
 
   const saveButton = document.getElementById('updateEvent');
   saveButton.dataset.eventId = eventData.extendedProps.eventId;
-  disableIfCantEdit(eventData.extendedProps.canEdit);
+  saveButton.dataset.occurrenceId = eventData.extendedProps.occurrenceId;
+  saveButton.dataset.oldRecurrence = eventData.extendedProps.recurrence;
+
   modal.style.display = 'block';
 };
-function disableIfCantEdit(canEdit) {
-  if (!canEdit) {
-    document.getElementById('eventTitle').disabled = true;
-    document.getElementById('eventDetails').disabled = true;
-    document.getElementById('startEventTime').disabled = true;
-    document.getElementById('eventAllDay').disabled = true;
-    document.getElementById('eventRecurrence').disabled = true;
-    document.getElementById('endEventTime').disabled = true;
-    document.getElementById('updateEvent').hidden = true;
-    document.getElementById('deleteEvent').hidden = true;
-  } else {
-    document.getElementById('eventTitle').disabled = false;
-    document.getElementById('eventDetails').disabled = false;
-    document.getElementById('startEventTime').disabled = false;
-    document.getElementById('eventAllDay').disabled = false;
-    document.getElementById('eventRecurrence').disabled = false;
-    document.getElementById('endEventTime').disabled = false;
-    document.getElementById('updateEvent').hidden = false;
-    document.getElementById('deleteEvent').hidden = false;
-  }
-}
 
 // Fonction pour fermer la modale d'édition
 export const closeModal = () => {
@@ -367,22 +412,63 @@ export const handleOutsideClick = (event) => {
   }
 };
 
-// Fonction pour mettre à jour un événement
 export const saveEvent = (startDate, endDate) => {
   const saveButton = document.getElementById('updateEvent');
   const errorMessages = document.getElementById('error-update-event');
-  const eventId = saveButton.dataset.eventId;
+  let eventId = saveButton.dataset.eventId;
+  let sentId = eventId;
+
   const stringAppend = document.getElementById('eventAllDay').checked ? '' : '+00:00';
+  const applyToAll = document.getElementById('applyToAllOccurrences').checked;
+  const oldRecurrence = Number(saveButton.dataset.oldRecurrence);
+
   const updatedData = {
-    title: document.getElementById('eventTitle').value,
-    description: document.getElementById('eventDetails').value,
+    title: document.getElementById('eventTitle').value.trim(),
+    description: document.getElementById('eventDetails').value.trim(),
     start: startDate + stringAppend,
     end: endDate + stringAppend,
     allDay: document.getElementById('eventAllDay').checked,
-    recurrence: document.getElementById('eventRecurrence').value
+    recurrence: document.getElementById('eventRecurrence').value,
+    occurrence: 0, // Par défaut, c'est un événement principal
+    applyToAll: applyToAll,
+    sentId: sentId,
+    oldRecurrence: oldRecurrence
   };
 
-  if (!updatedData.title.trim()) {
+  // Vérifie si une récurrence personnalisée est activée
+  let rec = Number(updatedData.recurrence);
+  if (rec === 5) {
+    const unit = document.getElementById('eventRecurrenceCustom').value;
+    const interval = document.getElementById('eventRecurrenceInterval').value;
+
+    if (oldRecurrence !== 4) {
+      eventId = saveButton.dataset.occurrenceId;
+      updatedData.sentId = eventId;
+    }
+    updatedData.unit = parseInt(unit, 10);
+    updatedData.interval = parseInt(interval, 10);
+    updatedData.occurrence = 1; // Marque comme une occurrence
+
+    if (
+      isNaN(updatedData.unit) ||
+      isNaN(updatedData.interval) ||
+      updatedData.interval < 1 ||
+      updatedData.interval > 30
+    ) {
+      errorMessages.innerText = 'Les champs doivent être des nombres entiers positifs.';
+      return;
+    }
+  } else if (rec === 0 || rec === 1 || rec === 2 || rec === 3) {
+    if (oldRecurrence !== 4) {
+      eventId = saveButton.dataset.occurrenceId;
+      updatedData.sentId = eventId;
+    }
+    updatedData.occurrence = 1; // Marque comme une occurrence
+    updatedData.unit = rec;
+    updatedData.interval = 1;
+  }
+
+  if (!updatedData.title) {
     errorMessages.innerText = 'Le champ titre est obligatoire.';
     return;
   }
@@ -390,6 +476,7 @@ export const saveEvent = (startDate, endDate) => {
     errorMessages.innerText = 'Les champs dates sont obligatoires.';
     return;
   }
+
   // Vérifie si la date de fin est supérieure à la date de début
   if (
     (new Date(updatedData.start) >= new Date(updatedData.end) && !updatedData.allDay) ||
@@ -412,23 +499,42 @@ export const saveEvent = (startDate, endDate) => {
         refreshCalendar();
         closeModal();
       } else {
+        addFlashMessages([data.message]);
         refreshCalendar();
-        alert("Échec de la mise à jour de l'événement.");
+        errorMessages.innerText = data.message || "Échec de la mise à jour de l'événement.";
       }
     })
-    .catch((error) => console.error('Erreur:', error));
+    .catch((error) => {
+      console.error('Erreur:', error);
+      errorMessages.innerText = 'Une erreur est survenue lors de la mise à jour.';
+    });
 };
 
 // Fonction pour supprimer un événement
 export const deleteEvent = () => {
   const saveButton = document.getElementById('updateEvent');
-  const eventId = saveButton.dataset.eventId;
+  let eventId = saveButton.dataset.eventId;
+  let recurrence = saveButton.dataset.eventRecurrence || document.getElementById('eventRecurrence').value;
+  let applyToAll = document.getElementById('applyToAllOccurrences').checked;
 
-  fetch(`/api/events/delete/${eventId}`, { method: 'DELETE' })
+  const deleteNature = {
+    recurrence: recurrence,
+    applyToAll: applyToAll
+  };
+
+  if (Number(recurrence) !== 4) {
+    eventId = saveButton.dataset.occurrenceId;
+  }
+
+  closeModal();
+  fetch(`/api/events/delete/${eventId}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(deleteNature)
+  })
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        closeModal();
         closeEventDetailsModal();
         notifyServer({ type: 'update', message: 'Event deletion' });
         refreshCalendar();

@@ -22,78 +22,210 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const event = this.server.database.tables.get('events').get(req.params.eventId);
-      if (event) {
-        await event.delete();
-        res.json({ success: true });
+      const { recurrence, applyToAll } = req.body;
+
+      if (Number(recurrence) === 4) {
+        // Suppression d'un seul événement qui ne se répète pas
+        const event = this.server.database.tables.get('events').get(req.params.eventId);
+        if (event) {
+          await event.delete();
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
+      } else if (applyToAll) {
+        // Suppression de toutes les récurrences d'un événement
+        const occ = this.server.database.tables.get('event_occurrences').get(req.params.eventId);
+        let parentEventId = occ.eventId;
+        const event = this.server.database.tables.get('events').get(parentEventId);
+        if (event) {
+          await event.delete();
+          const occurrences = this.server.database.tables
+            .get('event_occurrences')
+            .filter((o) => o.eventId === event.eventId);
+          for (const occurrence of occurrences) {
+            await occurrence.delete();
+          }
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
       } else {
-        res.json({ success: false });
+        // Suppression d'une seule occurrence
+        const event = this.server.database.tables.get('event_occurrences').get(req.params.eventId);
+        if (event) {
+          await event.update({ isCancelled: true });
+          res.json({ success: true });
+        } else {
+          res.json({ success: false });
+        }
       }
     });
 
-    this.router.put('/api/events/update/:eventId', (req, res) => {
-      // Vérifie si l'utilisateur est connecté
-      const user = res.locals.user;
-      if (!user) {
+    this.router.put('/api/events/update/:eventId', async (req, res) => {
+      if (!res.locals.user) {
         return res.json({
           success: false,
-          message: 'Vous devez être connecté pour effectuer cette action'
+          message: 'Vous devez être connecté pour effectuer cette action.'
         });
       }
 
-      const event = this.server.database.tables.get('events').get(req.params.eventId);
-      if (!event.getAgenda().verifyCanEdit(parseInt(user.id))) {
-        return res.json({
-          success: false,
-          message: "Vous n'avez pas la permission de modifier cet événement"
-        });
-      }
+      let { title, description, start, end, allDay, recurrence, occurrence, unit, interval, applyToAll } = req.body;
+      const oldRecurrence = req.body.oldRecurrence;
+      const sentId = Number(req.body.sentId);
+      const occurrencesTable = this.server.database.tables.get('event_occurrences');
 
-      //Permet de rajouter un jour au jour de Fin à un event all Day
-      if (req.body.allDay) {
+      if (allDay) {
         let endDate = new Date(req.body.end);
         let startDate = new Date(req.body.start);
-        endDate.setUTCDate(endDate.getUTCDate() + 1);
-        startDate.setUTCDate(startDate.getUTCDate() + 1);
-        req.body.end = endDate.toISOString();
-        req.body.start = startDate.toISOString();
+        endDate.setUTCHours(endDate.getUTCHours() + 1);
+        startDate.setUTCHours(startDate.getUTCHours() + 1);
+        end = endDate.toISOString();
+        start = startDate.toISOString();
       }
 
-      const fields = {
-        name: req.body.title,
-        description: req.body.description,
-        startDate: req.body.start,
-        endDate: req.body.end,
-        allDay: req.body.allDay,
-        recurrence: req.body.recurrence
+      const fieldsToUpdate = {
+        name: title,
+        description: description,
+        occurrenceStart: start,
+        occurrenceEnd: end,
+        startDate: start,
+        endDate: end,
+        allDay: allDay,
+        recurrence: recurrence,
+        unit: unit,
+        interval: interval
       };
 
-      if (event) {
-        event
-          .update(fields)
-          .then(() => {
-            res.json({
-              success: true,
-              message: 'Événement mis à jour avec succès'
-            });
-          })
-          .catch(() => {
-            res.json({
-              success: false,
-              message: "Erreur lors de la mise à jour de l'événement"
-            });
+      let table = 'events';
+      let oldRec = Number(oldRecurrence);
+      if (occurrence === 1 && oldRec !== 4) {
+        // Distinction entre événement et occurrence => ajout des champs unit et interval
+        table = 'event_occurrences';
+      }
+
+      try {
+        let eventId = Number(sentId);
+        const event = this.server.database.tables.get(table).get(eventId);
+        if (!event.getAgenda().verifyCanEdit(parseInt(res.locals.user.id))) {
+          return res.json({
+            success: false,
+            message: "Vous n'avez pas la permission de modifier cet événement"
           });
-      } else {
+        }
+
+        if (!event) {
+          return res.json({
+            success: false,
+            message: 'Événement ou occurrence introuvable.'
+          });
+        }
+        await event.update(fieldsToUpdate);
+        const occurrences_to_update = this.server.database.tables
+          .get('event_occurrences')
+          .filter((o) => o.eventId === event.eventId && !o.isCancelled && o.occurrenceId !== event.occurrenceId);
+        let rec = Number(recurrence);
+        if (applyToAll) {
+          for (const occurrence of occurrences_to_update) {
+            await occurrence.update({
+              name: title,
+              description: description
+            });
+          }
+        }
+        if (oldRecurrence === rec && unit === event.unit && interval === event.interval) {
+          // Aucun changement à apporter pour les occurrences
+          event.update(fieldsToUpdate);
+        } else {
+          if (occurrences_to_update.length > 0) {
+            if (rec === 5) {
+              let startDate = new Date(event.occurrenceStart);
+              let endDate = new Date(event.occurrenceEnd);
+              for (const occurrence of occurrences_to_update) {
+                handleFlexibleRecurrence(startDate, unit, interval);
+                handleFlexibleRecurrence(endDate, unit, interval);
+
+                await occurrence.update({
+                  occurrenceStart: startDate.toISOString(),
+                  occurrenceEnd: endDate.toISOString(),
+                  unit: unit,
+                  interval: interval
+                });
+              }
+            } else if (rec === 4) {
+              for (const occurrence of occurrences_to_update) {
+                await occurrence.update({
+                  isCancelled: true
+                });
+              }
+            } else {
+              let startDate = new Date(event.occurrenceStart);
+              let endDate = new Date(event.occurrenceEnd);
+              for (const occurrence of occurrences_to_update) {
+                handleFlexibleRecurrence(startDate, rec, 1);
+                handleFlexibleRecurrence(endDate, rec, 1);
+
+                await occurrence.update({
+                  occurrenceStart: startDate.toISOString(),
+                  occurrenceEnd: endDate.toISOString(),
+                  unit: rec,
+                  interval: 1
+                });
+              }
+            }
+          } else {
+            // Si aucune occurrence à mettre à jour, on crée les occurrences
+            if (rec !== 4) {
+              const debut = new Date(start);
+              const ending = new Date(end);
+              let maxOccurrences = 300;
+              let count = 0;
+              let currentDate = new Date(debut);
+              while (
+                currentDate <= new Date(debut.getTime() + 2 * 365 * 24 * 60 * 60 * 1000) &&
+                count < maxOccurrences
+              ) {
+                const occurrenceStart = new Date(currentDate);
+                const occurrenceEnd = new Date(currentDate.getTime() + (ending - debut));
+                await occurrencesTable.create({
+                  eventId: eventId,
+                  name: title,
+                  description: description,
+                  allDay: allDay,
+                  occurrenceStart: occurrenceStart.toISOString(),
+                  occurrenceEnd: occurrenceEnd.toISOString(),
+                  unit: unit,
+                  interval: interval
+                });
+                handleFlexibleRecurrence(currentDate, unit, interval);
+                count++;
+              }
+            } else {
+              event.update({
+                name: title,
+                description: description,
+                startDate: start,
+                endDate: adjustedEnd,
+                allDay: allDay
+              });
+            }
+          }
+        }
+        res.json({
+          success: true,
+          message: 'Mise à jour effectuée avec succès.'
+        });
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour :', error);
         res.json({
           success: false,
-          message: "Erreur lors de la mise à jour de l'événement"
+          message: 'Une erreur est survenue lors de la mise à jour.'
         });
       }
     });
 
     // Route pour créer un événement
     this.router.post('/api/events/create', (req, res) => {
-      // Vérifie si l'utilisateur est connecté
       if (!res.locals.user) {
         return res.json({
           success: false,
@@ -101,13 +233,14 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      const events = this.server.database.tables.get('events');
+      const eventsTable = this.server.database.tables.get('events');
+      const occurrencesTable = this.server.database.tables.get('event_occurrences');
 
-      // Permet de rajouter un jour au jour de Fin à un event all Day
-      if (req.body.allDay) {
-        let endDate = new Date(req.body.endDate);
-        endDate.setUTCDate(endDate.getUTCDate() + 1);
-        req.body.endDate = endDate.toISOString(); // Convertir à nouveau en chaîne ISO si nécessaire
+      if (!eventsTable) {
+        return res.json({
+          success: false,
+          message: "Vous n'avez pas la permission de créer un événement dans cet agenda"
+        });
       }
 
       /// Vérifie si l'utilisateur a accès à l'agenda
@@ -119,18 +252,74 @@ export default class EventRouteur extends Routeur {
         });
       }
 
-      events
-        .create(req.body)
-        .then(() => {
+      if (req.body.allDay) {
+        let endDate = new Date(req.body.endDate);
+        endDate.setUTCDate(endDate.getUTCDate() + 1);
+        req.body.endDate = endDate.toISOString();
+      }
+
+      let data = req.body;
+      if (!data.description.trim()) {
+        delete data.description;
+      }
+
+      // Création de l'événement
+      eventsTable
+        .create(data)
+        .then((newEvent) => {
+          // Si l'événement est récurrent, créer les occurrences
+          if (req.body.recurrence !== 4) {
+            const start = new Date(req.body.startDate);
+            const end = new Date(req.body.endDate);
+            let currentDate = new Date(start);
+
+            // Limitation à 2 ans (2 * 365 * 24 * 60 * 60 * 1000 = 2 ans en millisecondes)
+            while (currentDate <= new Date(start.getTime() + 2 * 365 * 24 * 60 * 60 * 1000)) {
+              const occurrenceStart = new Date(currentDate);
+              const occurrenceEnd = new Date(currentDate.getTime() + (end - start));
+
+              // Gestion des récurrences flexibles ou non
+              if (req.body.recurrence !== 5) {
+                req.body.interval = 1;
+                req.body.unit = req.body.recurrence;
+              }
+
+              occurrencesTable.create({
+                eventId: newEvent.eventId,
+                name: newEvent.name,
+                description: newEvent.description,
+                occurrenceStart: occurrenceStart.toISOString(),
+                occurrenceEnd: occurrenceEnd.toISOString(),
+                allDay: newEvent.allDay,
+                unit: req.body.unit,
+                interval: req.body.interval
+              });
+              handleFlexibleRecurrence(currentDate, req.body.unit, req.body.interval);
+            }
+          }
           res.json({ success: true, message: 'Événement créé avec succès' });
         })
-        .catch(() => {
-          res.json({
-            success: false,
-            message: "Erreur lors de la création de l'événement"
-          });
-        });
+        .catch((error) => console.error("Erreur lors de la création de l'événement :", error));
     });
+
+    function handleFlexibleRecurrence(currentDate, unit, interval) {
+      switch (unit) {
+        case 0: // Quotidien
+          currentDate.setUTCDate(currentDate.getUTCDate() + interval);
+          break;
+        case 1: // Hebdomadaire
+          currentDate.setUTCDate(currentDate.getUTCDate() + interval * 7);
+          break;
+        case 2: // Mensuel
+          currentDate.setUTCMonth(currentDate.getUTCMonth() + interval);
+          break;
+        case 3: // Annuel
+          currentDate.setUTCFullYear(currentDate.getUTCFullYear() + interval);
+          break;
+        default:
+          break;
+      }
+    }
 
     this.router.get('/api/events/:agendaIds', async (req, res) => {
       if (!res.locals.user) {
@@ -140,7 +329,6 @@ export default class EventRouteur extends Routeur {
       const { filter, start, end } = req.query;
       let { agendaIds } = req.params;
 
-      // Vérifie que start et end sont définis
       if (!start || !end) {
         return res.json([]);
       }
@@ -152,124 +340,71 @@ export default class EventRouteur extends Routeur {
 
       let allEvents = [];
 
-      // Parcours chaque agendaId et récupère les événements correspondants
+      // Parcours chaque agendaId
       for (const agendaId of agendaIds) {
-        const agenda = this.server.database.tables.get('agendas').get(agendaId);
-        if (!agenda || !agenda.verifyAgendaAccess(parseInt(res.locals.user.id))) {
+        let agenda = this.server.database.tables.get('agendas').get(agendaId);
+        if (!agenda) {
           continue;
         }
 
-        // Récupère les événements pour cet agenda spécifique
-        const events = agenda
-          .getEvents()
-          .filter((e) => {
-            return agendaId === e.agendaId && (!filter || e.name.toLowerCase().includes(filter.toLowerCase()));
-          })
-          .map((e) => ({
-            eventId: e.eventId,
-            description: e.description,
-            title: e.name,
-            start: moment(e.startDate).format(),
-            end: moment(e.endDate).format(),
-            color: agenda.color,
-            allDay: e.allDay,
-            recurrence: e.recurrence,
-            agendaId,
-            owner: agenda.getOwner().username,
-            canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id))
-          }));
+        // Récupère les événements non récurrents
+        const events = agenda.getEvents().filter((e) => {
+          const isWithinDateRange = new Date(e.startDate) <= new Date(end) && new Date(e.endDate) >= new Date(start);
+          const matchesSearch = filter ? e.name.toLowerCase().includes(filter.toLowerCase()) : true;
+          return agendaId === e.agendaId && isWithinDateRange && matchesSearch && e.recurrence === 4;
+        });
 
-        // On récupère les évènements récurrents
-        const recurringEvents = events.filter((event) => event.recurrence !== 0);
-        let adjustedRecurringEvents = [];
+        // Récupère les occurrences d'événements récurrents
+        const recurringEvents = this.server.database.tables.get('event_occurrences').filter((o) => {
+          const isWithinDateRange =
+            new Date(o.occurrenceStart) <= new Date(end) && new Date(o.occurrenceEnd) >= new Date(start);
+          const matchesSearch = filter ? o.name.toLowerCase().includes(filter.toLowerCase()) : true;
+          const parentEventInAgenda = agenda
+            .getEvents()
+            .map((e) => e.eventId)
+            .includes(o.eventId);
 
-        // Fonction pour vérifier si une année est bissextile
-        const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+          // Vérifie si l'ID de l'occurrence appartient à un événement valide
+          return isWithinDateRange && matchesSearch && parentEventInAgenda && !o.isCancelled;
+        });
 
-        // Parcourir les jours du calendrier affiché (entre startCalendar et endCalendar)
-        let currentDate = new Date(start);
-        currentDate.setUTCHours(23, 59, 59, 999);
-        const endCalendar = new Date(end);
+        // Mappe les événements dans le bon format
+        const formattedEvents = events.map((e) => ({
+          eventId: e.eventId,
+          description: e.description,
+          title: e.name,
+          start: moment(e.startDate).toISOString(),
+          end: moment(e.endDate).toISOString(),
+          color: agenda.color,
+          allDay: e.allDay,
+          recurrence: e.recurrence,
+          interval: 1,
+          unit: e.recurrence,
+          agendaId,
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id)),
+          owner: res.locals.user.username
+        }));
 
-        while (currentDate < endCalendar) {
-          // Récupération des informations de la date actuelle en UTC
-          const jour = currentDate.getUTCDate();
-          const mois = currentDate.getUTCMonth() + 1; // Les mois sont de 0 à 11
-          const annee = currentDate.getUTCFullYear();
-
-          // On parcourt les évènements récurrents pour savoir si on doit en afficher un
-          for (const evt of recurringEvents) {
-            let displayEvent = false;
-            const eventStart = new Date(evt.start);
-            const eventEnd = new Date(evt.end);
-            const dureeEvent = eventEnd - eventStart; // Durée de l'événement en millisecondes
-
-            const eventStartDate = eventStart.getUTCDate();
-            const eventStartMonth = eventStart.getUTCMonth() + 1;
-            const eventStartYear = eventStart.getUTCFullYear();
-
-            // On vérifie si l'évènement doit être affiché
-            if (currentDate > eventStart) {
-              switch (evt.recurrence) {
-                case 1: // Tous les jours
-                  displayEvent = true;
-                  break;
-                case 2: // Toutes les semaines
-                  const differenceInDays = Math.floor(
-                    (currentDate.getTime() - eventStart.getTime()) / (1000 * 60 * 60 * 24)
-                  );
-                  displayEvent = differenceInDays % 7 === 0;
-                  break;
-                case 3: // Tous les mois
-                  displayEvent = eventStartDate === jour;
-                  break;
-                case 4: // Tous les ans
-                  if (eventStartMonth === mois && eventStartDate === jour) {
-                    displayEvent = true;
-                  } else if (
-                    eventStartMonth === 2 &&
-                    eventStartDate === 29 &&
-                    mois === 3 &&
-                    jour === 1 &&
-                    !isLeapYear(annee)
-                  ) {
-                    // Gestion spécifique du 29 février dans une année non bissextile
-                    displayEvent = true;
-                  }
-                  break;
-                default:
-                  break;
-              }
-            }
-
-            // Éviter d'afficher l'événement deux fois s'il tombe sur sa date de départ
-            if (eventStartDate === jour && eventStartMonth === mois && eventStartYear === annee) {
-              displayEvent = false;
-            }
-
-            if (displayEvent) {
-              // Calculons la nouvelle date de début
-              const adjustedEventStart = new Date(
-                Date.UTC(annee, mois - 1, jour, eventStart.getUTCHours(), eventStart.getUTCMinutes())
-              );
-
-              // On clone l'évènement en ajustant la date de début et de fin
-              const adjustedEvent = {
-                ...evt,
-                start: adjustedEventStart.toISOString(),
-                end: new Date(adjustedEventStart.getTime() + dureeEvent).toISOString()
-              };
-
-              adjustedRecurringEvents.push(adjustedEvent);
-            }
-          }
-
-          // Passer au jour suivant
-          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
-        }
+        // Mappe les occurrences dans le bon format
+        const formattedOccurrences = recurringEvents.map((o) => ({
+          occurrenceId: o.occurrenceId,
+          eventId: o.eventId,
+          description: o.description,
+          title: o.name,
+          start: moment(o.occurrenceStart).toISOString(),
+          end: moment(o.occurrenceEnd).toISOString(),
+          color: agenda.color,
+          allDay: o.allDay,
+          isCancelled: o.isCancelled,
+          unit: o.unit,
+          interval: o.interval,
+          canEdit: agenda.verifyCanEdit(parseInt(res.locals.user.id)),
+          recurrence: 5,
+          owner: res.locals.user.username
+        }));
 
         // Ajoute les événements de cet agenda au tableau global
-        allEvents = allEvents.concat(events, adjustedRecurringEvents);
+        allEvents = allEvents.concat(formattedEvents, formattedOccurrences);
       }
 
       // Envoie tous les événements associés aux agendas spécifiés

@@ -14,7 +14,7 @@ export default class Entity {
   constructor(server, definition = {}, options = {}) {
     /**
      * Le cache de la table
-     * @type {Map<String, Object>}
+     * @type {Map<String, EntityStructure>}
      */
     this.cache = new Map();
 
@@ -62,11 +62,19 @@ export default class Entity {
   }
 
   /**
+   * Récupère la base de données
+   * @returns {Database} La base de données
+   */
+  get database() {
+    return this.server.database;
+  }
+
+  /**
    * Récupère la table dans la base de données
    * @return {Object} La table
    */
   get table() {
-    return this.server.database.models[this.tableName];
+    return this.database.models[this.tableName];
   }
 
   /**
@@ -89,7 +97,7 @@ export default class Entity {
         );
       }
     } catch (e) {
-      console.error('Synchronisation : ', e);
+      this.server.logger.error('Erreur lors du chargement de la table : ', e);
     }
   }
 
@@ -226,7 +234,7 @@ export default class Entity {
 
       await this.cache.set(`${this.tableName}:${key}`, structure);
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
     return structure;
   }
@@ -266,7 +274,7 @@ export default class Entity {
         await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
       }
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
 
     return updatedRows.map((u) => new this.entityStructure(this, u.dataValues));
@@ -301,7 +309,7 @@ export default class Entity {
       // Suppression de la ligne dans la base de données
       await this.table.destroy({ where: { [Op.or]: where } });
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
   }
 }

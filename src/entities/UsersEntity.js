@@ -46,7 +46,7 @@ export default class UsersEntity extends Entity {
         hooks: {
           beforeCreate: (user) => {
             // Génération du sel aléatoire
-            user.salt = crypto.randomBytes(2).toString('hex'); // 4 caractères hexadécimaux
+            user.salt = crypto.randomBytes(2).toString('hex');
 
             // Chiffrement du mot de passe avec le sel
             user.password = encryptPassword(user.password, user.salt);
