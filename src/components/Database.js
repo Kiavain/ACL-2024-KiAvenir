@@ -1,8 +1,8 @@
-import { Sequelize } from "sequelize";
-import fs from "fs/promises";
-import { getDirname } from "../utils/index.js";
-import { pathToFileURL } from "url";
-import path from "path";
+import { Sequelize } from 'sequelize';
+import fs from 'fs/promises';
+import { getDirname } from '../utils/index.js';
+import { pathToFileURL } from 'url';
+import path from 'path';
 
 // Obtenir __dirname en mode ES module
 const __dirname = getDirname(import.meta.url);
@@ -27,12 +27,12 @@ export default class Database {
      * @type {Sequelize}
      */
     this.connector = new Sequelize({
-      dialect: "sqlite",
-      storage: process.env.NODE_ENV === "test" ? "data/testdb.sqlite" : "data/db.sqlite",
+      dialect: 'sqlite',
+      storage: process.env.NODE_ENV === 'test' ? 'data/testdb.sqlite' : 'data/db.sqlite',
       logging: false,
       define: {
-        charset: "utf8",
-        collate: "utf8_unicode_ci",
+        charset: 'utf8',
+        collate: 'utf8_unicode_ci',
         timestamps: true
       },
       pool: {
@@ -45,7 +45,7 @@ export default class Database {
 
     /**
      * Les tables de la base de données
-     * @type {Map<String, Object>}
+     * @type {Map<String, Entity>}
      */
     this.tables = new Map();
   }
@@ -64,28 +64,28 @@ export default class Database {
    */
   async load() {
     // Récupère les fichiers des entités
-    const modelsPath = path.join(getDirname(import.meta.url), "../entities");
+    const modelsPath = path.join(getDirname(import.meta.url), '../entities');
     const modelsFiles = await fs.readdir(modelsPath);
 
     for (const file of modelsFiles) {
       // Vérifie que l'on traite bien un fichier JS
-      if (!file.endsWith(".js")) {
+      if (!file.endsWith('.js')) {
         continue;
       }
 
       // Récupère la classe de l'entité
-      const modulePath = path.join(__dirname, "../entities", file);
+      const modulePath = path.join(__dirname, '../entities', file);
       const moduleURL = pathToFileURL(modulePath).href; // Convertir en URL
       const { default: Table } = await import(moduleURL); // Utiliser l'URL pour l'import dynamique
       const table = new Table(this.server);
 
       // Définit la table dans la base de données
-      await this.connector?.define(table.tableName, table.definition, table.options);
+      await this.connector.define(table.tableName, table.definition, table.options);
       await table.load();
       this.tables.set(table.tableName, table);
     }
 
-    await this.connector?.authenticate();
+    await this.connector.authenticate();
   }
 
   /**
@@ -94,7 +94,7 @@ export default class Database {
    */
   async sync() {
     try {
-      await this.connector?.sync();
+      await this.connector.sync();
 
       for (const table of this.tables.values()) {
         await table.refreshCache();

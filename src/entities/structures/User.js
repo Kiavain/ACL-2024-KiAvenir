@@ -1,6 +1,6 @@
-import EntityStructures from "../../structures/EntityStructure.js";
-import { encryptPassword } from "../../utils/index.js";
-import crypto from "crypto";
+import EntityStructures from '../../structures/EntityStructure.js';
+import { encryptPassword } from '../../utils/index.js';
+import crypto from 'crypto';
 
 /**
  * Représente la structure d'un utilisateur
@@ -51,6 +51,12 @@ export default class User extends EntityStructures {
      * @type {String}
      */
     this.reset_token = data.reset_token;
+
+    /**
+     * La dernière date de mise à jour
+     * @type {Date}
+     */
+    this.updatedAt = new Date(data.updatedAt);
   }
 
   /**
@@ -58,7 +64,7 @@ export default class User extends EntityStructures {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
   }
 
   /**
@@ -66,7 +72,7 @@ export default class User extends EntityStructures {
    * @returns {Object} Les invitations
    */
   get guests() {
-    return this.entity.server.database.tables.get("guests");
+    return this.entity.server.database.tables.get('guests');
   }
 
   /**
@@ -100,7 +106,7 @@ export default class User extends EntityStructures {
    * Récupère les agendas de l'utilisateur
    * @returns {Agenda[]} L'aganda
    */
-  getAgendas() {
+  get getAgendas() {
     return this.agendas.filter((x) => x.ownerId === this.id);
   }
 
@@ -108,7 +114,7 @@ export default class User extends EntityStructures {
    * Récupère les invités de l'utilisateur
    * @returns {Guest[]} Les invités
    */
-  getGuests() {
+  get getGuests() {
     return this.guests.filter((x) => x.guestId === this.id);
   }
 
@@ -126,14 +132,8 @@ export default class User extends EntityStructures {
    * @returns {Promise<void>}
    */
   async resetPassword() {
-    this.reset_token = crypto.randomBytes(32).toString("hex");
+    this.reset_token = crypto.randomBytes(32).toString('hex');
     await this.update({ reset_token: this.reset_token });
-
-    // Valable 10 minutes
-    setTimeout(async () => {
-      this.reset_token = "";
-      await this.update({ reset_token: "" });
-    }, 600000);
   }
 
   /**
@@ -142,6 +142,8 @@ export default class User extends EntityStructures {
    * @returns {boolean} Si le token est valide
    */
   checkResetToken(token) {
-    return this.reset_token === token && this.reset_token !== "";
+    const date = new Date();
+    const isExpired = date.getTime() - this.updatedAt > 600000;
+    return this.reset_token === token && this.reset_token !== '' && !isExpired;
   }
 }

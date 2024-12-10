@@ -1,4 +1,16 @@
-import EntityStructure from "../../structures/EntityStructure.js";
+import EntityStructure from '../../structures/EntityStructure.js';
+
+/**
+ * Type de données pour les entités
+ * @typedef {import("../EventsEntity.js").default} EventsEntity
+ * @typedef {import("../GuestsEntity.js").default} GuestsEntity
+ * @typedef {import("../UsersEntity.js").default} UsersEntity
+ *
+ * Type de données pour les structures
+ * @typedef {import("../structures/User.js").default} User
+ * @typedef {import("../structures/Event.js").default} Event
+ * @typedef {import("../structures/Guest.js").default} Guest
+ */
 
 /**
  * Représente une structure d'agenda
@@ -37,13 +49,15 @@ export default class Agenda extends EntityStructure {
      * @type {string}
      */
     this.color = data.color;
+
     /**
      * La description de l'agenda
      * @type {string}
      */
     this.description = data.description;
+
     /**
-     * Permet de savoir si l'agenda est spécial (Autres agendas)
+     * Permet de savoir si l'agenda est spécial (Autres agendas : Vacances, Jours fériés, etc.)
      * @type {boolean}
      */
     this.special = data.special;
@@ -51,26 +65,26 @@ export default class Agenda extends EntityStructure {
 
   /**
    * Récupère les utilisateurs
-   * @returns {Object} Les utilisateurs
+   * @returns {UsersEntity} Les utilisateurs
    */
   get users() {
-    return this.entity.server.database.tables.get("users");
+    return this.database.get('users');
   }
 
   /**
    * Récupère les événements
-   * @returns {Object} Les événements
+   * @returns {EventsEntity} Les événements
    */
   get events() {
-    return this.entity.server.database.tables.get("events");
+    return this.database.get('events');
   }
 
   /**
    * Récupère les invités
-   * @returns {Object} Les invités
+   * @returns {GuestsEntity} Les invités
    */
   get guests() {
-    return this.entity.server.database.tables.get("guests");
+    return this.database.get('guests');
   }
 
   /**
@@ -106,7 +120,7 @@ export default class Agenda extends EntityStructure {
    */
   verifyCanEdit(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === "Editeur");
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && x.role === 'Editeur' && !x.invited);
 
     return isOwner || isGuest;
   }
@@ -117,16 +131,17 @@ export default class Agenda extends EntityStructure {
    */
   verifyAgendaAccess(userId) {
     const isOwner = this.ownerId === userId;
-    const isGuest = this.getGuests().some((x) => x.guestId === userId);
+    const isGuest = this.getGuests().some((x) => x.guestId === userId && !x.invited);
 
     return isOwner || isGuest;
   }
+
   /**
    * Récupère le propriétaire de l'agenda
    * @returns {User} L'utilisateur
    */
   getOwner() {
-    return this.users.get(this.ownerId);
+    return this.users.get(this.ownerId.toString());
   }
 
   /**
@@ -143,16 +158,5 @@ export default class Agenda extends EntityStructure {
    */
   getGuests() {
     return this.guests.filter((x) => x.agendaId === this.agendaId);
-  }
-
-  toJSON() {
-    return {
-      agendaId: this.agendaId,
-      ownerId: this.ownerId,
-      name: this.name,
-      color: this.color,
-      description: this.description,
-      special: this.special
-    };
   }
 }

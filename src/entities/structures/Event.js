@@ -1,4 +1,4 @@
-import EntityStructures from "../../structures/EntityStructure.js";
+import EntityStructures from '../../structures/EntityStructure.js';
 
 /**
  * Représente une structure d'un événement
@@ -68,7 +68,15 @@ export default class Event extends EntityStructures {
    * @returns {Object} Les agendas
    */
   get agendas() {
-    return this.entity.server.database.tables.get("agendas");
+    return this.entity.server.database.tables.get('agendas');
+  }
+
+  /**
+   * Récupère les événements récurrents
+   * @returns {Object} Les événements récurrents
+   */
+  get occurrences() {
+    return this.entity.server.database.tables.get('event_occurrences');
   }
 
   /**
@@ -92,7 +100,18 @@ export default class Event extends EntityStructures {
    * @returns {Promise<void>}
    */
   async delete() {
+    for (const x of this.getOccurrences()) {
+      await x.delete();
+    }
     return this.entity.delete((x) => x.eventId === this.eventId);
+  }
+
+  /**
+   * Récupère les événements récurrents
+   * @returns {EventOccurrence[]} Les événements récurrents
+   */
+  getOccurrences() {
+    return this.occurrences.getAll().filter((x) => x.eventId === this.eventId);
   }
 
   /**

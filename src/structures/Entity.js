@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op } from 'sequelize';
 
 /**
  * Représente une table de la base de données.
@@ -14,7 +14,7 @@ export default class Entity {
   constructor(server, definition = {}, options = {}) {
     /**
      * Le cache de la table
-     * @type {Map<String, Object>}
+     * @type {Map<String, EntityStructure>}
      */
     this.cache = new Map();
 
@@ -51,14 +51,22 @@ export default class Entity {
    * Récupère le nom de la table
    */
   get tableName() {
-    throw new Error("Nom de table invalide");
+    throw new Error('Nom de table invalide');
   }
 
   /**
    * Récupère les colonnes d'identifiant (primary key)
    */
   get identifierColumns() {
-    throw new Error("Invalid table identifier");
+    throw new Error('Invalid table identifier');
+  }
+
+  /**
+   * Récupère la base de données
+   * @returns {Database} La base de données
+   */
+  get database() {
+    return this.server.database;
   }
 
   /**
@@ -66,7 +74,7 @@ export default class Entity {
    * @return {Object} La table
    */
   get table() {
-    return this.server.database.models[this.tableName];
+    return this.database.models[this.tableName];
   }
 
   /**
@@ -81,7 +89,7 @@ export default class Entity {
       const rows = await this.table.findAll();
       for (const row of rows) {
         const data = row.dataValues;
-        const key = this.identifierColumns.map((c) => data[c]).join(":");
+        const key = this.identifierColumns.map((c) => data[c]).join(':');
 
         this.cache.set(
           `${this.tableName}:${key}`, // Stocke la ligne dans le cache avec les clés primaires
@@ -89,7 +97,7 @@ export default class Entity {
         );
       }
     } catch (e) {
-      console.error("Synchronisation : ", e);
+      this.server.logger.error('Erreur lors du chargement de la table : ', e);
     }
   }
 
@@ -103,13 +111,13 @@ export default class Entity {
 
       for (const row of rows) {
         const data = row.dataValues;
-        const key = this.identifierColumns.map((c) => data[c]).join(":");
+        const key = this.identifierColumns.map((c) => data[c]).join(':');
 
         // Met à jour le cache avec les nouvelles données
         this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
       }
     } catch (e) {
-      console.error("Erreur lors de la mise à jour du cache : ", e);
+      console.error('Erreur lors de la mise à jour du cache : ', e);
     }
   }
 
@@ -119,7 +127,7 @@ export default class Entity {
    * @returns {boolean} Si l'entité a la clé primaire
    */
   has(...key) {
-    return this.cache.has(`${this.tableName}:${key.map((x) => x).join(":")}`);
+    return this.cache.has(`${this.tableName}:${key.map((x) => x).join(':')}`);
   }
 
   /**
@@ -166,7 +174,7 @@ export default class Entity {
    * @returns {EntityStructure} La ligne
    */
   get(...key) {
-    return this.cache.get(`${this.tableName}:${key.map((x) => x).join(":")}`);
+    return this.cache.get(`${this.tableName}:${key.map((x) => x).join(':')}`);
   }
 
   /**
@@ -220,13 +228,13 @@ export default class Entity {
 
     try {
       const created = await this.table.create(data);
-      const key = this.identifierColumns.map((c) => created.dataValues[c]).join(":");
+      const key = this.identifierColumns.map((c) => created.dataValues[c]).join(':');
 
       structure = new this.entityStructure(this, created.dataValues);
 
       await this.cache.set(`${this.tableName}:${key}`, structure);
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
     return structure;
   }
@@ -261,12 +269,12 @@ export default class Entity {
 
       for (const row of updatedRows) {
         const data = row.dataValues;
-        const key = this.identifierColumns.map((c) => data[c]).join(":");
+        const key = this.identifierColumns.map((c) => data[c]).join(':');
 
         await this.cache.set(`${this.tableName}:${key}`, new this.entityStructure(this, data));
       }
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
 
     return updatedRows.map((u) => new this.entityStructure(this, u.dataValues));
@@ -292,7 +300,7 @@ export default class Entity {
         }
 
         // Suppression de la ligne dans le cache
-        const key = this.identifierColumns.map((c) => row.data[c]).join(":");
+        const key = this.identifierColumns.map((c) => row.data[c]).join(':');
         this.cache.delete(`${this.tableName}:${key}`);
 
         where.push(w);
@@ -301,7 +309,7 @@ export default class Entity {
       // Suppression de la ligne dans la base de données
       await this.table.destroy({ where: { [Op.or]: where } });
     } catch (err) {
-      console.error(err);
+      this.server.logger.error(err);
     }
   }
 }
