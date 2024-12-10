@@ -15,6 +15,10 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton.onclick = closeModal;
     window.onclick = handleOutsideClick;
 
+    if (new URLSearchParams(window.location.search).has('today')) {
+      calendar.changeView('timeGridDay');
+    }
+
     saveButton.onclick = () => {
       // Récupère les dates de début et de fin
       let startDate = document.getElementById('startEventTime').value;

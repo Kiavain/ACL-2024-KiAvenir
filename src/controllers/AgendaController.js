@@ -1,6 +1,5 @@
 import Controller from './Controller.js';
 import path from 'path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
 import ical from 'ical-generator';
 import * as ICAL from 'ical.js';
@@ -223,6 +222,7 @@ export class AgendaController extends Controller {
       })
       .catch((error) => res.err(500, error));
   }
+
   /**
    * Partage un agenda
    * @param req {Request} La requête
@@ -439,7 +439,7 @@ export class AgendaController extends Controller {
    */
   exportJSON(res, agenda) {
     // Crée une copie de l'objet agenda simple
-    const data = JSON.stringify({
+    return JSON.stringify({
       name: agenda.name,
       description: agenda.description,
       color: agenda.color,
@@ -472,16 +472,6 @@ export class AgendaController extends Controller {
           };
         })
     });
-
-    // Enregistre les données dans un fichier JSON
-    const filename = `agenda_${agenda.name}.json`;
-    let downloadsPath = path.join(os.homedir(), 'Downloads', filename);
-    if (!fs.existsSync(downloadsPath)) {
-      downloadsPath = path.join(os.homedir(), 'Téléchargements', filename);
-    }
-
-    fs.writeFileSync(downloadsPath, data, 'utf8');
-    res.download(downloadsPath, filename, () => {});
   }
 
   /**
@@ -506,9 +496,9 @@ export class AgendaController extends Controller {
     if (!agenda) {
       return res.err(404, 'Agenda non trouvé.');
     }
-
+    let content;
     if (format === 'JSON') {
-      this.exportJSON(res, agenda);
+      content = this.exportJSON(res, agenda);
     } else if (format === 'ICS') {
       // Crée un calendrier ICAL avec les événements
       const calendar = ical({ name: agenda.name, description: agenda.description });
@@ -536,21 +526,11 @@ export class AgendaController extends Controller {
       });
 
       // Convertit le calendrier en chaîne ICAL
-      const icsContent = calendar.toString();
-      const filename = `agenda_${agenda.name}.ics`;
-      let downloadsPath = path.join(os.homedir(), 'Downloads', filename);
-      if (!fs.existsSync(downloadsPath)) {
-        downloadsPath = path.join(os.homedir(), 'Téléchargements', filename);
-      }
-
-      // Enregistre la chaîne ICS dans un fichier
-      fs.writeFileSync(downloadsPath, icsContent, 'utf8');
-
-      res.download(downloadsPath, filename, () => {});
+      content = calendar.toString();
     } else {
       return res.err(400, 'Format inconnu.');
     }
-    res.success(`L'agenda ${agenda.name} a été exporté avec succès au format ${format}.`);
+    res.success(`L'agenda ${agenda.name} a été exporté avec succès au format ${format}.`, { content });
   }
 
   /**
@@ -662,6 +642,7 @@ export class AgendaController extends Controller {
     );
     res.success("L'agenda a été importé avec succès.");
   }
+
   /**
    * Importer un agenda de vacances
    * @param req
@@ -736,6 +717,7 @@ export class AgendaController extends Controller {
       }
     });
   }
+
   /**
    * Supprime un agenda de vacances
    * @param req La requête

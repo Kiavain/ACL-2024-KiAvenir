@@ -32,7 +32,7 @@ function submitExportAgenda() {
     format: format
   };
   fetch(`/api/agenda/${exportAgendaId}/exportAgenda`, {
-    method: 'PUT',
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
@@ -48,10 +48,24 @@ function submitExportAgenda() {
         exportError.style.display = 'none';
         addFlashMessages(data.flashMessages);
         modal.style.display = 'none';
+        let blob = new Blob([data.content], { type: format });
+
+        let a = document.createElement('a');
+        a.download = `agenda.${format.toLocaleLowerCase()}`;
+        a.href = URL.createObjectURL(blob);
+        a.dataset.downloadurl = [format, a.download, a.href].join(':');
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () {
+          URL.revokeObjectURL(a.href);
+        }, 1500);
       } else {
         if (isExportError) {
           exportError.textContent = data.message;
           exportError.style.display = 'block';
+        } else {
         }
       }
     })
