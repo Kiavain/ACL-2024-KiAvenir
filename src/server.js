@@ -16,6 +16,7 @@ dotenv.config();
 
 // Créez l'équivalent de __dirname
 const __dirname = getDirname(import.meta.url);
+let ending = false;
 
 /**
  * Classe principale de l'application
@@ -37,13 +38,17 @@ class KiAvenir {
 
     // Libère les ressources lors des signaux d'arrêt
     process.on('SIGINT', this.stop.bind(this));
-    process.on('SIGTERM', this.stop.bind(this));
   }
 
   /**
    * Méthode de fermeture propre
    */
   async stop() {
+    if (ending) {
+      return;
+    }
+    ending = true;
+
     try {
       this.logger.warn('Fermeture du serveur...');
 
