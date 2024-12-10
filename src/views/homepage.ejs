@@ -7,8 +7,7 @@
 <% /* global locals */ %>
 <%- include('partials/header') %>
 
-<div class="container"
-     style="display: flex; justify-content: center; align-items: center; height: 25%; flex-direction: column;">
+<div class="container-fluid d-flex justify-content-center align-items-center h-100" style="flex-direction: column;">
     <% if (locals.user) { %>
         <h1 class="text-center fw-bold text-primary">Bonjour, <%= locals.user.username %>!</h1>
     <% } else { %>
@@ -17,7 +16,7 @@
     <h3 class="text-center mt-4">
         <% if (locals.user) { %>
             <div>
-                <span class="fw-bold">Voici vos évenements aujourd'hui:</span>
+                <span class="fw-bold">Voici vos événements aujourd'hui:</span>
                 <div id="homepageDailyPreview"></div>
             </div>
         <% } else { %>
