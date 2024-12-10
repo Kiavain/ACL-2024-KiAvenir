@@ -1,55 +1,60 @@
 import Entity from '../structures/Entity.js';
-import Event from './structures/Event.js';
+import EventOccurrence from './structures/EventOccurrence.js';
 import { DataTypes } from 'sequelize';
 
 /**
- * Représente l'entité des sagenda
+ * Représente l'entité des occurrences d'événements
  */
-export default class EventsEntity extends Entity {
+export default class EventOccurrencesEntity extends Entity {
   /**
-   * Construit l'entité des agendas
+   * Construit l'entité des occurrences d'événements
    * @param server {KiAvenir} Le serveur de l'application
    * @constructor
    */
   constructor(server) {
     super(server, {
-      eventId: {
+      occurrenceId: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true
       },
-      agendaId: {
+      eventId: {
         type: DataTypes.INTEGER
       },
-      description: {
-        type: DataTypes.TEXT,
-        defaultValue: 'Pas de détails disponibles.'
+      occurrenceStart: {
+        type: DataTypes.DATE
+      },
+      occurrenceEnd: {
+        type: DataTypes.DATE
       },
       name: {
         type: DataTypes.STRING(32)
       },
-      startDate: {
-        type: DataTypes.DATE
-      },
-      endDate: {
-        type: DataTypes.DATE
+      description: {
+        type: DataTypes.TEXT
       },
       allDay: {
         type: DataTypes.BOOLEAN
       },
-      recurrence: {
-        type: DataTypes.INTEGER,
-        defaultValue: 4
+      isCancelled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      },
+      unit: {
+        type: DataTypes.INTEGER
+      },
+      interval: {
+        type: DataTypes.INTEGER
       }
     });
   }
 
   /**
    * Récupère la structure de l'entité
-   * @returns {Event} La structure de l'entité
+   * @returns {EventOccurrence} La structure de l'entité
    */
   get entityStructure() {
-    return Event;
+    return EventOccurrence;
   }
 
   /**
@@ -57,7 +62,7 @@ export default class EventsEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return 'events';
+    return 'event_occurrences';
   }
 
   /**
@@ -65,6 +70,6 @@ export default class EventsEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ['eventId'];
+    return ['occurrenceId'];
   }
 }

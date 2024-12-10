@@ -26,10 +26,10 @@ jobs:
 
       # Étape 3 : Installe les dépendances
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       # Étape 4 : Lance les tests avec couverture
       - name: Run tests with coverage
         env:
           NODE_ENV: test
-        run: npx cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage
+        run: npx cross-env NODE_ENV=test node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage --detectOpenHandles --forceExit

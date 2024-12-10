@@ -1,6 +1,6 @@
-import Entity from "../structures/Entity.js";
-import { DataTypes } from "sequelize";
-import Guest from "./structures/Guest.js";
+import Entity from '../structures/Entity.js';
+import { DataTypes } from 'sequelize';
+import Guest from './structures/Guest.js';
 
 /**
  * Représente l'entité des Guests
@@ -27,6 +27,10 @@ export default class GuestsEntity extends Entity {
       },
       role: {
         type: DataTypes.STRING(32)
+      },
+      invited: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
       }
     });
   }
@@ -44,7 +48,7 @@ export default class GuestsEntity extends Entity {
    * @returns {string} Le nom de la table
    */
   get tableName() {
-    return "guests";
+    return 'guests';
   }
 
   /**
@@ -52,6 +56,6 @@ export default class GuestsEntity extends Entity {
    * @returns {string[]} Les colonnes d'identifiant
    */
   get identifierColumns() {
-    return ["id"];
+    return ['id'];
   }
 }

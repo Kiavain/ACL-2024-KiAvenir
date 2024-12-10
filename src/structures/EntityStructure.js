@@ -23,6 +23,14 @@ export default class EntityStructure {
   }
 
   /**
+   * Récupère les données de l'entité
+   * @returns {Map<String, Entity>} Les données de l'entité
+   */
+  get database() {
+    return this.entity.database.tables;
+  }
+
+  /**
    * Met à jour les données de l'entité
    * @param data {Object} Les données à mettre à jour
    * @return {EntityStructure} La structure de l'entité

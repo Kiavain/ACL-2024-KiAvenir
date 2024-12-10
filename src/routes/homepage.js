@@ -13,8 +13,8 @@ export default class HomepageRouteur extends Routeur {
    * Implémentation de la construction des routes
    */
   build() {
-    this.router.get("/", (req, res) => {
-      res.render("homepage");
+    this.router.get('/', (req, res) => {
+      res.render('homepage');
     });
 
     this.router.get("/api/homepage/todayEvents", async (req, res) => {

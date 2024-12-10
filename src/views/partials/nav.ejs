@@ -1,4 +1,8 @@
 <% /* global locals,currentPath,agendas, err */ %>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/fr.min.js"></script>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-body-secondary sticky-top">
     <div class="container-fluid">
@@ -27,8 +31,20 @@
                 <% if (locals.user) { %>
                     <!-- Fenêtre modale si on est dans le /agenda -->
                     <% if (currentPath.includes("/agenda")) { %>
-                        <div class = "search-bar" id="searchBar">
-                            <input type="text" id="searchInput" placeholder="Rechercher un événement">
+                        <!-- Barre de recherche -->
+                        <div class="search-container search-bar">
+                            <input  type="text" id="eventSearch" class="form-control search-container search-bar" placeholder="Chercher un événement">
+                            <div id="searchResults" class="modal-container" style="display: none">
+                                <div id="searchResults" class="searc-result-content">
+                                    <ul id="eventList"></ul>
+                                    <p id="noResultsMessage" style="display: none;">Aucun événement trouvé.</p>
+                                </div>
+                            </div>
+                            <script type="module" src="/js/agenda/events/eventSearch.js"></script>
+                        </div>
+
+                        <div class="search-bar">
+                            <input type="text" id="filterInput" class="form-control" placeholder="Filtrer par nom">
                         </div>
 
                         <button class="icon-button" id="createAgendaOrEvent">
@@ -42,6 +58,24 @@
                             <button id="importAgenda">Importer un agenda</button>
                         </div>
                     <% } %>
+
+                    <!-- Dropdown pour les notifications -->
+                    <script type="module" src="/js/notifications/notifications.js"></script>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <!-- Badge pour le nombre de notifications -->
+                            <span class="position-absolute top-0 start-70 translate-middle badge rounded-pill bg-danger" id="notification-count" style="display: none">
+                                0
+                            </span>
+                        </a>
+                        <!-- Liste des notifications  avec le dataset-user-id pour les requêtes -->
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" id="notification-list">
+                            <!-- Liste des notifications -->
+                        </ul>
+                    </li>
+
+                    <!-- Dropdown pour le compte utilisateur -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <img class="d-inline-block align-text-top img-fluid rounded-circle" id="userIcon" width="30" src="/img/default_user_icon.jpg" alt="Logo" data-user-id="<%= locals.user.id %>">
@@ -50,12 +84,11 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item <%= currentPath === '/account' ? 'active' : '' %>" href="/account">Mon compte</a></li>
-                            <li><a class="dropdown-item <%= currentPath === '/agenda' ? 'active' : '' %>" href="/agenda">Mes agendas</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <script type="module" src="/js/account/logout.js"></script>
                                 <a id="logout_link" class="dropdown-item"  href="#">Déconnexion</a>
-                                <form id="logoutForm" action="/account/logout" method="POST" style="display: none;">
+                                <form id="logoutForm" action="/api/account/logout" method="POST" style="display: none;">
                                     <input type="hidden" name="_csrf" value="{{csrfToken}}">
                                 </form>
                             </li>
