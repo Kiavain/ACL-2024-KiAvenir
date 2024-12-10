@@ -158,14 +158,10 @@ export class AgendaController extends Controller {
    */
   updateAgenda(req, res) {
     const user = res.locals.user;
+
+    const { name, color, description } = req.body;
     if (!user) {
       return res.err(401, 'Vous devez être connecté pour accéder à cette page.');
-    }
-
-    // Vérifie les champs de l'agenda
-    const { name, color, description } = req.body;
-    if (!agenda) {
-      return res.err(404, 'Agenda non trouvé.');
     } else if (!name || name.trim() === '') {
       return res.err(400, "Le nom de l'agenda est requis.");
     } else if (color === '#FFFFFF') {
@@ -179,7 +175,9 @@ export class AgendaController extends Controller {
      * @type {Agenda}
      */
     const agenda = this.agendas.get(req.params.agendaId);
-    if (!agenda.verifyCanEdit(user.id)) {
+    if (!agenda) {
+      return res.err(404, 'Agenda non trouvé.');
+    } else if (!agenda.verifyCanEdit(user.id)) {
       return res.err(403, "Vous n'êtes pas autorisé à modifier cet agenda.");
     }
 
