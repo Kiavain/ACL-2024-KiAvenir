@@ -330,6 +330,9 @@ export const openModal = (eventData) => {
   let recurrence = eventData.extendedProps.recurrence ?? 5; // Si l'événement n'a pas de récurrence, il s'agit d'une récurrence personnalisée
 
   let unit = eventData.extendedProps.unit ?? recurrence;
+  if (unit === 4) {
+    unit = 0;
+  }
   let interval = eventData.extendedProps.interval ?? 1;
   recurrenceCustomSelect.value = unit;
   recurrenceCustomInterval.value = interval;
